@@ -21,6 +21,9 @@ module.exports = {
     'console': false,
     '$': false,
     'self': false,
-    'clients': false
+    'clients': false,
+    // project
+    'Notimatica': false,
+    'registeredActions': false
   }
 }

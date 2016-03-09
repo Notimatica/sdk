@@ -11,10 +11,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, '../dist'),
     publicPath: '/',
-    filename: '[name].js',
-    library: 'Notimatica',
-    libraryTarget: 'umd',
-    umdNamedDefine: true
+    filename: '[name].js'
   },
   resolve: {
     extensions: ['', '.js', '.css', '.scss'],
