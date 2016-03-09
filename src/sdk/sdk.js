@@ -38,7 +38,7 @@ const Notimatica = {
   },
 
   register: function () {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/js/sw.js')
       .then((registration) => {
         registration.addEventListener('updatefound', updateFound)
         return registration
@@ -47,9 +47,10 @@ const Notimatica = {
         return registration.pushManager.getSubscription()
           .then((subscription) => {
             if (subscription) {
+              log.debug('Already subscribed', subscription)
               return subscription
             }
-
+            log.debug('Subscribing', registration)
             return Notimatica.subscribe(registration)
           })
       })
