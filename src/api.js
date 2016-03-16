@@ -1,4 +1,4 @@
-import * as env from './env'
+import * as config from './config'
 import log from 'loglevel'
 
 export const apiCall = function (method, url, data, apiId) {
@@ -13,7 +13,7 @@ export const apiCall = function (method, url, data, apiId) {
     headers['Authorization'] = 'Notimatica apiId="' + apiId + '"'
   }
 
-  return fetch(env.API_URL + url, {
+  return fetch(config.api.base_url + url, {
       method,
       headers,
       body: JSON.stringify(data)
@@ -32,5 +32,5 @@ export const subscribe = function (apiId, endpoint) {
 }
 
 export const getPayload = function (endpoint) {
-  return apiCall('get', '/push/payload?endpoint=' + encodeURIComponent(endpoint))
+  return apiCall('get', '/notification/payload?endpoint=' + encodeURIComponent(endpoint))
 }

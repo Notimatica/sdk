@@ -1,5 +1,5 @@
 import * as utils from '../utils'
-import * as env from '../env'
+import * as config from '../config'
 import * as api from '../api'
 import log from 'loglevel'
 
@@ -32,7 +32,7 @@ const Notimatica = {
       .then((subscription) => {
         api.subscribe(Notimatica.options.apiId, subscription.endpoint)
           .catch((res) => {
-            console.log(res)
+            log.error(res)
           })
       })
   },
@@ -96,7 +96,7 @@ const updateFound = function () {
   // })
 }
 
-if (env.DEBUG) {
+if (config.debug) {
   log.setLevel(log.levels.TRACE)
 } else {
   log.setLevel(log.levels.ERROR)
