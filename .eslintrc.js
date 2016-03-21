@@ -24,6 +24,8 @@ module.exports = {
     'clients': false,
     // project
     'Notimatica': false,
-    'registeredActions': false
+    'registeredActions': false,
+    'swfobject': false,
+    'screen': false
   }
 }

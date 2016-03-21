@@ -34,10 +34,10 @@ app.get('/manifest.json', function (req, res) {
   res.send('{"name": "Notimatica.IO","gcm_sender_id": "639800134146"}');
 });
 
-app.listen(8080, function (err) {
+app.listen(8081, function (err) {
   if (err) {
     console.log(err)
     return
   }
-  console.log('Listening at http://localhost:8080')
+  console.log('Listening at http://localhost:8081')
 })

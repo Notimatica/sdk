@@ -1,6 +1,7 @@
-import * as utils from '../utils'
-import * as config from '../config'
 import * as api from '../api'
+import * as utils from '../utils'
+import config from '../config'
+import visitor from '../visitor'
 import log from 'loglevel'
 
 const Notimatica = {
@@ -30,7 +31,22 @@ const Notimatica = {
   subscribe: function (registration) {
     registration.pushManager.subscribe({ userVisibleOnly: true })
       .then((subscription) => {
-        api.subscribe(Notimatica.options.apiId, subscription.endpoint)
+        const data = {
+          endpoint: subscription.endpoint,
+          browser: visitor.browser,
+          browserVersion: visitor.browserMajorVersion,
+          cookies: visitor.cookies,
+          flash: visitor.flashVersion,
+          mobile: visitor.mobile,
+          os: visitor.os,
+          osVersion: visitor.osVersion,
+          screen: visitor.screen,
+          timezone: visitor.timezone,
+          language: visitor.language
+        }
+        log.debug('Subscribing user', data)
+        api.subscribe(Notimatica.options.apiId, data)
+          .then((data) => log.debug('Subscribed', data))
           .catch((res) => {
             log.error(res)
           })
@@ -38,7 +54,7 @@ const Notimatica = {
   },
 
   register: function () {
-    navigator.serviceWorker.register('/js/sw.js')
+    navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
         registration.addEventListener('updatefound', updateFound)
         return registration
@@ -50,7 +66,7 @@ const Notimatica = {
               log.debug('Already subscribed', subscription)
               return subscription
             }
-            log.debug('Subscribing', registration)
+
             return Notimatica.subscribe(registration)
           })
       })
