@@ -39,14 +39,17 @@ var ServiceWorker = {
           return api.getPayload(token)
             .then((res) => {
               console.log(res)
-              self.registration.showNotification(res.title, {
-                body: res.body,
-                icon: res.icon,
-                tag: res.tag,
+              self.registration.showNotification(res.payload.title, {
+                body: res.payload.body,
+                icon: res.payload.icon,
+                tag: res.payload.tag,
                 data: {
-                  url: res.url
+                  url: res.payload.url
                 }
               })
+            })
+            .cache((err) => {
+              console.log(err)
             })
         })
     )

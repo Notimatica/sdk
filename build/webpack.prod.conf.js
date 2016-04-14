@@ -5,7 +5,6 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 
 // naming output files with hashes for better caching.
 // dist/index.html will be auto-generated with correct URLs.
-config.output.filename = '[name].js'
 config.output.chunkFilename = '[id].js'
 
 // whether to generate source map for production files.
