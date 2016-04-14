@@ -26,7 +26,7 @@ var ServiceWorker = {
   onPushReceived: function (event) {
     console.log('Push message received', event)
 
-    event.waitUntil(
+    return event.waitUntil(
       self.registration.pushManager.getSubscription()
         .then((subscription) => {
           if (!subscription) {
@@ -39,7 +39,7 @@ var ServiceWorker = {
           return api.getPayload(token)
             .then((res) => {
               console.log(res)
-              self.registration.showNotification(res.payload.title, {
+              return self.registration.showNotification(res.payload.title, {
                 body: res.payload.body,
                 icon: res.payload.icon,
                 tag: res.payload.tag,
@@ -48,7 +48,7 @@ var ServiceWorker = {
                 }
               })
             })
-            .cache((err) => {
+            .catch((err) => {
               console.log(err)
             })
         })
