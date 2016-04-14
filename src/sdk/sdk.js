@@ -31,7 +31,7 @@ const Notimatica = {
   subscribe: function (registration) {
     registration.pushManager.subscribe({ userVisibleOnly: true })
       .then((subscription) => {
-        const data = {
+        let data = {
           endpoint: subscription.endpoint,
           browser: visitor.browser,
           browserVersion: visitor.browserMajorVersion,
@@ -44,6 +44,9 @@ const Notimatica = {
           timezone: visitor.timezone,
           language: visitor.language
         }
+
+        data.provider = utils.provider(data.browser)
+
         log.debug('Subscribing user', data)
         api.subscribe(Notimatica.options.apiId, data)
           .then((data) => log.debug('Subscribed', data))
@@ -54,7 +57,7 @@ const Notimatica = {
   },
 
   register: function () {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/notimatica-sw.js')
       .then((registration) => {
         registration.addEventListener('updatefound', updateFound)
         return registration
@@ -72,6 +75,11 @@ const Notimatica = {
       })
   },
 
+  /**
+   * Implement array's push method to handle push calls.
+   *
+   * @param  {Array} item Method call. [method_name, args...]
+   */
   push: function (item) {
     if (typeof item === 'function') {
       item()
@@ -81,6 +89,11 @@ const Notimatica = {
     }
   },
 
+  /**
+   * Handle already registered actions.
+   *
+   * @param  {Array} array History of calls
+   */
   _process_pushes: function (array) {
     for (var i = 0; i < array.length; i++) {
       Notimatica.push(array[i])

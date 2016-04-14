@@ -1,15 +1,5 @@
-export var array = []
-
-export var ExtendedObject = function () {
-  var obj = function (option) {
-    var options = option || {}
-    this.extend(options)
-  }
-
-  obj.prototype.extend = extend
-  obj.prototype.getProperty = getProperty
-
-  return obj
+export var provider = function (browser) {
+  return browser.toLowerCase()
 }
 
 export var extend = function (object) {

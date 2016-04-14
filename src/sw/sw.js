@@ -35,8 +35,10 @@ var ServiceWorker = {
 
           console.log(subscription)
 
-          return api.getPayload(subscription.endpoint)
+          const token = subscription.endpoint.replace(new RegExp('^(https://android.googleapis.com/gcm/send/|https://updates.push.services.mozilla.com/push/v1/)'), '')
+          return api.getPayload(token)
             .then((res) => {
+              console.log(res)
               self.registration.showNotification(res.title, {
                 body: res.body,
                 icon: res.icon,
@@ -57,20 +59,24 @@ var ServiceWorker = {
 
     event.notification.close()
 
-    event.waitUntil(
-      clients.matchAll({ type: 'window' })
-        .then((windowClients) => {
-          for (let i = 0; i < windowClients.length; i++) {
-            let client = windowClients[i]
-            if (client.url === url && 'focus' in client) {
-              return client.focus()
+    if (url) {
+      event.waitUntil(
+        clients.matchAll({ type: 'window' })
+          .then((windowClients) => {
+            for (let i = 0; i < windowClients.length; i++) {
+              let client = windowClients[i]
+
+              if (client.url === url && 'focus' in client) {
+                return client.focus()
+              }
             }
-          }
-          if (clients.openWindow) {
-            return clients.openWindow(url)
-          }
-        })
-    )
+
+            if (clients.openWindow) {
+              return clients.openWindow(url)
+            }
+          })
+      )
+    }
   }
 }
 
