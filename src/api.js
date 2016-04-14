@@ -2,8 +2,6 @@ import config from './config'
 import log from 'loglevel'
 
 export const apiCall = function (method, url, data, apiId) {
-  log.info('Api call', method, url, data, apiId || 'unauthorized')
-
   let headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json'
@@ -12,6 +10,8 @@ export const apiCall = function (method, url, data, apiId) {
   if (apiId !== undefined) {
     headers['Authorization'] = 'Notimatica id="' + apiId + '"'
   }
+
+  log.info('Api call', method, url, data, headers)
 
   return fetch(config.api.base_url + url, {
     method,
@@ -24,6 +24,9 @@ export const apiCall = function (method, url, data, apiId) {
       } else {
         return Promise.reject(response)
       }
+    })
+    .catch((err) => {
+      log.trace(err)
     })
 }
 
