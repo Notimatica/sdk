@@ -34,12 +34,12 @@ const Notimatica = {
         let data = {
           endpoint: subscription.endpoint,
           browser: visitor.browser,
-          browserVersion: visitor.browserMajorVersion,
+          browser_version: visitor.browserMajorVersion,
           cookies: visitor.cookies,
           flash: visitor.flashVersion,
           mobile: visitor.mobile,
           os: visitor.os,
-          osVersion: visitor.osVersion,
+          os_version: visitor.osVersion,
           screen: visitor.screen,
           timezone: visitor.timezone,
           language: visitor.language

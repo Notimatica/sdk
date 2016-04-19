@@ -1,4 +1,4 @@
-let unknown = null
+let unknown = false
 
 // screen
 let screenSize = ''
