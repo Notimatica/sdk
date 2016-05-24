@@ -1,20 +1,33 @@
-export var provider = function (browser) {
-  return browser.toLowerCase()
-}
+import {PROVIDERS_ENDPOINTS} from './defaults'
 
-export var extend = function (object) {
-  object = object || {}
+/**
+ * Make token from endpoint.
+ * @param {String} endpoint
+ * @param {String} provider
+ * @returns {String}
+ */
+export var makeToken = function (endpoint, provider) {
+  let urls = []
 
-  for (var i in object) {
-    if (object.hasOwnProperty(i)) {
-      this[i] = object[i]
+  if (provider !== undefined && PROVIDERS_ENDPOINTS[provider] !== undefined) {
+    urls.push(PROVIDERS_ENDPOINTS[provider])
+  } else {
+    for (let key in PROVIDERS_ENDPOINTS) {
+      if (PROVIDERS_ENDPOINTS.hasOwnProperty(key)) {
+        urls.push(PROVIDERS_ENDPOINTS[key])
+      }
     }
   }
+
+  return endpoint.replace(new RegExp('^(' + urls.join('|') + ')'), '')
 }
 
+/**
+ * Merge objects.
+ * @param {Object} target
+ * @param {Object} object
+ */
 export var merge = function (target, object) {
-  object = object || {}
-
   for (var i in object) {
     if (object.hasOwnProperty(i)) {
       target[i] = object[i]
@@ -22,6 +35,20 @@ export var merge = function (target, object) {
   }
 }
 
+/**
+ * Extend object.
+ * @param {Object} object
+ */
+export var extend = function (object) {
+  merge(this, object)
+}
+
+/**
+ * Get property recursively by 'foo.bar' syntax.
+ * @param {String} propertyName
+ * @param {Object} object
+ * @returns {*}
+ */
 export function getProperty (propertyName, object) {
   if (propertyName === undefined) {
     return object

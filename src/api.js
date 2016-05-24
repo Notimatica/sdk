@@ -1,19 +1,20 @@
-import config from './config'
 import log from 'loglevel'
+import { API_URL, POSTMAN_URL } from './defaults'
 
-export const apiCall = function (method, url, data, apiId) {
+const apiCall = function (source, method, url, data) {
   let headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json'
   }
 
-  if (apiId !== undefined) {
-    headers['Authorization'] = 'Notimatica id="' + apiId + '"'
+  let domains = {
+    api: API_URL,
+    postman: POSTMAN_URL
   }
 
-  log.info('Api call', method, url, data, headers)
+  log.info('Api call', method, url, data)
 
-  return fetch(config.api.base_url + url, {
+  return fetch(domains[source] + url, {
     method,
     headers,
     body: JSON.stringify(data)
@@ -30,10 +31,10 @@ export const apiCall = function (method, url, data, apiId) {
     })
 }
 
-export const subscribe = function (apiId, data) {
-  return apiCall('post', '/api/v1/projects/subscribe', data, apiId)
+export const subscribe = function (project, data) {
+  return apiCall('api', 'post', '/v1/projects/' + project + '/subscribers', data)
 }
 
-export const getPayload = function (endpoint) {
-  return apiCall('get', '/notification/payload?endpoint=' + encodeURIComponent(endpoint))
+export const getPayload = function (token) {
+  return apiCall('postman', 'get', '/v1/notifications/payload?token=' + encodeURIComponent(token))
 }

@@ -1,4 +1,5 @@
-import * as api from '../api'
+import { getPayload } from '../api'
+import { makeToken } from '../utils'
 
 var ServiceWorker = {
   _inited: false,
@@ -35,8 +36,8 @@ var ServiceWorker = {
 
           console.log(subscription)
 
-          const token = subscription.endpoint.replace(new RegExp('^(https://android.googleapis.com/gcm/send/|https://updates.push.services.mozilla.com/push/v1/)'), '')
-          return api.getPayload(token)
+          const token = makeToken(subscription.endpoint)
+          return getPayload(token)
             .then((res) => {
               console.log(res)
               return self.registration.showNotification(res.payload.title, {
