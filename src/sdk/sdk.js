@@ -2,13 +2,13 @@ import log from 'loglevel'
 import visitor from '../visitor'
 import { subscribe } from '../api'
 import { merge, makeToken } from '../utils'
-import { SDK_PATH, PROVIDER_CHROME, PROVIDER_FIREFOX, PROVIDER_SAFARI } from '../defaults'
+import { DEBUG, SDK_PATH, PROVIDER_CHROME, PROVIDER_FIREFOX, PROVIDER_SAFARI } from '../defaults'
 
 const Notimatica = {
   _inited: false,
   _provider: null,
   options: {
-    debug: false,
+    debug: DEBUG,
     sdkPath: SDK_PATH,
     project: null,
     autoSubscribe: true,

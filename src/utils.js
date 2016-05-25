@@ -1,4 +1,4 @@
-import {PROVIDERS_ENDPOINTS} from './defaults'
+import { PROVIDERS_ENDPOINTS } from './defaults'
 
 /**
  * Make token from endpoint.

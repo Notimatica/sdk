@@ -12,7 +12,7 @@ const apiCall = function (source, method, url, data) {
     postman: POSTMAN_URL
   }
 
-  log.info('Api call', method, url, data)
+  log.debug('Api call', method, url, data)
 
   return fetch(domains[source] + url, {
     method,
@@ -27,7 +27,7 @@ const apiCall = function (source, method, url, data) {
       }
     })
     .catch((err) => {
-      log.trace(err)
+      log.debug(err)
     })
 }
 

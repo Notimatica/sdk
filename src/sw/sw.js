@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { getPayload } from '../api'
 import { makeToken } from '../utils'
 
@@ -12,20 +13,20 @@ var ServiceWorker = {
 
     ServiceWorker._inited = true
 
-    console.log('ServiceWorker inited')
+    log.debug('ServiceWorker inited')
   },
 
   onInstalled: function (event) {
     self.skipWaiting()
-    console.log('Installed', event)
+    log.debug('Installed', event)
   },
 
   onActivated: function (event) {
-    console.log('Activated', event)
+    log.debug('Activated', event)
   },
 
   onPushReceived: function (event) {
-    console.log('Push message received', event)
+    log.debug('Push message received', event)
 
     return event.waitUntil(
       self.registration.pushManager.getSubscription()
@@ -34,12 +35,12 @@ var ServiceWorker = {
             return
           }
 
-          console.log(subscription)
+          log.debug(subscription)
 
           const token = makeToken(subscription.endpoint)
           return getPayload(token)
             .then((res) => {
-              console.log(res)
+              log.debug(res)
               return self.registration.showNotification(res.payload.title, {
                 body: res.payload.body,
                 icon: res.payload.icon,
@@ -50,14 +51,14 @@ var ServiceWorker = {
               })
             })
             .catch((err) => {
-              console.log(err)
+              log.debug(err)
             })
         })
     )
   },
 
   onNotificationClicked: function (event) {
-    console.log('Notification click: tag ', event.notification.tag)
+    log.debug('Notification click: tag ', event.notification.tag)
 
     const url = event.notification.data.url
 
