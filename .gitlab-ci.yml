@@ -14,7 +14,7 @@ build:
   stage: build
   script:
     - npm install
-    - ./bin/build
+    - npm run build
   artifacts:
     paths:
       - dist/notimatica-sdk/
