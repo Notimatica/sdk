@@ -9,7 +9,7 @@ module.exports = {
     sw: './src/sw/entry.js'
   },
   output: {
-    path: path.resolve(__dirname, '../dist'),
+    path: path.resolve(__dirname, '../dist/'),
     filename: 'notimatica-sdk/[name].js'
   },
   resolve: {
