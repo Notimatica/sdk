@@ -1,4 +1,3 @@
-import log from 'loglevel'
 import { API_URL, POSTMAN_URL } from './defaults'
 
 const apiCall = function (source, method, url, data) {
@@ -12,7 +11,7 @@ const apiCall = function (source, method, url, data) {
     postman: POSTMAN_URL
   }
 
-  log.debug('Api call', method, url, data)
+  console.log('Api call', method, url, data)
 
   return fetch(domains[source] + url, {
     method,
@@ -21,13 +20,13 @@ const apiCall = function (source, method, url, data) {
   })
     .then((response) => {
       if (response.status >= 200 && response.status < 300) {
-        return response.json()
+        return response.status !== 204 ? response.json() : response.text()
       } else {
         return Promise.reject(response)
       }
     })
     .catch((err) => {
-      log.debug(err)
+      console.log(err)
     })
 }
 

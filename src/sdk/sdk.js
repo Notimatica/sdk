@@ -103,16 +103,14 @@ const Notimatica = {
     return Notimatica._provider.ready()
       .then(() => Notimatica._provider.subscribe())
       .then(({ existed, result }) => {
-        if (!existed) {
-          return result.then((subscription) => {
-            Notimatica._register(subscription)
-            return subscription
-          })
-        }
+        if (existed) return result
 
-        return result
+        return result.then((subscription) => Notimatica._register(subscription))
       })
-      .then((subscription) => log.debug('Retrieved subscription', subscription))
+      .then((subscription) => {
+        Notimatica._subscribed = true
+        log.debug('Retrieved subscription', subscription)
+      })
       .catch((err) => log.trace(err))
   },
 
@@ -120,7 +118,7 @@ const Notimatica = {
    * Subscribe to notifications.
    *
    * @param   {Object} subscription
-   * @returns {Promise}
+   * @returns {Object}
    */
   _register: function (subscription) {
     let data = {
@@ -139,9 +137,11 @@ const Notimatica = {
     }
 
     log.debug('Subscribing user', data)
-    return subscribe(Notimatica.options.project, data)
+    subscribe(Notimatica.options.project, data)
       .then((data) => log.debug('Subscribed', data))
       .catch((res) => log.error(res))
+
+    return subscription
   },
 
   /**
@@ -157,17 +157,21 @@ const Notimatica = {
   /**
    * Delete subscription from notimatica.
    *
-   * @param  {Object} subscription Subscription object
+   * @param  {Object|null} subscription Subscription object
    * @return {Promise}
    */
   _unregister: function (subscription) {
+    if (!subscription) return
+
     const data = {
       token: makeToken(subscription.endpoint, Notimatica._provider)
     }
 
+    Notimatica._subscribed = false
+
     log.debug('Unsubscribing user', data)
     return unsubscribe(Notimatica.options.project, data)
-      .then((data) => log.debug('Unsubscribed', data))
+      .then(() => log.debug('Unsubscribed'))
       .catch((res) => log.error(res))
   },
 

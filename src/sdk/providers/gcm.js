@@ -71,7 +71,7 @@ const provider = class Gcm extends AbstractProvider {
   unsubscribe () {
     return this.getSubscription()
       .then((subscription) => {
-        subscription.unsubscribe()
+        if (subscription) subscription.unsubscribe()
         return subscription
       })
   }
