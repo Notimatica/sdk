@@ -1,7 +1,7 @@
 import log from 'loglevel'
 import visitor from '../visitor'
 import { subscribe, unsubscribe } from '../api'
-import { merge, makeToken } from '../utils'
+import { merge, makeToken, isHttps } from '../utils'
 import { DEBUG, PROVIDER_CHROME, PROVIDER_FIREFOX, PROVIDER_SAFARI, PROVIDER_UNKNOWN } from '../defaults'
 
 const Notimatica = {
@@ -20,7 +20,7 @@ const Notimatica = {
    *
    * @param {Object} options
    */
-  init: function (options) {
+  init (options) {
     if (Notimatica._inited) return log.warn('Notimatica SDK was already inited.')
 
     options = options || {}
@@ -31,7 +31,7 @@ const Notimatica = {
     if (Notimatica.options.debug) {
       log.setLevel(log.levels.TRACE)
     } else {
-      log.setLevel(log.levels.ERROR)
+      log.setLevel(log.levels.WARN)
     }
 
     Notimatica._provider = Notimatica.detectProvider()
@@ -46,7 +46,7 @@ const Notimatica = {
   /**
    * SDK inited.
    */
-  inited: function () {
+  inited () {
     Notimatica._inited = true
     log.info('Notimatica SDK inited with', Notimatica.options)
   },
@@ -55,7 +55,7 @@ const Notimatica = {
    * If automatic subscription allowed.
    * @returns {Boolean}
    */
-  autoSubscribe: function () {
+  autoSubscribe () {
     return Notimatica.options.autoSubscribe && Notimatica.options.subdomain === null
   },
 
@@ -64,7 +64,7 @@ const Notimatica = {
    *
    * @returns {String|null}
    */
-  detectProvider: function () {
+  detectProvider () {
     let provider
     switch (visitor.browser) {
       case 'Chrome':
@@ -90,8 +90,21 @@ const Notimatica = {
    *
    * @returns {Boolean}
    */
-  pushSupported: function () {
+  pushSupported () {
+    if (!isHttps() && !Notimatica.options.subdomain) {
+      Notimatica._httpUnsupported()
+      return false
+    }
+
     return Notimatica._provider.pushSupported()
+  },
+
+  /**
+   * Http unsupported message.
+   */
+  _httpUnsupported () {
+    log.warn('Push messages can only be used on fully https sites.')
+    log.warn('To make them work for you, change project options in the admin panel and retrieve your private subdomain.')
   },
 
   /**
@@ -99,7 +112,22 @@ const Notimatica = {
    *
    * @return {Promise}
    */
-  subscribe: function () {
+  subscribe () {
+    if (isHttps()) {
+      return Notimatica._subscribeHttps()
+    } else if (!isHttps() && Notimatica.options.subdomain) {
+      return Notimatica._subscribeHttp()
+    } else {
+      Notimatica._httpUnsupported()
+    }
+  },
+
+  /**
+   * Subscribe for https sites via native sdk.
+   *
+   * @return {Promise}
+   */
+  _subscribeHttps () {
     return Notimatica._provider.ready()
       .then(() => Notimatica._provider.subscribe())
       .then(({ existed, result }) => {
@@ -115,12 +143,22 @@ const Notimatica = {
   },
 
   /**
+   * Subscribe for http sites via popup.
+   *
+   * @return {Promise}
+   */
+  _subscribeHttp () {
+    const href = `https://${Notimatica.options.subdomain}.notimatica.io`
+    window.open(href, 'notimatica', 'width=500,height=500')
+  },
+
+  /**
    * Subscribe to notifications.
    *
    * @param   {Object} subscription
    * @returns {Object}
    */
-  _register: function (subscription) {
+  _register (subscription) {
     let data = {
       provider: Notimatica._provider.name,
       token: makeToken(subscription.endpoint, Notimatica._provider),
@@ -149,7 +187,7 @@ const Notimatica = {
    *
    * @returns {Promise}
    */
-  unsubscribe: function () {
+  unsubscribe () {
     return Notimatica._provider.unsubscribe()
       .then((subscription) => Notimatica._unregister(subscription))
   },
@@ -160,7 +198,7 @@ const Notimatica = {
    * @param  {Object|null} subscription Subscription object
    * @return {Promise}
    */
-  _unregister: function (subscription) {
+  _unregister (subscription) {
     if (!subscription) return
 
     const data = {
@@ -180,7 +218,7 @@ const Notimatica = {
    *
    * @return {Boolean}
    */
-  isSubscribed: function () {
+  isSubscribed () {
     return Notimatica._subscribed
   },
 
@@ -189,7 +227,7 @@ const Notimatica = {
    *
    * @return {Boolean}
    */
-  isUnsubscribed: function () {
+  isUnsubscribed () {
     return !Notimatica._subscribed
   },
 
@@ -198,11 +236,11 @@ const Notimatica = {
    *
    * @param  {Array|Function} item Method call. [method_name, args...]
    */
-  push: function (item) {
+  push (item) {
     if (typeof item === 'function') {
       item()
     } else {
-      var functionName = item.shift()
+      const functionName = item.shift()
       Notimatica[functionName].apply(null, item)
     }
   },
@@ -212,8 +250,8 @@ const Notimatica = {
    *
    * @param  {Array} array History of calls
    */
-  _process_pushes: function (array) {
-    for (var i = 0; i < array.length; i++) {
+  _process_pushes (array) {
+    for (let i = 0; i < array.length; i++) {
       Notimatica.push(array[i])
     }
   }

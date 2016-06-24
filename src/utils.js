@@ -67,3 +67,12 @@ export function getProperty (propertyName, object) {
 
   return property
 }
+
+/**
+ * If site is under https.
+ *
+ * @return {Boolean}
+ */
+export function isHttps () {
+  return window.location.protocol === 'https:'
+}
