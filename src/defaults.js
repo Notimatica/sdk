@@ -8,6 +8,7 @@ export const ENV_SW = 'sw'
 export const PROVIDER_CHROME = 'chrome'
 export const PROVIDER_FIREFOX = 'firefox'
 export const PROVIDER_SAFARI = 'safari'
+export const PROVIDER_UNKNOWN = 'unknown'
 
 export const PROVIDERS_ENDPOINTS = {
   [PROVIDER_CHROME]: 'https://android.googleapis.com/gcm/send/',
@@ -16,5 +17,4 @@ export const PROVIDERS_ENDPOINTS = {
 
 export const API_URL = 'https://api.notimatica.io'
 export const POSTMAN_URL = 'https://postman.notimatica.io'
-export const SDK_PATH = '/notimatica-sdk'
 export const AUTOSUBSCRIBE = true

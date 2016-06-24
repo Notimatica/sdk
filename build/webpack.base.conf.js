@@ -10,7 +10,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, '../dist/'),
-    filename: 'notimatica-sdk/[name].js'
+    filename: 'notimatica-[name].js'
   },
   resolve: {
     extensions: ['', '.js', '.css', '.scss'],

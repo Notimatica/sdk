@@ -35,6 +35,10 @@ export const subscribe = function (project, data) {
   return apiCall('api', 'post', '/v1/projects/' + project + '/subscribers', data)
 }
 
+export const unsubscribe = function (project, data) {
+  return apiCall('api', 'delete', '/v1/projects/' + project + '/subscribers', data)
+}
+
 export const getPayload = function (token) {
   return apiCall('postman', 'get', '/v1/notifications/payload?token=' + encodeURIComponent(token))
 }

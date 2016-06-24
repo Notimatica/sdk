@@ -1,32 +1,35 @@
-import log from 'loglevel'
 import { getPayload } from '../api'
 import { makeToken } from '../utils'
 
-var ServiceWorker = {
+var NotimaticaServiceWorker = {
   _inited: false,
 
   init: function () {
-    self.addEventListener('install', ServiceWorker.onInstalled)
-    self.addEventListener('activate', ServiceWorker.onActivated)
-    self.addEventListener('push', ServiceWorker.onPushReceived)
-    self.addEventListener('notificationclick', ServiceWorker.onNotificationClicked)
+    if (!NotimaticaServiceWorker._inited) {
+      self.addEventListener('install', NotimaticaServiceWorker.onInstalled)
+      self.addEventListener('activate', NotimaticaServiceWorker.onActivated)
+      self.addEventListener('push', NotimaticaServiceWorker.onPushReceived)
+      self.addEventListener('notificationclick', NotimaticaServiceWorker.onNotificationClicked)
 
-    ServiceWorker._inited = true
+      NotimaticaServiceWorker._inited = true
+    }
 
-    log.debug('ServiceWorker inited')
+    console.log('Notimatica ServiceWorker inited')
+
+    return NotimaticaServiceWorker
   },
 
   onInstalled: function (event) {
     self.skipWaiting()
-    log.debug('Installed', event)
+    console.log('Installed', event)
   },
 
   onActivated: function (event) {
-    log.debug('Activated', event)
+    console.log('Activated', event)
   },
 
   onPushReceived: function (event) {
-    log.debug('Push message received', event)
+    console.log('Push message received', event)
 
     return event.waitUntil(
       self.registration.pushManager.getSubscription()
@@ -35,12 +38,12 @@ var ServiceWorker = {
             return
           }
 
-          log.debug(subscription)
+          console.log(subscription)
 
           const token = makeToken(subscription.endpoint)
           return getPayload(token)
             .then((res) => {
-              log.debug(res)
+              console.log(res)
               return self.registration.showNotification(res.payload.title, {
                 body: res.payload.body,
                 icon: res.payload.icon,
@@ -51,14 +54,14 @@ var ServiceWorker = {
               })
             })
             .catch((err) => {
-              log.debug(err)
+              console.log(err)
             })
         })
     )
   },
 
   onNotificationClicked: function (event) {
-    log.debug('Notification click: tag ', event.notification.tag)
+    console.log('Notification click: tag ', event.notification.tag)
 
     const url = event.notification.data.url
 
@@ -85,4 +88,4 @@ var ServiceWorker = {
   }
 }
 
-ServiceWorker.init()
+module.exports = NotimaticaServiceWorker.init()
