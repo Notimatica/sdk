@@ -1,4 +1,5 @@
 import log from 'loglevel'
+import events from 'minivents'
 import visitor from '../visitor'
 import { subscribe, unsubscribe } from '../api'
 import { merge, makeToken, isHttps } from '../utils'
@@ -11,8 +12,7 @@ const Notimatica = {
   options: {
     debug: DEBUG,
     project: null,
-    autoSubscribe: true,
-    subdomain: null
+    autoSubscribe: true
   },
 
   /**
@@ -26,21 +26,21 @@ const Notimatica = {
     options = options || {}
     merge(Notimatica.options, options)
 
-    if (Notimatica.options.project === null) return log.error('Project ID is absent.')
-
     if (Notimatica.options.debug) {
       log.setLevel(log.levels.TRACE)
     } else {
       log.setLevel(log.levels.WARN)
     }
 
-    Notimatica._provider = Notimatica.detectProvider()
+    if (Notimatica.options.project === null) return log.error('Project ID is absent.')
+
+    Notimatica.detectProvider()
+
+    Notimatica.inited()
 
     if (Notimatica.pushSupported() && Notimatica.autoSubscribe()) {
       Notimatica.subscribe()
     }
-
-    Notimatica.inited()
   },
 
   /**
@@ -48,6 +48,7 @@ const Notimatica = {
    */
   inited () {
     Notimatica._inited = true
+    Notimatica.emit('notimatica:init')
     log.info('Notimatica SDK inited with', Notimatica.options)
   },
 
@@ -82,7 +83,7 @@ const Notimatica = {
     }
 
     const Provider = require('./providers/' + provider)
-    return new Provider(Notimatica.options)
+    Notimatica._provider = new Provider(Notimatica.options)
   },
 
   /**
@@ -91,20 +92,7 @@ const Notimatica = {
    * @returns {Boolean}
    */
   pushSupported () {
-    if (!isHttps() && !Notimatica.options.subdomain) {
-      Notimatica._httpUnsupported()
-      return false
-    }
-
     return Notimatica._provider.pushSupported()
-  },
-
-  /**
-   * Http unsupported message.
-   */
-  _httpUnsupported () {
-    log.warn('Push messages can only be used on fully https sites.')
-    log.warn('To make them work for you, change project options in the admin panel and retrieve your private subdomain.')
   },
 
   /**
@@ -113,13 +101,11 @@ const Notimatica = {
    * @return {Promise}
    */
   subscribe () {
-    if (isHttps()) {
-      return Notimatica._subscribeHttps()
-    } else if (!isHttps() && Notimatica.options.subdomain) {
-      return Notimatica._subscribeHttp()
-    } else {
-      Notimatica._httpUnsupported()
-    }
+    return new Promise(function (resolve, reject) {
+      return isHttps() ? Notimatica._subscribeHttps() : Notimatica._subscribeHttp()
+    })
+      .then(() => Notimatica.emit('notimatica:subscribe:success'))
+      .catch(() => Notimatica.emit('notimatica:subscribe:fail'))
   },
 
   /**
@@ -148,7 +134,7 @@ const Notimatica = {
    * @return {Promise}
    */
   _subscribeHttp () {
-    const href = `https://${Notimatica.options.subdomain}.notimatica.io`
+    const href = `https://notimatica.io/subscribe/${Notimatica.options.project}.`
     window.open(href, 'notimatica', 'width=500,height=500')
   },
 
@@ -190,6 +176,8 @@ const Notimatica = {
   unsubscribe () {
     return Notimatica._provider.unsubscribe()
       .then((subscription) => Notimatica._unregister(subscription))
+      .then(() => Notimatica.emit('notimatica:unsubscribe:success'))
+      .catch(() => Notimatica.emit('notimatica:unsubscribe:fail'))
   },
 
   /**
@@ -250,11 +238,13 @@ const Notimatica = {
    *
    * @param  {Array} array History of calls
    */
-  _process_pushes (array) {
+  _processRegisteredActions (array) {
     for (let i = 0; i < array.length; i++) {
       Notimatica.push(array[i])
     }
   }
 }
+
+events(Notimatica)
 
 module.exports = Notimatica

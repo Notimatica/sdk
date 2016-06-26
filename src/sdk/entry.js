@@ -3,13 +3,11 @@
 /**
  * Let sdk be loaded async via [].push method
  */
-
+let registeredActions = []
 if (typeof Notimatica !== 'undefined') {
-  const registeredActions = Notimatica
+  registeredActions = Notimatica
 }
 
 require('expose?Notimatica!./sdk.js')
 
-if (typeof registeredActions !== 'undefined') {
-  Notimatica._processRegisteredActions(registeredActions)
-}
+Notimatica._processRegisteredActions(registeredActions)
