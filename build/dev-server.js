@@ -29,10 +29,7 @@ app.use(devMiddleware)
 // enable hot-reload and state-preserving
 // compilation error display
 app.use(hotMiddleware)
-
-app.get('/manifest.json', function (req, res) {
-  res.send('{"name": "Notimatica.IO","gcm_sender_id": "639800134146"}');
-});
+app.use(express.static('./examples'))
 
 app.listen(8081, function (err) {
   if (err) {

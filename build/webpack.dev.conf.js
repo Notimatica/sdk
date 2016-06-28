@@ -1,3 +1,4 @@
+var path = require('path')
 var webpack = require('webpack')
 var config = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')

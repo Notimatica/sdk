@@ -74,5 +74,5 @@ export function getProperty (propertyName, object) {
  * @return {Boolean}
  */
 export function isHttps () {
-  return window.location.protocol === 'https:'
+  return window.location.protocol === 'https:' || window.location.hostname === 'localhost'
 }

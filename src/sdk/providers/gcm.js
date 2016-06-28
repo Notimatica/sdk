@@ -26,19 +26,12 @@ const provider = class Gcm extends AbstractProvider {
    */
   ready () {
     return navigator.serviceWorker.register('notimatica-sw.js')
-      .then(() => navigator.serviceWorker.ready)
+      .then(navigator.serviceWorker.ready)
       .then((registration) => {
         this.registration = registration
-      })
-  }
 
-  /**
-   * Get active subscription.
-   *
-   * @return {Promise}
-   */
-  getSubscription () {
-    return this.registration.pushManager.getSubscription()
+        return this.registration.pushManager.getSubscription()
+      })
   }
 
   /**
@@ -47,19 +40,9 @@ const provider = class Gcm extends AbstractProvider {
    * @return {Promise}
    */
   subscribe () {
-    return this.getSubscription()
-      .then((subscription) => {
-        if (!subscription) {
-          return {
-            existed: false,
-            result: this.registration.pushManager.subscribe({ userVisibleOnly: true })
-          }
-        }
-
-        return {
-          existed: true,
-          result: subscription
-        }
+    return this.ready()
+      .then(() => {
+        return this.registration.pushManager.subscribe({ userVisibleOnly: true })
       })
   }
 
@@ -69,9 +52,10 @@ const provider = class Gcm extends AbstractProvider {
    * @returns {Promise}
    */
   unsubscribe () {
-    return this.getSubscription()
+    return this.ready()
       .then((subscription) => {
         if (subscription) subscription.unsubscribe()
+
         return subscription
       })
   }

@@ -17,4 +17,11 @@ export const PROVIDERS_ENDPOINTS = {
 
 export const API_URL = 'https://api.notimatica.io'
 export const POSTMAN_URL = 'https://postman.notimatica.io'
+export const POPUP_URL = 'https://notimatica.io/subscribe'
+
+export const POPUP_HEIGHT = 450
+export const POPUP_WIGHT = 450
+
 export const AUTOSUBSCRIBE = true
+export const TOKEN_STORAGE_NAME = 'notimatica_token'
+export const UNSUBSCRIBED_STORAGE_NAME = 'notimatica_unsubscribed'

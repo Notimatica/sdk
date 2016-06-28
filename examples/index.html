@@ -22,19 +22,6 @@
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
   <script src="/notimatica-sdk.js" async></script>
-  <script>
-    var Notimatica = Notimatica || [];
-    Notimatica.push(['on', 'notimatica:init', function () {
-      console.log('event: inited')
-    }]);
-    Notimatica.push(['on', 'notimatica:subscribe:success', function () {
-      console.log('event: subscribed')
-    }]);
-    Notimatica.push(['init', {
-      project: '08823593-135f-5576-9a91-f3a0675aa1d2',
-      debug: true
-    }]);
-  </script>
 </head>
 <body>
   <div class="container">
@@ -51,8 +38,8 @@
             Test page for testing Notimatica service
           </div>
           <div class="panel-footer">
-            <a href="#" onclick="Notimatica.subscribe()">Subscribe</a>
-            <a href="#" onclick="Notimatica.unsubscribe()">Unsubscribe</a>
+            <a href="#" class="subscribe_link hidden" onclick="Notimatica.subscribe()">Subscribe</a>
+            <a href="#" class="unsubscribe_link hidden" onclick="Notimatica.unsubscribe()">Unsubscribe</a>
           </div>
         </div>
       </div>
@@ -62,5 +49,6 @@
   <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="/index.js"></script>
 </body>
 </html>

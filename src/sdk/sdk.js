@@ -1,6 +1,7 @@
 import log from 'loglevel'
 import events from 'minivents'
-import visitor from '../visitor'
+import Visitor from '../visitor'
+import Popup from '../popup'
 import { subscribe, unsubscribe } from '../api'
 import { merge, makeToken, isHttps } from '../utils'
 import { DEBUG, PROVIDER_CHROME, PROVIDER_FIREFOX, PROVIDER_SAFARI, PROVIDER_UNKNOWN } from '../defaults'
@@ -8,11 +9,14 @@ import { DEBUG, PROVIDER_CHROME, PROVIDER_FIREFOX, PROVIDER_SAFARI, PROVIDER_UNK
 const Notimatica = {
   _inited: false,
   _provider: null,
+  _visitor: null,
   _subscribed: false,
+  _popup: null,
   options: {
     debug: DEBUG,
     project: null,
-    autoSubscribe: true
+    autoSubscribe: true,
+    usePopup: false
   },
 
   /**
@@ -23,8 +27,7 @@ const Notimatica = {
   init (options) {
     if (Notimatica._inited) return log.warn('Notimatica SDK was already inited.')
 
-    options = options || {}
-    merge(Notimatica.options, options)
+    merge(Notimatica.options, options || {})
 
     if (Notimatica.options.debug) {
       log.setLevel(log.levels.TRACE)
@@ -34,40 +37,89 @@ const Notimatica = {
 
     if (Notimatica.options.project === null) return log.error('Project ID is absent.')
 
-    Notimatica.detectProvider()
+    Notimatica._prepareVisitor()
+    Notimatica._preparePopup(Notimatica._visitor)
+    Notimatica._prepareProvider()
 
-    Notimatica.inited()
-
-    if (Notimatica.pushSupported() && Notimatica.autoSubscribe()) {
-      Notimatica.subscribe()
+    if (Notimatica.pushSupported() && !Notimatica._usePopup()) {
+      Notimatica._provider.ready()
+        .then((subscription) => {
+          Notimatica._ready(subscription)
+            .then((wasUnsibscribed) => {
+              if (Notimatica._autoSubscribe() && Notimatica.isUnsubscribed() && !wasUnsibscribed) {
+                Notimatica.subscribe()
+              }
+            })
+        })
+    } else {
+      Notimatica._popup.ready()
+        .then((subscription) => {
+          Notimatica._ready(subscription)
+        })
     }
   },
 
   /**
-   * SDK inited.
+   * SDK is ready.
+   *
+   * @param  {Object|Null} subscription Subscription
    */
-  inited () {
+  _ready (subscription) {
+    Notimatica._subscribed = subscription !== null
     Notimatica._inited = true
-    Notimatica.emit('notimatica:init')
+    Notimatica.emit('ready')
     log.info('Notimatica SDK inited with', Notimatica.options)
+
+    return Notimatica._visitor.wasUnsubscribed()
   },
 
   /**
    * If automatic subscription allowed.
+   *
    * @returns {Boolean}
    */
-  autoSubscribe () {
-    return Notimatica.options.autoSubscribe && Notimatica.options.subdomain === null
+  _autoSubscribe () {
+    return Notimatica.options.autoSubscribe
+  },
+
+  /**
+   * Prepare visitor.
+   */
+  _prepareVisitor () {
+    Notimatica._visitor = new Visitor()
+  },
+
+  /**
+   * Prepare popup.
+   *
+   * @param  {Object} visitor The visitor object.
+   */
+  _preparePopup (visitor) {
+    Notimatica._popup = new Popup(visitor)
+
+    Notimatica.on('popup:subscribed', (data) => {
+      Notimatica._visitor.token(data.token)
+        .then(() => {
+          Notimatica._subscribed = true
+          Notimatica.emit('subscribe:success', data.token)
+        })
+    })
+
+    Notimatica.on('popup:unsubscribed', () => {
+      Notimatica._visitor.token(null)
+        .then(() => {
+          Notimatica._subscribed = false
+          Notimatica.emit('unsubscribe:success')
+        })
+    })
   },
 
   /**
    * Detect provider from browser.
-   *
-   * @returns {String|null}
    */
-  detectProvider () {
+  _prepareProvider () {
     let provider
-    switch (visitor.browser) {
+    switch (Notimatica._visitor.browser) {
       case 'Chrome':
         provider = PROVIDER_CHROME
         break
@@ -97,45 +149,64 @@ const Notimatica = {
 
   /**
    * Register service worker.
-   *
-   * @return {Promise}
    */
   subscribe () {
-    return new Promise(function (resolve, reject) {
-      return isHttps() ? Notimatica._subscribeHttps() : Notimatica._subscribeHttp()
-    })
-      .then(() => Notimatica.emit('notimatica:subscribe:success'))
-      .catch(() => Notimatica.emit('notimatica:subscribe:fail'))
+    if (!Notimatica.pushSupported()) {
+      Notimatica.emit('subscribe:fail', 'Web push unsupported by browser.')
+      return
+    }
+
+    if (Notimatica.isSubscribed()) {
+      Notimatica._visitor.token()
+        .then((token) => Notimatica.emit('subscribe:success', token))
+      return
+    }
+
+    Notimatica._usePopup() ? Notimatica._subscribeViaPopup() : Notimatica._subscribeViaNative()
   },
 
   /**
-   * Subscribe for https sites via native sdk.
+   * Use popup or native subscription process.
+   *
+   * @return {Boolean}
+   */
+  _usePopup () {
+    return !isHttps() || Notimatica.options.usePopup
+  },
+
+  /**
+   * Subscribe for https sites using native sdk.
    *
    * @return {Promise}
    */
-  _subscribeHttps () {
-    return Notimatica._provider.ready()
-      .then(() => Notimatica._provider.subscribe())
-      .then(({ existed, result }) => {
-        if (existed) return result
+  _subscribeViaNative () {
+    Notimatica.emit('subscribe:start')
 
-        return result.then((subscription) => Notimatica._register(subscription))
-      })
+    return Notimatica._provider.subscribe()
+      .then((subscription) => Notimatica._register(subscription))
       .then((subscription) => {
         Notimatica._subscribed = true
-        log.debug('Retrieved subscription', subscription)
+
+        Notimatica._visitor.unsubscribe(null)
+          .then(() => Notimatica._visitor.token())
+          .then((token) => {
+            Notimatica.emit('subscribe:success', token)
+            log.debug('Retrieved subscription', subscription)
+          })
       })
-      .catch((err) => log.trace(err))
+      .catch((err) => {
+        log.trace(err)
+        Notimatica.emit('subscribe:fail', err)
+      })
   },
 
   /**
-   * Subscribe for http sites via popup.
+   * Subscribe for http sites using Notimatica popup.
    *
    * @return {Promise}
    */
-  _subscribeHttp () {
-    const href = `https://notimatica.io/subscribe/${Notimatica.options.project}.`
-    window.open(href, 'notimatica', 'width=500,height=500')
+  _subscribeViaPopup () {
+    Notimatica._popup.open(Notimatica.options.project)
   },
 
   /**
@@ -145,7 +216,8 @@ const Notimatica = {
    * @returns {Object}
    */
   _register (subscription) {
-    let data = {
+    const visitor = Notimatica._visitor.info
+    const data = {
       provider: Notimatica._provider.name,
       token: makeToken(subscription.endpoint, Notimatica._provider),
       browser: visitor.browser,
@@ -161,11 +233,14 @@ const Notimatica = {
     }
 
     log.debug('Subscribing user', data)
-    subscribe(Notimatica.options.project, data)
-      .then((data) => log.debug('Subscribed', data))
-      .catch((res) => log.error(res))
+    return subscribe(Notimatica.options.project, data)
+      .then((data) => {
+        Notimatica._visitor.token(data.subscriber.token)
+          .then(() => log.debug('Subscribed', data))
 
-    return subscription
+        return subscription
+      })
+      .catch((err) => log.error(err))
   },
 
   /**
@@ -174,10 +249,38 @@ const Notimatica = {
    * @returns {Promise}
    */
   unsubscribe () {
+    if (Notimatica.isUnsubscribed()) {
+      Notimatica.emit('unsubscribe:success')
+      return
+    }
+
+    (Notimatica._usePopup() ? Notimatica._unsubscribeViaPopup() : Notimatica._unsubscribeViaNative())
+  },
+
+  /**
+   * Unsubscribe via native.
+   *
+   * @return {Promise}
+   */
+  _unsubscribeViaNative () {
     return Notimatica._provider.unsubscribe()
-      .then((subscription) => Notimatica._unregister(subscription))
-      .then(() => Notimatica.emit('notimatica:unsubscribe:success'))
-      .catch(() => Notimatica.emit('notimatica:unsubscribe:fail'))
+      .then((subscription) => Notimatica._unregister(subscription.endpoint))
+      .then(() => {
+        Notimatica._subscribed = false
+        Notimatica._visitor.token(null)
+        Notimatica._visitor.unsubscribe()
+      })
+      .then(() => Notimatica.emit('unsubscribe:success'))
+      .catch((err) => Notimatica.emit('unsubscribe:fail', err))
+  },
+
+  /**
+   * Unsubscribe via popup.
+   *
+   * @return {Promise}
+   */
+  _unsubscribeViaPopup () {
+    return Notimatica._popup.open(Notimatica.options.project)
   },
 
   /**
@@ -187,18 +290,17 @@ const Notimatica = {
    * @return {Promise}
    */
   _unregister (subscription) {
+    console.log(subscription)
     if (!subscription) return
 
     const data = {
-      token: makeToken(subscription.endpoint, Notimatica._provider)
+      token: makeToken(subscription, Notimatica._provider)
     }
-
-    Notimatica._subscribed = false
 
     log.debug('Unsubscribing user', data)
     return unsubscribe(Notimatica.options.project, data)
       .then(() => log.debug('Unsubscribed'))
-      .catch((res) => log.error(res))
+      .catch((err) => log.error(err))
   },
 
   /**
