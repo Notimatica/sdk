@@ -7,17 +7,8 @@ module.exports = class Visitor {
    * Constructor
    */
   constructor () {
-    this.info = env
-    this.storage = new Storage(this.info.localStorage)
-  }
-
-  /**
-   * Get browser name.
-   *
-   * @return {String}
-   */
-  get browser () {
-    return this.info.browser
+    this.env = env
+    this.storage = new Storage(this.env.localStorage)
   }
 
   /**
@@ -37,6 +28,16 @@ module.exports = class Visitor {
     if (token === null) {
       return this.storage.delete(TOKEN_STORAGE_NAME)
     }
+  }
+
+  /**
+   * If user is subscribed.
+   *
+   * @return {Promise}
+   */
+  isSubscribed () {
+    return this.token()
+      .then((token) => !!token)
   }
 
   /**

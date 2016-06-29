@@ -1,22 +1,20 @@
-import log from 'loglevel'
 import events from 'minivents'
-import Visitor from '../visitor'
-import Popup from '../popup'
-import { subscribe, unsubscribe } from '../api'
-import { merge, makeToken, isHttps } from '../utils'
-import { DEBUG, PROVIDER_CHROME, PROVIDER_FIREFOX, PROVIDER_SAFARI, PROVIDER_UNKNOWN } from '../defaults'
+import { merge, isHttps } from '../utils'
+import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT } from '../defaults'
 
 const Notimatica = {
   _inited: false,
-  _provider: null,
-  _visitor: null,
+  _driver: null,
   _subscribed: false,
-  _popup: null,
   options: {
     debug: DEBUG,
     project: null,
     autoSubscribe: true,
-    usePopup: false
+    usePopup: false,
+    popup: {
+      width: POPUP_WIGHT,
+      height: POPUP_HEIGHT
+    }
   },
 
   /**
@@ -25,68 +23,33 @@ const Notimatica = {
    * @param {Object} options
    */
   init (options) {
-    if (Notimatica._inited) return log.warn('Notimatica SDK was already inited.')
+    if (Notimatica._inited) return console.warn('Notimatica SDK was already inited.')
 
     merge(Notimatica.options, options || {})
 
-    if (Notimatica.options.debug) {
-      log.setLevel(log.levels.TRACE)
-    } else {
-      log.setLevel(log.levels.WARN)
-    }
+    if (Notimatica.options.project === null) return Notimatica.emit('error', 'Project ID is absent.')
 
-    if (Notimatica.options.project === null) return log.error('Project ID is absent.')
+    Notimatica._prepareEvents()
+    Notimatica._prepareDriver()
 
-    Notimatica._prepareVisitor()
-    Notimatica._preparePopup(Notimatica._visitor)
-    Notimatica._prepareProvider()
+    if (Notimatica.pushSupported()) {
+      Notimatica._driver.ready()
+        .then(({isSubscribed, wasUnsubscribed}) => {
+          Notimatica._ready()
 
-    if (Notimatica.pushSupported() && !Notimatica._usePopup()) {
-      Notimatica._provider.ready()
-        .then((subscription) => {
-          Notimatica._ready(subscription)
-            .then((wasUnsibscribed) => {
-              if (Notimatica._autoSubscribe() && Notimatica.isUnsubscribed() && !wasUnsibscribed) {
-                Notimatica.subscribe()
-              }
-            })
-        })
-    } else {
-      Notimatica._popup.ready()
-        .then((subscription) => {
-          Notimatica._ready(subscription)
+          if (Notimatica.options.autoSubscribe && !Notimatica._usePopup && !wasUnsubscribed && !isSubscribed) {
+            Notimatica._driver.subscribe()
+          }
         })
     }
   },
 
   /**
    * SDK is ready.
-   *
-   * @param  {Object|Null} subscription Subscription
    */
-  _ready (subscription) {
-    Notimatica._subscribed = subscription !== null
+  _ready () {
     Notimatica._inited = true
     Notimatica.emit('ready')
-    log.info('Notimatica SDK inited with', Notimatica.options)
-
-    return Notimatica._visitor.wasUnsubscribed()
-  },
-
-  /**
-   * If automatic subscription allowed.
-   *
-   * @returns {Boolean}
-   */
-  _autoSubscribe () {
-    return Notimatica.options.autoSubscribe
-  },
-
-  /**
-   * Prepare visitor.
-   */
-  _prepareVisitor () {
-    Notimatica._visitor = new Visitor()
   },
 
   /**
@@ -94,48 +57,65 @@ const Notimatica = {
    *
    * @param  {Object} visitor The visitor object.
    */
-  _preparePopup (visitor) {
-    Notimatica._popup = new Popup(visitor)
+  _prepareDriver () {
+    const driver = Notimatica._usePopup() ? DRIVER_POPUP : DRIVER_NATIVE
+    const Driver = require('./drivers/' + driver)
 
-    Notimatica.on('popup:subscribed', (data) => {
-      Notimatica._visitor.token(data.token)
-        .then(() => {
-          Notimatica._subscribed = true
-          Notimatica.emit('subscribe:success', data.token)
-        })
-    })
-
-    Notimatica.on('popup:unsubscribed', () => {
-      Notimatica._visitor.token(null)
-        .then(() => {
-          Notimatica._subscribed = false
-          Notimatica.emit('unsubscribe:success')
-        })
-    })
+    Notimatica._driver = new Driver(Notimatica.options)
   },
 
-  /**
-   * Detect provider from browser.
-   */
-  _prepareProvider () {
-    let provider
-    switch (Notimatica._visitor.browser) {
-      case 'Chrome':
-        provider = PROVIDER_CHROME
-        break
-      case 'Firefox':
-        provider = PROVIDER_FIREFOX
-        break
-      case 'Safari':
-        provider = PROVIDER_SAFARI
-        break
-      default:
-        provider = PROVIDER_UNKNOWN
-        break
-    }
+  _prepareEvents () {
+    Notimatica.on('ready', function () {
+      console.info('Notimatica SDK inited with:', Notimatica.options)
+    })
+    Notimatica.on('error', function (error) {
+      console.error(error)
+    })
 
-    const Provider = require('./providers/' + provider)
-    Notimatica._provider = new Provider(Notimatica.options)
+    if (Notimatica.options.debug) {
+      Notimatica.on('driver:create', function (driver) {
+        console.log('Driver created:', driver)
+      })
+      Notimatica.on('subscribe:start', function () {
+        console.log('Start subscribing.')
+      })
+      Notimatica.on('subscribe:success', function (token) {
+        console.log('User subscribed with token:', token)
+      })
+      Notimatica.on('subscribe:subscription', function (subscription) {
+        console.log('Subscription recieved:', subscription)
+      })
+      Notimatica.on('subscribe:fail', function (err) {
+        console.trace('Subscription failed:', err)
+      })
+      Notimatica.on('register:start', function (data) {
+        console.log('Start registering subscriber:', data)
+      })
+      Notimatica.on('register:success', function (data) {
+        console.log('Subscriber registered:', data)
+      })
+      Notimatica.on('register:fail', function (err) {
+        console.trace('Registration failed:', err)
+      })
+      Notimatica.on('unsubscribe:start', function () {
+        console.log('Start unsubscribing.')
+      })
+      Notimatica.on('unsubscribe:success', function () {
+        console.log('User unsubscribed.')
+      })
+      Notimatica.on('unsubscribe:fail', function (err) {
+        console.trace('Unsubscription failed:', err)
+      })
+      Notimatica.on('unregister:start', function (data) {
+        console.log('Start removing registration:', data)
+      })
+      Notimatica.on('unregister:success', function () {
+        console.log('Registration removed.')
+      })
+      Notimatica.on('unregister:fail', function (err) {
+        console.trace('Removing registration failed:', err)
+      })
+    }
   },
 
   /**
@@ -144,7 +124,7 @@ const Notimatica = {
    * @returns {Boolean}
    */
   pushSupported () {
-    return Notimatica._provider.pushSupported()
+    return Notimatica._driver.pushSupported()
   },
 
   /**
@@ -156,13 +136,7 @@ const Notimatica = {
       return
     }
 
-    if (Notimatica.isSubscribed()) {
-      Notimatica._visitor.token()
-        .then((token) => Notimatica.emit('subscribe:success', token))
-      return
-    }
-
-    Notimatica._usePopup() ? Notimatica._subscribeViaPopup() : Notimatica._subscribeViaNative()
+    Notimatica._driver.subscribe()
   },
 
   /**
@@ -172,75 +146,6 @@ const Notimatica = {
    */
   _usePopup () {
     return !isHttps() || Notimatica.options.usePopup
-  },
-
-  /**
-   * Subscribe for https sites using native sdk.
-   *
-   * @return {Promise}
-   */
-  _subscribeViaNative () {
-    Notimatica.emit('subscribe:start')
-
-    return Notimatica._provider.subscribe()
-      .then((subscription) => Notimatica._register(subscription))
-      .then((subscription) => {
-        Notimatica._subscribed = true
-
-        Notimatica._visitor.unsubscribe(null)
-          .then(() => Notimatica._visitor.token())
-          .then((token) => {
-            Notimatica.emit('subscribe:success', token)
-            log.debug('Retrieved subscription', subscription)
-          })
-      })
-      .catch((err) => {
-        log.trace(err)
-        Notimatica.emit('subscribe:fail', err)
-      })
-  },
-
-  /**
-   * Subscribe for http sites using Notimatica popup.
-   *
-   * @return {Promise}
-   */
-  _subscribeViaPopup () {
-    Notimatica._popup.open(Notimatica.options.project)
-  },
-
-  /**
-   * Subscribe to notifications.
-   *
-   * @param   {Object} subscription
-   * @returns {Object}
-   */
-  _register (subscription) {
-    const visitor = Notimatica._visitor.info
-    const data = {
-      provider: Notimatica._provider.name,
-      token: makeToken(subscription.endpoint, Notimatica._provider),
-      browser: visitor.browser,
-      browser_version: visitor.browserMajorVersion,
-      cookies: visitor.cookies,
-      flash: visitor.flashVersion,
-      mobile: visitor.mobile,
-      os: visitor.os,
-      os_version: visitor.osVersion,
-      screen: visitor.screen,
-      timezone: visitor.timezone,
-      language: visitor.language
-    }
-
-    log.debug('Subscribing user', data)
-    return subscribe(Notimatica.options.project, data)
-      .then((data) => {
-        Notimatica._visitor.token(data.subscriber.token)
-          .then(() => log.debug('Subscribed', data))
-
-        return subscription
-      })
-      .catch((err) => log.error(err))
   },
 
   /**
@@ -254,53 +159,7 @@ const Notimatica = {
       return
     }
 
-    (Notimatica._usePopup() ? Notimatica._unsubscribeViaPopup() : Notimatica._unsubscribeViaNative())
-  },
-
-  /**
-   * Unsubscribe via native.
-   *
-   * @return {Promise}
-   */
-  _unsubscribeViaNative () {
-    return Notimatica._provider.unsubscribe()
-      .then((subscription) => Notimatica._unregister(subscription.endpoint))
-      .then(() => {
-        Notimatica._subscribed = false
-        Notimatica._visitor.token(null)
-        Notimatica._visitor.unsubscribe()
-      })
-      .then(() => Notimatica.emit('unsubscribe:success'))
-      .catch((err) => Notimatica.emit('unsubscribe:fail', err))
-  },
-
-  /**
-   * Unsubscribe via popup.
-   *
-   * @return {Promise}
-   */
-  _unsubscribeViaPopup () {
-    return Notimatica._popup.open(Notimatica.options.project)
-  },
-
-  /**
-   * Delete subscription from notimatica.
-   *
-   * @param  {Object|null} subscription Subscription object
-   * @return {Promise}
-   */
-  _unregister (subscription) {
-    console.log(subscription)
-    if (!subscription) return
-
-    const data = {
-      token: makeToken(subscription, Notimatica._provider)
-    }
-
-    log.debug('Unsubscribing user', data)
-    return unsubscribe(Notimatica.options.project, data)
-      .then(() => log.debug('Unsubscribed'))
-      .catch((err) => log.error(err))
+    Notimatica._driver.unsubscribe()
   },
 
   /**
@@ -309,7 +168,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   isSubscribed () {
-    return Notimatica._subscribed
+    return Notimatica._driver.isSubscribed
   },
 
   /**
@@ -318,7 +177,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   isUnsubscribed () {
-    return !Notimatica._subscribed
+    return !Notimatica._driver.isSubscribed
   },
 
   /**

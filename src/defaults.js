@@ -5,6 +5,9 @@ export const DEBUG = process.env.NODE_ENV !== undefined && process.env.NODE_ENV 
 export const ENV_SDK = 'sdk'
 export const ENV_SW = 'sw'
 
+export const DRIVER_NATIVE = 'native'
+export const DRIVER_POPUP = 'popup'
+
 export const PROVIDER_CHROME = 'chrome'
 export const PROVIDER_FIREFOX = 'firefox'
 export const PROVIDER_SAFARI = 'safari'

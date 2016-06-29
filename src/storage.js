@@ -50,7 +50,8 @@ module.exports = class Storage {
    */
   _setInStorage (key, value) {
     return new Promise(function (resolve, reject) {
-      resolve(localStorage.setItem(key, value))
+      localStorage.setItem(key, value)
+      resolve(value)
     })
   }
 
@@ -87,7 +88,8 @@ module.exports = class Storage {
    */
   _setCookie (key, value) {
     return new Promise(function (resolve, reject) {
-      resolve(this._createCookie(key, value, 365))
+      this._createCookie(key, value, 365)
+      resolve(value)
     })
   }
 
