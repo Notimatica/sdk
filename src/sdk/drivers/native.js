@@ -5,6 +5,16 @@ import { makeToken } from '../../utils'
 
 module.exports = class Native extends Driver {
   /**
+   * Ready.
+   *
+   * @return {Promise}
+   */
+  ready () {
+    return this.provider.ready()
+      .then(() => super.ready())
+  }
+
+  /**
    * Subscribe for https sites using native sdk.
    *
    * @return {Promise}
@@ -16,13 +26,13 @@ module.exports = class Native extends Driver {
       // Register in notimatica
       .then((subscription) => this._register(subscription))
       // Save token
-      .then((token) => this.visitor().token(token))
+      .then((token) => this.visitor.token(token))
       // Emit success event
       .then((token) => {
-        Notimatica._subscribed = true
+        this.isSubscribed = true
         Notimatica.emit('subscribe:success', token)
 
-        return this.visitor().unsubscribe(null)
+        return this.visitor.unsubscribe(null)
       })
       .catch((err) => Notimatica.emit('subscribe:fail', err))
   }
@@ -38,9 +48,9 @@ module.exports = class Native extends Driver {
     return this.provider.unsubscribe()
       .then((subscription) => this._unregister(subscription.endpoint))
       .then(() => {
-        this._subscribed = false
-        this.visitor().token(null)
-        this.visitor().unsubscribe()
+        this.isSubscribed = false
+        this.visitor.token(null)
+        this.visitor.unsubscribe()
       })
       .then(() => Notimatica.emit('unsubscribe:success'))
       .catch((err) => Notimatica.emit('unsubscribe:fail', err))

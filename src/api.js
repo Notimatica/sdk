@@ -11,7 +11,7 @@ const apiCall = function (source, method, url, data) {
     postman: POSTMAN_URL
   }
 
-  console.log('Api call', method, url, data)
+  Notimatica.emit('api:call', method, url, data)
 
   return fetch(domains[source] + url, {
     method,
@@ -25,9 +25,7 @@ const apiCall = function (source, method, url, data) {
         return Promise.reject(response)
       }
     })
-    .catch((err) => {
-      console.log(err)
-    })
+    .catch((err) => Notimatica.emit('api:fail', err))
 }
 
 export const subscribe = function (project, data) {

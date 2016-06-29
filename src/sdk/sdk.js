@@ -37,7 +37,7 @@ const Notimatica = {
         .then(({isSubscribed, wasUnsubscribed}) => {
           Notimatica._ready()
 
-          if (Notimatica.options.autoSubscribe && !Notimatica._usePopup && !wasUnsubscribed && !isSubscribed) {
+          if (Notimatica.options.autoSubscribe && !Notimatica._usePopup() && !wasUnsubscribed && !isSubscribed) {
             Notimatica._driver.subscribe()
           }
         })
@@ -73,6 +73,12 @@ const Notimatica = {
     })
 
     if (Notimatica.options.debug) {
+      Notimatica.on('api:call', function (method, url, data) {
+        console.log('API call:', method, url, data)
+      })
+      Notimatica.on('api:fail', function (err) {
+        console.trace('API call failed:', err)
+      })
       Notimatica.on('driver:create', function (driver) {
         console.log('Driver created:', driver)
       })
