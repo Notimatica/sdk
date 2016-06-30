@@ -9,6 +9,7 @@ const Notimatica = {
   options: {
     debug: DEBUG,
     project: null,
+    tags: [],
     autoSubscribe: true,
     usePopup: false,
     popup: {
@@ -76,8 +77,8 @@ const Notimatica = {
       Notimatica.on('api:call', function (method, url, data) {
         console.log('API call:', method, url, data)
       })
-      Notimatica.on('api:fail', function (err) {
-        console.trace('API call failed:', err)
+      Notimatica.on('api:fail', function (status, data) {
+        console.error('API call failed:', status, data)
       })
       Notimatica.on('driver:create', function (driver) {
         console.log('Driver created:', driver)
@@ -92,7 +93,7 @@ const Notimatica = {
         console.log('Subscription recieved:', subscription)
       })
       Notimatica.on('subscribe:fail', function (err) {
-        console.trace('Subscription failed:', err)
+        console.error('Subscription failed:', err)
       })
       Notimatica.on('register:start', function (data) {
         console.log('Start registering subscriber:', data)
@@ -101,7 +102,7 @@ const Notimatica = {
         console.log('Subscriber registered:', data)
       })
       Notimatica.on('register:fail', function (err) {
-        console.trace('Registration failed:', err)
+        console.error('Registration failed:', err)
       })
       Notimatica.on('unsubscribe:start', function () {
         console.log('Start unsubscribing.')
@@ -110,7 +111,7 @@ const Notimatica = {
         console.log('User unsubscribed.')
       })
       Notimatica.on('unsubscribe:fail', function (err) {
-        console.trace('Unsubscription failed:', err)
+        console.error('Unsubscription failed:', err)
       })
       Notimatica.on('unregister:start', function (data) {
         console.log('Start removing registration:', data)
@@ -119,7 +120,7 @@ const Notimatica = {
         console.log('Registration removed.')
       })
       Notimatica.on('unregister:fail', function (err) {
-        console.trace('Removing registration failed:', err)
+        console.error('Removing registration failed:', err)
       })
     }
   },

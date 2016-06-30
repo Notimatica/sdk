@@ -22,10 +22,13 @@ const apiCall = function (source, method, url, data) {
       if (response.status >= 200 && response.status < 300) {
         return response.status !== 204 ? response.json() : response.text()
       } else {
-        return Promise.reject(response)
+        return response.json()
+          .then((data) => {
+            Notimatica.emit('api:fail', response.status, data)
+            throw new Error('Api error: ' + data.message)
+          })
       }
     })
-    .catch((err) => Notimatica.emit('api:fail', err))
 }
 
 export const subscribe = function (project, data) {

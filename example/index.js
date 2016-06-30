@@ -20,5 +20,10 @@ Notimatica.push(['on', 'unsubscribe:success', function () {
 
 Notimatica.push(['init', {
   project: '08823593-135f-5576-9a91-f3a0675aa1d2',
-  debug: true
+  debug: true,
+  tags: [
+    123456789,
+    'foo',
+    'bar'
+  ]
 }])

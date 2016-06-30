@@ -77,7 +77,8 @@ module.exports = class Native extends Driver {
       os_version: env.osVersion,
       screen: env.screen,
       timezone: env.timezone,
-      language: env.language
+      language: env.language,
+      tags: this.options.tags
     }
 
     Notimatica.emit('register:start', data)
@@ -88,7 +89,10 @@ module.exports = class Native extends Driver {
 
         return data.subscriber.token
       })
-      .catch((err) => Notimatica.emit('register:fail', err))
+      .catch((err) => {
+        Notimatica.emit('register:fail', err)
+        throw new Error('Registration failed.')
+      })
   }
 
   /**
@@ -108,6 +112,9 @@ module.exports = class Native extends Driver {
 
     return unsubscribe(this.options.project, data)
       .then(() => Notimatica.emit('unregister:success'))
-      .catch((err) => Notimatica.emit('unregister:fail', err))
+      .catch((err) => {
+        Notimatica.emit('unregister:fail', err)
+        throw new Error('Failed to unregister.')
+      })
   }
 }
