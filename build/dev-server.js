@@ -29,7 +29,7 @@ app.use(devMiddleware)
 // enable hot-reload and state-preserving
 // compilation error display
 app.use(hotMiddleware)
-app.use(express.static('./examples'))
+app.use(express.static('./example'))
 
 app.listen(8081, function (err) {
   if (err) {
