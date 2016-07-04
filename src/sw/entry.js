@@ -4,10 +4,11 @@ import { makeToken } from '../utils'
 var NotimaticaServiceWorker = {
   _inited: false,
 
+  /**
+   * Init SW.
+   */
   init: function () {
     if (!NotimaticaServiceWorker._inited) {
-      self.addEventListener('install', NotimaticaServiceWorker.onInstalled)
-      self.addEventListener('activate', NotimaticaServiceWorker.onActivated)
       self.addEventListener('push', NotimaticaServiceWorker.onPushReceived)
       self.addEventListener('notificationclick', NotimaticaServiceWorker.onNotificationClicked)
 
@@ -19,28 +20,24 @@ var NotimaticaServiceWorker = {
     return NotimaticaServiceWorker
   },
 
-  onInstalled: function (event) {
-    self.skipWaiting()
-    console.log('Installed', event)
-  },
-
-  onActivated: function (event) {
-    console.log('Activated', event)
-  },
-
+  /**
+   * Push received event.
+   *
+   * @param  {Object} event The push event
+   * @return {Object}
+   */
   onPushReceived: function (event) {
     console.log('Push message received', event)
 
     return event.waitUntil(
       self.registration.pushManager.getSubscription()
         .then((subscription) => {
-          if (!subscription) {
-            return
-          }
+          if (!subscription) return
 
           console.log(subscription)
 
           const token = makeToken(subscription.endpoint)
+
           return getPayload(token)
             .then((res) => {
               console.log(res)
@@ -53,13 +50,17 @@ var NotimaticaServiceWorker = {
                 }
               })
             })
-            .catch((err) => {
-              console.log(err)
-            })
+            .catch((err) => console.log(err))
         })
     )
   },
 
+  /**
+   * Notification clicked event.
+   *
+   * @param  {Object} event The event.
+   * @return {Object}
+   */
   onNotificationClicked: function (event) {
     console.log('Notification click: tag ', event.notification.tag)
 
@@ -68,7 +69,7 @@ var NotimaticaServiceWorker = {
     event.notification.close()
 
     if (url) {
-      event.waitUntil(
+      return event.waitUntil(
         clients.matchAll({ type: 'window' })
           .then((windowClients) => {
             for (let i = 0; i < windowClients.length; i++) {
@@ -79,9 +80,7 @@ var NotimaticaServiceWorker = {
               }
             }
 
-            if (clients.openWindow) {
-              return clients.openWindow(url)
-            }
+            if (clients.openWindow) return clients.openWindow(url)
           })
       )
     }
