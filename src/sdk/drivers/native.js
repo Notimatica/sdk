@@ -43,7 +43,7 @@ module.exports = class Native extends Driver {
    * @return {Promise}
    */
   unsubscribe () {
-    Notimatica.emit('unsibscribe:start')
+    Notimatica.emit('unsubscribe:start')
 
     return this.provider.unsubscribe()
       .then((subscription) => this._unregister(subscription.endpoint))

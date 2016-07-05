@@ -54,6 +54,8 @@ module.exports = class Popup extends Driver {
    * @return {Promise}
    */
   unsubscribe () {
+    Notimatica.emit('unsubscribe:start')
+
     return this._open(this.options.project)
       .catch((err) => Notimatica.emit('unsubscribe:fail', err))
   }
