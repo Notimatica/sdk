@@ -1,5 +1,18 @@
 import { API_URL, POSTMAN_URL } from './defaults'
 
+const empty = []
+const Notimatica = Notimatica || {
+  options: {
+    debug: typeof process.env.NODE_ENV !== 'undefined' && process.env.NODE_ENV !== 'production'
+  },
+  emit (event) {
+    const method = event === 'api:fail' ? 'error' : 'log'
+    if (Notimatica.options.debug) {
+      console[method].apply(console, empty.slice.call(arguments, 1))
+    }
+  }
+}
+
 const apiCall = function (source, method, url, data) {
   let headers = {
     'Content-type': 'application/json',

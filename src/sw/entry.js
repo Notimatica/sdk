@@ -1,16 +1,9 @@
 import { getPayload } from '../api'
 import { makeToken } from '../utils'
 
-const empty = []
-const Notimatica = Notimatica || {
-  emit (event) {
-    const method = event === 'api:call' ? 'log' : event
-    console[method].apply(console, empty.slice.call(arguments, 1))
-  }
-}
-
 var NotimaticaServiceWorker = {
   _inited: false,
+  debug: typeof process.env.NODE_ENV !== 'undefined' && process.env.NODE_ENV !== 'production',
 
   /**
    * Init SW.
@@ -23,7 +16,7 @@ var NotimaticaServiceWorker = {
       NotimaticaServiceWorker._inited = true
     }
 
-    Notimatica.emit('log', 'Notimatica ServiceWorker inited')
+    NotimaticaServiceWorker.log('Notimatica ServiceWorker inited')
 
     return NotimaticaServiceWorker
   },
@@ -35,20 +28,21 @@ var NotimaticaServiceWorker = {
    * @return {Object}
    */
   onPushReceived: function (event) {
-    Notimatica.emit('log', 'Push message received', event)
+    NotimaticaServiceWorker.log('Push message received', event)
 
     return event.waitUntil(
       self.registration.pushManager.getSubscription()
         .then((subscription) => {
           if (!subscription) return
 
-          Notimatica.emit('log', subscription)
+          NotimaticaServiceWorker.log(subscription)
 
           const token = makeToken(subscription.endpoint)
 
           return getPayload(token)
             .then((res) => {
-              Notimatica.emit('log', res)
+              NotimaticaServiceWorker.log(res)
+
               return self.registration.showNotification(res.payload.title, {
                 body: res.payload.body,
                 icon: res.payload.icon,
@@ -58,7 +52,7 @@ var NotimaticaServiceWorker = {
                 }
               })
             })
-            .catch((err) => Notimatica.emit('error', err))
+            .catch((err) => console.error(err))
         })
     )
   },
@@ -70,7 +64,7 @@ var NotimaticaServiceWorker = {
    * @return {Object}
    */
   onNotificationClicked: function (event) {
-    Notimatica.emit('log', 'Notification click: tag ', event.notification.tag)
+    NotimaticaServiceWorker.log('Notification click: tag ', event.notification.tag)
 
     const url = event.notification.data.url
 
@@ -91,6 +85,15 @@ var NotimaticaServiceWorker = {
             if (clients.openWindow) return clients.openWindow(url)
           })
       )
+    }
+  },
+
+  /**
+   * Log message.
+   */
+  log () {
+    if (NotimaticaServiceWorker.debug) {
+      console.log.apply(console, arguments)
     }
   }
 }
