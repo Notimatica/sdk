@@ -1,7 +1,7 @@
 var path = require('path')
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-
-var extractCSS = new ExtractTextPlugin('notimatica-[name].css');
+var config = require('../config')
+var utils = require('./utils')
+var projectRoot = path.resolve(__dirname, '../')
 
 module.exports = {
   entry: {
@@ -10,30 +10,46 @@ module.exports = {
     button: './src/plugins/button.js'
   },
   output: {
-    path: path.resolve(__dirname, '../dist/'),
+    path: config.build.assetsRoot,
+    publicPath: process.env.NODE_ENV === 'production' ? config.build.assetsPublicPath : config.dev.assetsPublicPath,
     filename: 'notimatica-[name].js'
   },
   resolve: {
-    extensions: ['', '.js', '.css', '.scss'],
+    extensions: ['', '.js', '.vue'],
+    fallback: [path.join(__dirname, '../node_modules')],
     alias: {
-      src: path.resolve(__dirname, '../src')
+      'src': path.resolve(__dirname, '../src'),
+      'assets': path.resolve(__dirname, '../src/assets'),
+      'components': path.resolve(__dirname, '../src/components')
     }
   },
   resolveLoader: {
-    root: path.join(__dirname, 'node_modules')
+    fallback: [path.join(__dirname, '../node_modules')]
   },
   module: {
     preLoaders: [
       {
+        test: /\.vue$/,
+        loader: 'eslint',
+        include: projectRoot,
+        exclude: /node_modules/
+      },
+      {
         test: /\.js$/,
         loader: 'eslint',
+        include: projectRoot,
         exclude: /node_modules/
       }
     ],
     loaders: [
       {
+        test: /\.vue$/,
+        loader: 'vue'
+      },
+      {
         test: /\.js$/,
         loader: 'babel',
+        include: projectRoot,
         exclude: /node_modules/
       },
       {
@@ -41,43 +57,31 @@ module.exports = {
         loader: 'json'
       },
       {
-        test: /\.(png|jpg|gif)$/,
+        test: /\.html$/,
+        loader: 'vue-html'
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url',
         query: {
           limit: 10000,
-          name: '[name].[ext]?[hash:7]'
+          name: utils.assetsPath('img/[name].[hash:7].[ext]')
         }
       },
       {
-        test: /\.s?css$/,
-        loader: extractCSS.extract(['css','sass'])
-      },
-      {
-        test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "url?limit=10000&mimetype=application/font-woff"
-      },
-      {
-        test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "url?limit=10000&mimetype=application/font-woff"
-      },
-      {
-        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "url?limit=10000&mimetype=application/octet-stream"
-      },
-      {
-        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "file"
-      },
-      {
-        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "url?limit=10000&mimetype=image/svg+xml"
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+        loader: 'url',
+        query: {
+          limit: 10000,
+          name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
+        }
       }
     ]
   },
-  plugins: [
-    extractCSS
-  ],
   eslint: {
     formatter: require('eslint-friendly-formatter')
+  },
+  vue: {
+    loaders: utils.cssLoaders()
   }
 }

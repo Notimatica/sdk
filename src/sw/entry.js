@@ -5,7 +5,6 @@ const empty = []
 const Notimatica = Notimatica || {
   emit (event) {
     const method = event === 'api:call' ? 'log' : event
-
     console[method].apply(console, empty.slice.call(arguments, 1))
   }
 }
