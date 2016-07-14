@@ -16,7 +16,7 @@ var NotimaticaServiceWorker = {
       NotimaticaServiceWorker._inited = true
     }
 
-    NotimaticaServiceWorker.log('Notimatica ServiceWorker inited')
+    NotimaticaServiceWorker.log('Notimatica: ServiceWorker inited')
 
     return NotimaticaServiceWorker
   },
@@ -28,20 +28,18 @@ var NotimaticaServiceWorker = {
    * @return {Object}
    */
   onPushReceived: function (event) {
-    NotimaticaServiceWorker.log('Push message received', event)
+    NotimaticaServiceWorker.log('Notimatica: message received', event)
 
     return event.waitUntil(
       self.registration.pushManager.getSubscription()
         .then((subscription) => {
           if (!subscription) return
 
-          NotimaticaServiceWorker.log(subscription)
-
           const token = makeToken(subscription.endpoint)
 
           return getPayload(token)
             .then((res) => {
-              NotimaticaServiceWorker.log(res)
+              NotimaticaServiceWorker.log('Notimatica: payload recieved', res)
 
               return self.registration.showNotification(res.payload.title, {
                 body: res.payload.body,
@@ -52,7 +50,7 @@ var NotimaticaServiceWorker = {
                 }
               })
             })
-            .catch((err) => console.error(err))
+            .catch((err) => console.error('Notimatica: payload error', err))
         })
     )
   },
@@ -64,7 +62,7 @@ var NotimaticaServiceWorker = {
    * @return {Object}
    */
   onNotificationClicked: function (event) {
-    NotimaticaServiceWorker.log('Notification click: tag ', event.notification.tag)
+    NotimaticaServiceWorker.log('Notimatica: click ', event.notification.data.url)
 
     const url = event.notification.data.url
 

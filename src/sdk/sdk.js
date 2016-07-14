@@ -26,11 +26,11 @@ const Notimatica = {
    * @param {Object} options
    */
   init (options) {
-    if (Notimatica._inited) return console.warn('Notimatica SDK was already inited.')
+    if (Notimatica._inited) return console.warn('Notimatica: SDK was already inited.')
 
     Notimatica.options = merge(Notimatica.options, options || {})
 
-    if (Notimatica.options.project === null) return Notimatica.emit('error', 'Project ID is absent.')
+    if (Notimatica.options.project === null) return Notimatica.emit('error', 'Notimatica: Project ID is absent.')
 
     Notimatica._prepareEvents()
     Notimatica._prepareDriver()
@@ -45,7 +45,7 @@ const Notimatica = {
           }
         })
     } else {
-      Notimatica.emit('unsupported', 'Push notifications are not yet available for your browser.')
+      Notimatica.emit('unsupported', 'Notimatica: Push notifications are not yet available for your browser.')
     }
   },
 
@@ -86,16 +86,16 @@ const Notimatica = {
 
   _prepareEvents () {
     Notimatica.on('ready', function () {
-      console.info('Notimatica SDK inited with:', Notimatica.options)
+      console.info('Notimatica: SDK inited with:', Notimatica.options)
     })
     Notimatica.on('unsupported', function (message) {
       console.warn('Notimatica: ' + message)
     })
     Notimatica.on('warning', function (message) {
-      console.warn(message)
+      console.warn('Notimatica: ' + message)
     })
     Notimatica.on('error', function (message) {
-      console.error(message)
+      console.error('Notimatica: ' + message)
     })
     Notimatica.on('plugin:ready', function (plugin) {
       plugin.init(Notimatica.options.plugins[plugin.name])
@@ -103,52 +103,52 @@ const Notimatica = {
 
     if (Notimatica.options.debug) {
       Notimatica.on('api:call', function (method, url, data) {
-        console.log('API call:', method, url, data)
+        console.log('Notimatica: API call', method, url, data)
       })
       Notimatica.on('api:fail', function (status, data) {
-        console.error('API call failed:', status, data)
+        console.error('Notimatica: API call failed', status, data)
       })
       Notimatica.on('driver:create', function (driver) {
-        console.log('Driver created:', driver)
+        console.log('Notimatica: Driver created', driver)
       })
       Notimatica.on('subscribe:start', function () {
-        console.log('Start subscribing.')
+        console.log('Notimatica: Start subscribing.')
       })
       Notimatica.on('subscribe:success', function (token) {
-        console.log('User subscribed with token:', token)
+        console.log('Notimatica: User subscribed with token', token)
       })
       Notimatica.on('subscribe:subscription', function (subscription) {
-        console.log('Subscription recieved:', subscription)
+        console.log('Notimatica: Subscription recieved', subscription)
       })
       Notimatica.on('subscribe:fail', function (err) {
-        console.error('Subscription failed:', err)
+        console.error('Notimatica: Subscription failed', err)
       })
       Notimatica.on('register:start', function (data) {
-        console.log('Start registering subscriber:', data)
+        console.log('Notimatica: Start registering subscriber', data)
       })
       Notimatica.on('register:success', function (data) {
-        console.log('Subscriber registered:', data)
+        console.log('Notimatica: Subscriber registered:', data)
       })
       Notimatica.on('register:fail', function (err) {
-        console.error('Registration failed:', err)
+        console.error('Notimatica: Registration failed', err)
       })
       Notimatica.on('unsubscribe:start', function () {
-        console.log('Start unsubscribing.')
+        console.log('Notimatica: Start unsubscribing.')
       })
       Notimatica.on('unsubscribe:success', function () {
-        console.log('User unsubscribed.')
+        console.log('Notimatica: User unsubscribed.')
       })
       Notimatica.on('unsubscribe:fail', function (err) {
-        console.error('Unsubscription failed:', err)
+        console.error('Notimatica: Unsubscription failed', err)
       })
       Notimatica.on('unregister:start', function (data) {
-        console.log('Start removing registration:', data)
+        console.log('Notimatica: Start removing registration', data)
       })
       Notimatica.on('unregister:success', function () {
-        console.log('Registration removed.')
+        console.log('Notimatica: Registration removed.')
       })
       Notimatica.on('unregister:fail', function (err) {
-        console.error('Removing registration failed:', err)
+        console.error('Notimatica: Removing registration failed', err)
       })
     }
   },
