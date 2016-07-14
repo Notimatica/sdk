@@ -1,12 +1,13 @@
 var path = require('path')
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-var extractCSS = new ExtractTextPlugin('css/[name].css');
+var extractCSS = new ExtractTextPlugin('notimatica-[name].css');
 
 module.exports = {
   entry: {
     sdk: './src/sdk/entry.js',
-    sw: './src/sw/entry.js'
+    sw: './src/sw/entry.js',
+    button: './src/plugins/button.js'
   },
   output: {
     path: path.resolve(__dirname, '../dist/'),

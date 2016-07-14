@@ -25,5 +25,10 @@ Notimatica.push(['init', {
     123456789,
     'foo',
     'bar'
-  ]
+  ],
+  plugins: {
+    button: {
+      css: '/notimatica-button.css'
+    }
+  }
 }])
