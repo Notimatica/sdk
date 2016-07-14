@@ -25,14 +25,34 @@ export var makeToken = function (endpoint, provider) {
 /**
  * Merge objects.
  * @param {Object} target
- * @param {Object} object
+ * @param {Object} source
  */
-export var merge = function (target, object) {
-  for (var i in object) {
-    if (object.hasOwnProperty(i)) {
-      target[i] = object[i]
+export var merge = function (target, source) {
+  /* Merges two (or more) objects,
+   giving the last one precedence */
+
+  if (typeof target !== 'object') {
+    target = {}
+  }
+
+  for (let property in source) {
+    if (source.hasOwnProperty(property)) {
+      var sourceProperty = source[property]
+
+      if (typeof sourceProperty === 'object') {
+        target[property] = merge(target[property], sourceProperty)
+        continue
+      }
+
+      target[property] = sourceProperty
     }
   }
+
+  for (var a = 2, l = arguments.length; a < l; a++) {
+    merge(target, arguments[a])
+  }
+
+  return target
 }
 
 /**
@@ -74,5 +94,7 @@ export function getProperty (propertyName, object) {
  * @return {Boolean}
  */
 export function isHttps () {
+  if (typeof window === 'undefined') return false
+
   return window.location.protocol === 'https:' || window.location.hostname === 'localhost'
 }

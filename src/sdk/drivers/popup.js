@@ -1,7 +1,7 @@
-import Driver from './driver'
+import AbstractDriver from './abstract'
 import { POPUP_URL } from '../../defaults'
 
-module.exports = class Popup extends Driver {
+module.exports = class Popup extends AbstractDriver {
   /**
    * Ready.
    *

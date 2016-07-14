@@ -1,0 +1,40 @@
+@mixin animation ($delay, $duration, $iterations, $animation_name, $timing) {
+	-webkit-animation-delay: $delay;
+	-webkit-animation-duration: $duration;
+	-webkit-animation-name: $animation_name;
+	-webkit-animation-iteration-count: $iterations;
+	-webkit-animation-timing-function: $timing;
+	-webkit-animation-fill-mode: forwards; /* this prevents the animation from restarting! */
+
+	-moz-animation-delay: $delay;
+	-moz-animation-duration: $duration;
+	-moz-animation-name: $animation_name;
+	-moz-animation-iteration-count: $iterations;
+	-moz-animation-timing-function: $timing;
+	-moz-animation-fill-mode: forwards; /* this prevents the animation from restarting! */
+
+	animation-delay: $delay;
+	animation-duration: $duration;
+	animation-name: $animation_name;
+	animation-iteration-count: $iterations;
+	animation-timing-function: $timing;
+	animation-fill-mode: forwards; /* this prevents the animation from restarting! */
+}
+
+@mixin keyframe ($animation_name) {
+	@-webkit-keyframes #{$animation-name} {
+		@content;
+	}
+
+	@-moz-keyframes #{$animation-name} {
+		@content;
+	}
+
+	@-o-keyframes #{$animation-name} {
+		@content;
+	}
+
+	@keyframes #{$animation-name} {
+		@content;
+	}
+}

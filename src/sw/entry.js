@@ -1,6 +1,15 @@
 import { getPayload } from '../api'
 import { makeToken } from '../utils'
 
+const empty = []
+const Notimatica = Notimatica || {
+  emit (event) {
+    const method = event === 'api:call' ? 'log' : event
+
+    console[method].apply(console, empty.slice.call(arguments, 1))
+  }
+}
+
 var NotimaticaServiceWorker = {
   _inited: false,
 
@@ -15,7 +24,7 @@ var NotimaticaServiceWorker = {
       NotimaticaServiceWorker._inited = true
     }
 
-    console.log('Notimatica ServiceWorker inited')
+    Notimatica.emit('log', 'Notimatica ServiceWorker inited')
 
     return NotimaticaServiceWorker
   },
@@ -27,20 +36,20 @@ var NotimaticaServiceWorker = {
    * @return {Object}
    */
   onPushReceived: function (event) {
-    console.log('Push message received', event)
+    Notimatica.emit('log', 'Push message received', event)
 
     return event.waitUntil(
       self.registration.pushManager.getSubscription()
         .then((subscription) => {
           if (!subscription) return
 
-          console.log(subscription)
+          Notimatica.emit('log', subscription)
 
           const token = makeToken(subscription.endpoint)
 
           return getPayload(token)
             .then((res) => {
-              console.log(res)
+              Notimatica.emit('log', res)
               return self.registration.showNotification(res.payload.title, {
                 body: res.payload.body,
                 icon: res.payload.icon,
@@ -50,7 +59,7 @@ var NotimaticaServiceWorker = {
                 }
               })
             })
-            .catch((err) => console.log(err))
+            .catch((err) => Notimatica.emit('error', err))
         })
     )
   },
@@ -62,7 +71,7 @@ var NotimaticaServiceWorker = {
    * @return {Object}
    */
   onNotificationClicked: function (event) {
-    console.log('Notification click: tag ', event.notification.tag)
+    Notimatica.emit('log', 'Notification click: tag ', event.notification.tag)
 
     const url = event.notification.data.url
 

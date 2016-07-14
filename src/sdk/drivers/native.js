@@ -1,9 +1,9 @@
-import Driver from './driver'
+import AbstractDriver from './abstract'
 
 import { subscribe, unsubscribe } from '../../api'
 import { makeToken } from '../../utils'
 
-module.exports = class Native extends Driver {
+module.exports = class Native extends AbstractDriver {
   /**
    * Ready.
    *

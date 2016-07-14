@@ -1,7 +1,7 @@
 import Visitor from '../../visitor'
 import { PROVIDER_CHROME, PROVIDER_FIREFOX, PROVIDER_SAFARI, PROVIDER_UNKNOWN } from '../../defaults'
 
-module.exports = class Driver {
+module.exports = class AbstractDriver {
   /**
    * Constructor.
    *

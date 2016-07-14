@@ -1,6 +1,6 @@
 import events from 'minivents'
 import { merge, isHttps } from '../utils'
-import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT } from '../defaults'
+import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
 
 const Notimatica = {
   _inited: false,
@@ -15,7 +15,9 @@ const Notimatica = {
     popup: {
       width: POPUP_WIGHT,
       height: POPUP_HEIGHT
-    }
+    },
+    plugins: {},
+    sdkPath: SDK_PATH
   },
 
   /**
@@ -26,7 +28,7 @@ const Notimatica = {
   init (options) {
     if (Notimatica._inited) return console.warn('Notimatica SDK was already inited.')
 
-    merge(Notimatica.options, options || {})
+    Notimatica.options = merge(Notimatica.options, options || {})
 
     if (Notimatica.options.project === null) return Notimatica.emit('error', 'Project ID is absent.')
 
@@ -42,6 +44,8 @@ const Notimatica = {
             Notimatica._driver.subscribe()
           }
         })
+    } else {
+      Notimatica.emit('unsupported', 'Push notifications are not yet available for your browser.')
     }
   },
 
@@ -49,8 +53,23 @@ const Notimatica = {
    * SDK is ready.
    */
   _ready () {
+    Notimatica._loadPlugins()
     Notimatica._inited = true
     Notimatica.emit('ready')
+  },
+
+  /**
+   * Load enabled plugins.
+   */
+  _loadPlugins () {
+    for (let name in Notimatica.options.plugins) {
+      const head = document.getElementsByTagName('head')[0]
+      const script = document.createElement('script')
+      script.type = 'text/javascript'
+      script.src = Notimatica.options.sdkPath + '/notimatica-' + name + '.js'
+      script.async = 'true'
+      head.appendChild(script)
+    }
   },
 
   /**
@@ -69,8 +88,17 @@ const Notimatica = {
     Notimatica.on('ready', function () {
       console.info('Notimatica SDK inited with:', Notimatica.options)
     })
-    Notimatica.on('error', function (error) {
-      console.error(error)
+    Notimatica.on('unsupported', function (message) {
+      console.warn('Notimatica: ' + message)
+    })
+    Notimatica.on('warning', function (message) {
+      console.warn(message)
+    })
+    Notimatica.on('error', function (message) {
+      console.error(message)
+    })
+    Notimatica.on('plugin:ready', function (plugin) {
+      plugin.init(Notimatica.options.plugins[plugin.name])
     })
 
     if (Notimatica.options.debug) {

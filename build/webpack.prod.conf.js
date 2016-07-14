@@ -34,7 +34,7 @@ config.plugins = (config.plugins || []).concat([
   }),
   new webpack.optimize.OccurenceOrderPlugin(),
   // extract css into its own file
-  new ExtractTextPlugin('[name].css'),
+  new ExtractTextPlugin('notimatica-[name].css'),
 ])
 
 module.exports = config
