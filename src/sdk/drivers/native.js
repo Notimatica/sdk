@@ -67,7 +67,7 @@ module.exports = class Native extends AbstractDriver {
     const provider = this.provider.name
     const data = {
       provider: provider,
-      token: makeToken(subscription.endpoint, provider),
+      token: makeToken(subscription, provider),
       browser: env.browser,
       browser_version: env.browserMajorVersion,
       cookies: env.cookies,
@@ -87,7 +87,7 @@ module.exports = class Native extends AbstractDriver {
       .then((data) => {
         Notimatica.emit('register:success', data)
 
-        return data.subscriber.token
+        return data.subscriber.uuid
       })
       .catch((err) => {
         Notimatica.emit('register:fail', err)

@@ -71,7 +71,7 @@ const provider = class Safari extends AbstractProvider {
    *
    * @return {Promise}
    */
-  isUnsubscribed () {
+  wasUnsubscribed () {
     return this.ready()
       .then((permissionData) => permissionData.permission === 'denied')
   }
@@ -81,7 +81,7 @@ const provider = class Safari extends AbstractProvider {
    */
   _requestPermission () {
     window.safari.pushNotification.requestPermission(
-      API_URL + '/v1/projects/' + this.options.project + '/safari', // The web service URL.
+      `${API_URL}/v1/projects/${this.options.project}/safari`, // The web service URL.
       this.options.safariWebId,
       {},
       (permissionData) => {

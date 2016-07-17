@@ -64,6 +64,24 @@ const provider = class Gcm extends AbstractProvider {
         return subscription
       })
   }
+
+  /**
+   * If user was subscribed.
+   *
+   * @return {Promise}
+   */
+  isSubscribed () {
+    return this.visitor.isSubscribed()
+  }
+
+  /**
+   * If user was unsubscribed.
+   *
+   * @return {Promise}
+   */
+  wasUnsubscribed () {
+    return this.visitor.wasUnsubscribed()
+  }
 }
 
 module.exports = provider

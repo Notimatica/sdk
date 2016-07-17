@@ -27,12 +27,12 @@ module.exports = class AbstractDriver {
       wasUnsubscribed: false
     }
 
-    return this.visitor.isSubscribed()
+    return this.provider.isSubscribed()
       .then((isSubscribed) => {
         this.isSubscribed = isSubscribed
         ready.isSubscribed = isSubscribed
 
-        return this.visitor.wasUnsubscribed()
+        return this.provider.wasUnsubscribed()
       })
       .then((wasUnsubscribed) => {
         this.wasUnsubscribed = wasUnsubscribed
@@ -79,6 +79,6 @@ module.exports = class AbstractDriver {
     }
 
     const Provider = require('../providers/' + provider)
-    this.provider = new Provider(this.options)
+    this.provider = new Provider(this.options, this.visitor)
   }
 }
