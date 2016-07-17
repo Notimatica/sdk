@@ -21,7 +21,7 @@ const Button = class Button extends AbstractPlugin {
    */
   get defaults () {
     return {
-      autoplay: true,
+      autorun: true,
       target: null,
       position: 'bottom-right',
       tooltip: {

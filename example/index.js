@@ -1,26 +1,31 @@
 var Notimatica = Notimatica || []
 
 Notimatica.push(['on', 'ready', function () {
+  $('.provider').text(Notimatica._driver.provider.name)
+  $('.options').text(JSON.stringify(Notimatica.options, null, 2))
+
   if (Notimatica.isUnsubscribed()) {
-    $('.subscribe_link').removeClass('hidden')
+    $('.subscribe-link').removeClass('hidden')
   } else {
-    $('.unsubscribe_link').removeClass('hidden')
+    $('.unsubscribe-link').removeClass('hidden')
   }
 }])
 
 Notimatica.push(['on', 'subscribe:success', function (token) {
-  $('.subscribe_link').addClass('hidden')
-  $('.unsubscribe_link').removeClass('hidden')
+  $('.subscribe-link').addClass('hidden')
+  $('.unsubscribe-link').removeClass('hidden')
 }])
 
 Notimatica.push(['on', 'unsubscribe:success', function () {
-  $('.subscribe_link').removeClass('hidden')
-  $('.unsubscribe_link').addClass('hidden')
+  $('.subscribe-link').removeClass('hidden')
+  $('.unsubscribe-link').addClass('hidden')
 }])
 
 Notimatica.push(['init', {
   project: '08823593-135f-5576-9a91-f3a0675aa1d2',
+  safariWebId: 'web.io.notimatica',
   debug: true,
+  autoSubscribe: false,
   tags: [
     123456789,
     'foo',
@@ -32,3 +37,16 @@ Notimatica.push(['init', {
     }
   }
 }])
+
+$(function () {
+  $('.subscribe-link').on('click', function () {
+    Notimatica.push(['subscribe'])
+  })
+  $('.unsubscribe-link').on('click', function () {
+    Notimatica.push(['unsubscribe'])
+  })
+
+  $('.toggle-options').on('click', function () {
+    $('options').toggle()
+  })
+})

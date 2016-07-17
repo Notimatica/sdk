@@ -1,0 +1,8 @@
+.toggle {
+  cursor: pointer;
+}
+
+.options {
+  display:block;
+  white-space: pre;
+}

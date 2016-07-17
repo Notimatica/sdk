@@ -29,7 +29,7 @@ module.exports = class AbstractPlugin {
   init (options) {
     this.options = merge(this.defaults, options)
 
-    if (this.options.autoplay) {
+    if (this.options.autorun) {
       this.prepare().then(() => this.play())
     }
   }
