@@ -11,6 +11,7 @@ module.exports = class Native extends AbstractDriver {
    */
   ready () {
     return this.provider.ready()
+      .then(() => this._subscribeToEvents())
       .then(() => super.ready())
   }
 
@@ -23,10 +24,18 @@ module.exports = class Native extends AbstractDriver {
     Notimatica.emit('subscribe:start')
 
     return this.provider.subscribe()
-      // Register in notimatica
-      .then((subscription) => this._register(subscription))
+  }
+
+  /**
+   * Register subscriber.
+   *
+   * @param  {String} subscription The subscription
+   * @return {Promise}
+   */
+  register (subscription) {
+    return this._register(subscription)
       // Save token
-      .then((token) => this.visitor.token(token))
+      .then((token) => this.visitor.uuid(token))
       // Emit success event
       .then((token) => {
         this.isSubscribed = true
@@ -46,10 +55,11 @@ module.exports = class Native extends AbstractDriver {
     Notimatica.emit('unsubscribe:start')
 
     return this.provider.unsubscribe()
-      .then((subscription) => this._unregister(subscription.endpoint))
+      .then(() => this.visitor.uuid())
+      .then((token) => this._unregister(token))
       .then(() => {
         this.isSubscribed = false
-        this.visitor.token(null)
+        this.visitor.uuid(null)
         this.visitor.unsubscribe()
       })
       .then(() => Notimatica.emit('unsubscribe:success'))
@@ -57,7 +67,7 @@ module.exports = class Native extends AbstractDriver {
   }
 
   /**
-   * Subscribe to notifications.
+   * Call notimatica API to register subscriber.
    *
    * @param   {Object} subscription
    * @returns {Object}
@@ -98,14 +108,14 @@ module.exports = class Native extends AbstractDriver {
   /**
    * Delete subscription from notimatica.
    *
-   * @param  {Object|null} subscription Subscription object
+   * @param  {Object|null} uuid Subscriber's notimatica uuid
    * @return {Promise}
    */
-  _unregister (subscription) {
-    if (!subscription) return
+  _unregister (uuid) {
+    if (!uuid) return
 
     const data = {
-      token: makeToken(subscription, this.provider.name)
+      uuid
     }
 
     Notimatica.emit('unregister:start', data)
@@ -116,5 +126,14 @@ module.exports = class Native extends AbstractDriver {
         Notimatica.emit('unregister:fail', err)
         throw new Error('Failed to unregister.')
       })
+  }
+
+  /**
+   * Subscribe to provider events.
+   */
+  _subscribeToEvents () {
+    this.provider.on('subscribe:success', (subscription) => {
+      this.register(subscription)
+    })
   }
 }

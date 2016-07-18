@@ -203,7 +203,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   isSubscribed () {
-    return Notimatica._driver.isSubscribed
+    return Notimatica._driver.isSubscribed && !Notimatica._driver.wasUnsubscribed
   },
 
   /**
@@ -212,7 +212,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   isUnsubscribed () {
-    return !Notimatica._driver.isSubscribed
+    return Notimatica._driver.wasUnsubscribed
   },
 
   /**

@@ -2,8 +2,9 @@ import { PROVIDERS_ENDPOINTS } from './defaults'
 
 /**
  * Make token from endpoint.
- * @param {String} endpoint
- * @param {String} provider
+ *
+ * @param   {String} endpoint The endpoint string
+ * @param   {String} provider The provider name
  * @returns {String}
  */
 export var makeToken = function (endpoint, provider) {
@@ -24,8 +25,9 @@ export var makeToken = function (endpoint, provider) {
 
 /**
  * Merge objects.
- * @param {Object} target
- * @param {Object} source
+ *
+ * @param {Object} target The target object
+ * @param {Object} source The source object
  */
 export var merge = function (target, source) {
   /* Merges two (or more) objects,
@@ -57,6 +59,7 @@ export var merge = function (target, source) {
 
 /**
  * Extend object.
+ *
  * @param {Object} object
  */
 export var extend = function (object) {
@@ -65,8 +68,9 @@ export var extend = function (object) {
 
 /**
  * Get property recursively by 'foo.bar' syntax.
- * @param {String} propertyName
- * @param {Object} object
+ *
+ * @param   {String} propertyName The property name
+ * @param   {Object} object       The object
  * @returns {*}
  */
 export function getProperty (propertyName, object) {

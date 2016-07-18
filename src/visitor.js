@@ -1,6 +1,6 @@
 import env from './env'
 import Storage from './storage'
-import { TOKEN_STORAGE_NAME, UNSUBSCRIBED_STORAGE_NAME } from './defaults'
+import { UUID_STORAGE_NAME, UNSUBSCRIBED_STORAGE_NAME } from './defaults'
 
 module.exports = class Visitor {
   /**
@@ -16,17 +16,17 @@ module.exports = class Visitor {
    *
    * @return {Promise}
    */
-  token (token) {
-    if (token) {
-      return this.storage.set(TOKEN_STORAGE_NAME, token)
+  uuid (uuid) {
+    if (uuid) {
+      return this.storage.set(UUID_STORAGE_NAME, uuid)
     }
 
-    if (typeof token === 'undefined') {
-      return this.storage.get(TOKEN_STORAGE_NAME)
+    if (typeof uuid === 'undefined') {
+      return this.storage.get(UUID_STORAGE_NAME)
     }
 
-    if (token === null) {
-      return this.storage.delete(TOKEN_STORAGE_NAME)
+    if (uuid === null) {
+      return this.storage.delete(UUID_STORAGE_NAME)
     }
   }
 
@@ -36,8 +36,8 @@ module.exports = class Visitor {
    * @return {Promise}
    */
   isSubscribed () {
-    return this.token()
-      .then((token) => !!token)
+    return this.uuid()
+      .then((uuid) => !!uuid)
   }
 
   /**
@@ -47,6 +47,7 @@ module.exports = class Visitor {
    */
   wasUnsubscribed () {
     return this.storage.get(UNSUBSCRIBED_STORAGE_NAME)
+      .then((value) => !!value)
   }
 
   /**
