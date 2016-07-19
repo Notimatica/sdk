@@ -21,7 +21,7 @@ Notimatica.push(['on', 'unsubscribe:success', function () {
   $('.unsubscribe-link').addClass('hidden')
 }])
 
-Notimatica.push(['init', {
+var options = {
   project: '08823593-135f-5576-9a91-f3a0675aa1d2',
   safariWebId: 'web.io.notimatica',
   debug: true,
@@ -36,7 +36,13 @@ Notimatica.push(['init', {
       css: '/notimatica-button.css'
     }
   }
-}])
+}
+
+if (typeof process !== 'undefined') {
+  options.sdkPath = ''
+}
+
+Notimatica.push(['init', options])
 
 $(function () {
   $('.subscribe-link').on('click', function () {

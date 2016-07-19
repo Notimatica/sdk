@@ -15,7 +15,6 @@ module.exports = class Native extends AbstractDriver {
     })
 
     return this.provider.ready()
-      .then(() => this._subscribeToEvents())
       .then(() => super.ready())
   }
 

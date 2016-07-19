@@ -88,6 +88,9 @@ const Notimatica = {
     Notimatica.on('ready', function () {
       console.info('Notimatica: SDK inited with:', Notimatica.options)
     })
+    Notimatica.on('plugin:ready', function (plugin) {
+      plugin.init(Notimatica.options.plugins[plugin.name])
+    })
     Notimatica.on('unsupported', function (message) {
       console.warn('Notimatica: ' + message)
     })
@@ -96,9 +99,6 @@ const Notimatica = {
     })
     Notimatica.on('error', function (message) {
       console.error('Notimatica: ' + message)
-    })
-    Notimatica.on('plugin:ready', function (plugin) {
-      plugin.init(Notimatica.options.plugins[plugin.name])
     })
 
     if (Notimatica.options.debug) {
@@ -167,8 +167,7 @@ const Notimatica = {
    */
   subscribe () {
     if (!Notimatica.pushSupported()) {
-      Notimatica.emit('subscribe:fail', 'Web push unsupported by browser.')
-      return
+      return Notimatica.emit('subscribe:fail', 'Web push unsupported by browser.')
     }
 
     Notimatica._driver.subscribe()
@@ -190,8 +189,7 @@ const Notimatica = {
    */
   unsubscribe () {
     if (Notimatica.isUnsubscribed()) {
-      Notimatica.emit('unsubscribe:success')
-      return
+      return Notimatica.emit('unsubscribe:success')
     }
 
     Notimatica._driver.unsubscribe()
@@ -212,7 +210,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   isUnsubscribed () {
-    return Notimatica._driver.wasUnsubscribed
+    return !Notimatica.isSubscribed()
   },
 
   /**
