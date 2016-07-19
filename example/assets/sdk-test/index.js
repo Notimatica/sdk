@@ -38,7 +38,7 @@ var options = {
   }
 }
 
-if (typeof process !== 'undefined') {
+if (window.location.host === 'localhost:8081') {
   options.sdkPath = ''
 }
 

@@ -1,5 +1,6 @@
 @import "../assets/mixins/animation";
 @import "../assets/tooltip";
+@import "./popover";
 
 .notimatica-reset {
   margin: 0;
@@ -88,6 +89,7 @@
     }
   }
 }
+
 
 @include keyframe(ring1) {
 	0% { opacity: 1; }

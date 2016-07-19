@@ -2,7 +2,8 @@ require('./button.scss')
 
 import $ from 'jbone'
 import AbstractPlugin from './abstract'
-import { SDK_PATH } from '../defaults'
+import Popover from './popover'
+
 
 const Button = class Button extends AbstractPlugin {
   /**
@@ -33,7 +34,7 @@ const Button = class Button extends AbstractPlugin {
           ? Notimatica.unsubscribe()
           : Notimatica.subscribe()
       },
-      css: SDK_PATH + '/notimatica-button.css',
+      css: this.options.sdkPath + '/notimatica-button.css',
       cssTarget: null
     }
   }
@@ -70,6 +71,15 @@ const Button = class Button extends AbstractPlugin {
   }
 
   /**
+   * Return target node.
+   *
+   * @return {Object}
+   */
+  get target () {
+    return this.$button
+  }
+
+  /**
    * Get tooltip position from button position.
    *
    * @param  {String} position The button position
@@ -100,6 +110,10 @@ const Button = class Button extends AbstractPlugin {
       this.unsubscribed(this.$button)
     })
 
+    Notimatica.on('button:show-popover', (title, body) => {
+      this.showPopover(title, body)
+    })
+
     return fetch(this.options.css)
       .then((response) => {
         if (response.status === 200) {
@@ -121,6 +135,8 @@ const Button = class Button extends AbstractPlugin {
     }
 
     this.$button = this.build()
+
+    this.popover = new Popover(this.$button)
   }
 
   /**
@@ -140,7 +156,6 @@ const Button = class Button extends AbstractPlugin {
       : this.unsubscribed($button)
 
     $button.appendTo(this.options.target || document.body)
-
     return $button
   }
 
@@ -166,6 +181,10 @@ const Button = class Button extends AbstractPlugin {
       .removeClass('notimatica-plugin-button-unsubscribe')
       .addClass('notimatica-plugin-button-subscribe')
       .attr('data-balloon', this.options.tooltip.subscribe)
+  }
+
+  showPopover (title, body) {
+    this.popover.show(title, body)
   }
 }
 
