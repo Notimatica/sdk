@@ -10,6 +10,10 @@ module.exports = class Native extends AbstractDriver {
    * @return {Promise}
    */
   ready () {
+    Notimatica.on('subscribe:success', (subscription) => {
+      this.register(subscription)
+    })
+
     return this.provider.ready()
       .then(() => this._subscribeToEvents())
       .then(() => super.ready())
@@ -126,14 +130,5 @@ module.exports = class Native extends AbstractDriver {
         Notimatica.emit('unregister:fail', err)
         throw new Error('Failed to unregister.')
       })
-  }
-
-  /**
-   * Subscribe to provider events.
-   */
-  _subscribeToEvents () {
-    this.provider.on('subscribe:success', (subscription) => {
-      this.register(subscription)
-    })
   }
 }

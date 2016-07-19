@@ -1,5 +1,3 @@
-import events from 'minivents'
-
 const provider = class AbstractProvider {
   /**
    * Constructor.
@@ -9,8 +7,6 @@ const provider = class AbstractProvider {
   constructor (options, visitor) {
     this.options = options
     this.visitor = visitor
-
-    events(this)
   }
 
   /**

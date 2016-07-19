@@ -53,7 +53,7 @@ const provider = class Safari extends AbstractProvider {
             this._requestPermission()
             break
           case 'granted':
-            this.emit('subscribe:success', permissionData.deviceToken)
+            Notimatica.emit('subscribe:success', permissionData.deviceToken)
             break
           default:
             Notimatica.emit('subscribe:fail', 'Safari denied to send notification')
@@ -118,7 +118,7 @@ const provider = class Safari extends AbstractProvider {
           throw new Error('Subcription was empty.')
         }
 
-        this.emit('subscribe:success', permissionData.deviceToken)
+        Notimatica.emit('subscribe:success', permissionData.deviceToken)
       }
     )
   }
