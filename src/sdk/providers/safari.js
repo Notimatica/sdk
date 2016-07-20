@@ -70,9 +70,17 @@ const provider = class Safari extends AbstractProvider {
   unsubscribe () {
     return this.ready()
       .then((permissionData) => {
-        permissionData.permission === 'granted'
-          ? Promise.resolve()
-          : Promise.reject()
+        if (permissionData.permission === 'granted') {
+          Notimatica.emit(
+            'popover:show',
+            'You are unsubscribed',
+            'Now you can open notifications preferences and remove this site from the list.'
+          )
+
+          Promise.resolve()
+        } else {
+          Promise.reject()
+        }
       })
   }
 
@@ -118,7 +126,7 @@ const provider = class Safari extends AbstractProvider {
           throw new Error('Subcription was empty.')
         }
 
-        Notimatica.emit('subscribe:success', permissionData.deviceToken)
+        Notimatica.emit('subscribe:subscription-received', permissionData.deviceToken)
       }
     )
   }

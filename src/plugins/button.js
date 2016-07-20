@@ -25,6 +25,7 @@ const Button = class Button extends AbstractPlugin {
       autorun: true,
       target: null,
       position: 'bottom-right',
+      popover: true,
       tooltip: {
         subscribe: 'Subscribe to notifications?',
         unsubscribe: 'Unsubscribe from notifications?'
@@ -46,10 +47,10 @@ const Button = class Button extends AbstractPlugin {
    */
   get template () {
     /*eslint quotes: 0*/
-    return `<div class="notimatica-reset notimatica-plugin-button">
-      <span class="notimatica-plugin-button-content">
-        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-           viewBox="0 0 1920 1920" style="enable-background:new 0 0 1920 1920;" xml:space="preserve">
+    return `<div class="notimatica-reset notimatica-plugin-button-wrapper">
+      <div class="notimatica-plugin-button">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+           viewBox="0 0 1920 1920" xml:space="preserve">
           <path class="notimatica-plugin-button-bell" d="M954,1291.7c-16-0.2-438.2-5.2-438.5,0c-3.5,65.2,55.5,71.4,55.5,71.4h382.5h1H1337c0,0,59.1-6.2,55.5-71.4 C1392.3,1286.5,970,1291.5,954,1291.7z"/>
           <path class="notimatica-plugin-button-bell" d="M859.1,1394.8c5.3,47.6,45.6,84.6,94.6,84.6s89.3-37,94.6-84.6H859.1z"/>
           <path class="notimatica-plugin-button-bell" d="M1232.3,880c-11.5-143.7,19.4-248.6-74.1-290c-45.5-20.2-94.5-29.9-133.2-34.6c-2.2-8.9-8.2-16.5-16.3-21.4
@@ -66,7 +67,7 @@ const Button = class Button extends AbstractPlugin {
           <path class="notimatica-plugin-button-wave-2" d="M1497.4,728.9c56.3,59.7,90.9,140.1,90.9,228.5c0,90-35.9,171.8-94.1,231.9l39.9,34.4c0,0,1.6,2.7,4,6.4
             c68.1-70.7,110-166.8,110-272.7c0-105-41.2-200.3-108.3-270.8L1497.4,728.9z"/>
         </svg>
-      </span>
+      </div>
     </div>`
   }
 
@@ -76,7 +77,7 @@ const Button = class Button extends AbstractPlugin {
    * @return {Object}
    */
   get target () {
-    return this.$button
+    return this.$wrapper
   }
 
   /**
@@ -103,15 +104,15 @@ const Button = class Button extends AbstractPlugin {
    */
   prepare () {
     Notimatica.on('subscribe:success', () => {
-      this.subscribed(this.$button)
+      this.subscribed(this.$wrapper)
     })
 
     Notimatica.on('unsubscribe:success', () => {
-      this.unsubscribed(this.$button)
+      this.unsubscribed(this.$wrapper)
     })
 
     Notimatica.on('button:show-popover', (title, body) => {
-      this.showPopover(title, body)
+      this.popover.show(title, body)
     })
 
     return fetch(this.options.css)
@@ -130,13 +131,15 @@ const Button = class Button extends AbstractPlugin {
    * Play widget.
    */
   play () {
-    if (this.$button) {
-      this.$button.remove()
+    if (this.$wrapper) {
+      this.$wrapper.remove()
     }
 
-    this.$button = this.build()
+    this.$wrapper = this.build()
 
-    this.popover = new Popover(this.$button)
+    if (this.options.popover) {
+      this.popover = new Popover(this.$wrapper)
+    }
   }
 
   /**
@@ -145,18 +148,20 @@ const Button = class Button extends AbstractPlugin {
    * @return {Object}
    */
   build () {
-    const $button = $(this.template)
-      .addClass('notimatica-reset notimatica-plugin-button')
+    const $wrapper = $(this.template)
       .addClass('notimatica-plugin-button-' + this.options.position)
+
+    $wrapper.find('.notimatica-plugin-button')
       .attr('data-balloon-pos', this.getTooltipPosition(this.options.position))
       .on('click', this.options.click)
 
     Notimatica.isSubscribed()
-      ? this.subscribed($button)
-      : this.unsubscribed($button)
+      ? this.subscribed($wrapper)
+      : this.unsubscribed($wrapper)
 
-    $button.appendTo(this.options.target || document.body)
-    return $button
+    $wrapper.appendTo(this.options.target || document.body)
+
+    return $wrapper
   }
 
   /**
@@ -164,8 +169,8 @@ const Button = class Button extends AbstractPlugin {
    *
    * @param {Object} $button The button node
    */
-  subscribed ($button) {
-    $button
+  subscribed ($wrapper) {
+    $wrapper.find('.notimatica-plugin-button')
       .removeClass('notimatica-plugin-button-subscribe')
       .addClass('notimatica-plugin-button-unsubscribe')
       .attr('data-balloon', this.options.tooltip.unsubscribe)
@@ -176,15 +181,11 @@ const Button = class Button extends AbstractPlugin {
    *
    * @param {Object} position The button node
    */
-  unsubscribed ($button) {
-    $button
+  unsubscribed ($wrapper) {
+    $wrapper.find('.notimatica-plugin-button')
       .removeClass('notimatica-plugin-button-unsubscribe')
       .addClass('notimatica-plugin-button-subscribe')
       .attr('data-balloon', this.options.tooltip.subscribe)
-  }
-
-  showPopover (title, body) {
-    this.popover.show(title, body)
   }
 }
 

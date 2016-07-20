@@ -1,40 +1,32 @@
 .notimatica-popover {
-  position: absolute;
-  z-index: 1060;
-  width: 276px;
+  position: fixed;
+  z-index: 400002;
+  max-width: 276px;
   padding: 1px;
   border: 1px solid #d3e0e9;
   border-radius: 6px;
   box-shadow: 0 5px 10px rgba(0,0,0,.2);
-  text-align: start;
-  text-decoration: none;
-  text-shadow: none;
-  text-transform: none;
-  letter-spacing: normal;
-  word-break: normal;
-  word-spacing: normal;
-  word-wrap: normal;
-  white-space: normal;
 
   &.fade {
-    @include base-effects();
+    opacity: 0;
+    pointer-events: none;
+    transition: all .18s ease-out;
 
     &.in {
       opacity: 1;
       pointer-events: auto;
-      @include transform(translate(-50%, 0));
-      &:before {
+      &:after {
         opacity: 1;
         pointer-events: auto;
-        @include transform(translate(-50%, 0));
       }
     }
   }
 
-  &:before {
+  &:after {
     @include svg-arrow(#fff);
-    @include base-effects();
-
+    opacity: 0;
+    pointer-events: none;
+    transition: all .18s ease-out;
     content: '';
     position: absolute;
     z-index: 10;
@@ -48,27 +40,32 @@
     background-color: #f5f8fa;
     border-bottom: 1px solid #d3e0e9;
     border-radius: 5px 5px 0 0;
+    padding-right: 25px;
   }
   .notimatica-popover-content {
     background-color: #fff;
-    border-radius: 5px 5px 0 0;
+    border-radius: 0 0 5px 5px;
+  }
+  .notimatica-popover-close {
+    position: absolute;
+    top: 9px;
+    right: 14px;
+    z-index: 400003;
+    cursor: pointer;
+    color: #23527c;
+    font-size: 14px;
   }
 }
 
 .notimatica-plugin-button-bottom-right {
   .notimatica-popover {
-    bottom: 100%;
-    left: 50%;
+    bottom: 100px;
+    right: 30px;
     margin-bottom: 5px + $balloon-arrow-height;
-    @include transform(translate(-50%, 10px));
-    @include transform-origin(top);
 
-    &:before {
-      bottom: 100%;
-      left: 50%;
+    &:after {
+      right: 15px;
       margin-bottom: 5px;
-      @include transform(translate(-50%, 10px));
-      @include transform-origin(top);
     }
   }
 }

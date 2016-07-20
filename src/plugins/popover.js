@@ -9,6 +9,14 @@ export default class Popover {
     this.target = target
 
     this.$popover = this.build()
+
+    Notimatica.on('popover:show', (title, body, options) => {
+      this.show(title, body, options)
+    })
+    Notimatica.on('popover:hide', () => {
+      this.hide()
+    })
+    Notimatica.emit('popover:ready', this)
   }
 
   /**
@@ -19,8 +27,9 @@ export default class Popover {
   get template () {
     /*eslint quotes: 0*/
     return `<div class="notimatica-popover">
-      <div class="notimatica-popover-title"></div>
-      <div class="notimatica-popover-content"></div>
+      <div class="notimatica-popover-title" style="display:none;"></div>
+      <div class="notimatica-popover-content" style="display:none;"></div>
+      <div class="notimatica-popover-close">x</div>
     </div>`
   }
 
@@ -32,24 +41,35 @@ export default class Popover {
   build () {
     const $popover = $(this.template)
       .addClass('fade')
-      .on('blur', () => this.hide())
 
-    return this.target.parent().append($popover)
+    $popover.find('.notimatica-popover-close').on('click', () => {
+      this.hide()
+    })
+
+    return $popover.appendTo(this.target)
   }
 
   /**
    * Show popover.
    *
-   * @param  {String} title [description]
-   * @param  {[String]} body  [description]
+   * @param  {String} title The title
+   * @param  {String} body  The body
    */
   show (title, body) {
-    this.$popover.find('.notimatica-popover-title').html(title)
-    this.$popover.find('.notimatica-popover-content').html(body)
+    if (title) {
+      this.$popover.find('.notimatica-popover-title')
+        .html(title).css({display: 'block'})
+    }
+    if (body) {
+      this.$popover.find('.notimatica-popover-content')
+        .html(body).css({display: 'block'})
+    }
     this.$popover.addClass('in')
-    console.log('Show popover')
   }
 
+  /**
+   * Hide popover.
+   */
   hide () {
     this.$popover.removeClass('in')
   }

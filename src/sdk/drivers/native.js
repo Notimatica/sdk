@@ -10,15 +10,9 @@ module.exports = class Native extends AbstractDriver {
    * @return {Promise}
    */
   ready () {
-    Notimatica.on('subscribe:success', (subscription) => {
+    Notimatica.on('subscribe:subscription-received', (subscription) => {
       this.register(subscription)
     })
-
-    Notimatica.emit(
-      'button:show-popover',
-      'Popover title',
-      "And here's some amazing content. It's very engaging. Right?"
-    )
 
     return this.provider.ready()
       .then(() => super.ready())
