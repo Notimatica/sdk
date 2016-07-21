@@ -179,7 +179,7 @@ export function createNode (html) {
  */
 export function t (string) {
   const lang = Notimatica.visitor.env.language
-
+  console.log(string, lang, Notimatica.strings[lang], Notimatica.strings[lang][string])
   return typeof Notimatica.strings[lang][string] !== 'undefined'
     ? Notimatica.strings[lang][string]
     : typeof Notimatica.strings[Notimatica.options.defaultLocale][string] !== 'undefined'

@@ -51,7 +51,7 @@ require('./button.scss')
 import { t } from '../../utils'
 
 export default {
-  props: ['position', 'tooltip', 'usePopover', 'popover', 'click'],
+  props: ['position', 'usePopover', 'click'],
   data () {
     return {
       acting: false,
@@ -125,12 +125,22 @@ export default {
           : t('tooltip.subscribe')
     },
 
+    /**
+     * Get popover message.
+     *
+     * @return {String}
+     */
     popoverMessage () {
       return this.subscribed
         ? t('popover.unsubscribe')
         : t('popover.subscribe')
     },
 
+    /**
+     * Get popover button.
+     *
+     * @return {String}
+     */
     popoverButton () {
       return this.subscribed
         ? t('popover.button.unsubscribe')
