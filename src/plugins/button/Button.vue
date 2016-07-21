@@ -7,7 +7,7 @@
       'notimatica-plugin-button-acting': acting
     }"
     :data-balloon-pos="tooltipPosition"
-    :data-balloon="t(tooltipMessage)"
+    :data-balloon="tooltipMessage"
     @click="processClick">
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
        viewBox="0 0 1920 1920" xml:space="preserve">
@@ -36,9 +36,9 @@
       <div class="notimatica-popover-content">{{{ message.body }}}</div>
     </div>
     <div v-else>
-      <div class="notimatica-popover-title">{{ t(tooltipMessage) }}</div>
-      <div class="notimatica-popover-content"><p>{{ t(popoverMessage) }}</p>
-        <button @click="click">{{ t(popoverButton) }}</button>
+      <div class="notimatica-popover-title">{{ tooltipMessage }}</div>
+      <div class="notimatica-popover-content"><p>{{ popoverMessage }}</p>
+        <button @click="click">{{ popoverButton }}</button>
       </div>
     </div>
     <div class="notimatica-popover-close" @click="hidePopover">&times;</div>
@@ -119,22 +119,22 @@ export default {
      */
     tooltipMessage () {
       return this.counter > 0
-        ? 'tooltip.message'
+        ? t('tooltip.message')
         : this.subscribed
-          ? 'tooltip.unsubscribe'
-          : 'tooltip.subscribe'
+          ? t('tooltip.unsubscribe')
+          : t('tooltip.subscribe')
     },
 
     popoverMessage () {
       return this.subscribed
-        ? 'popover.unsubscribe'
-        : 'popover.subscribe'
+        ? t('popover.unsubscribe')
+        : t('popover.subscribe')
     },
 
     popoverButton () {
       return this.subscribed
-        ? 'popover.button.unsubscribe'
-        : 'popover.button.subscribe'
+        ? t('popover.button.unsubscribe')
+        : t('popover.button.subscribe')
     }
   },
   methods: {
