@@ -7,7 +7,7 @@
     }"
     :data-balloon-pos="tooltipPosition"
     :data-balloon="tooltipMessage"
-    @click="click">
+    @click="processClick">
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
        viewBox="0 0 1920 1920" xml:space="preserve">
       <path class="notimatica-plugin-button-bell" d="M954,1291.7c-16-0.2-438.2-5.2-438.5,0c-3.5,65.2,55.5,71.4,55.5,71.4h382.5h1H1337c0,0,59.1-6.2,55.5-71.4 C1392.3,1286.5,970,1291.5,954,1291.7z"/>
@@ -42,7 +42,7 @@ export default {
   data () {
     return {
       subscribed: false,
-      counter: 1
+      counter: 0
     }
   },
   components: {
@@ -57,14 +57,14 @@ export default {
       this.subscribed = false
     })
 
-    Notimatica.on('popover:show', (title, body, options) => {
-      this.$refs.popover.show(title, body, options)
+    Notimatica.on('popover:show', (title, body) => {
+      this.$refs.popover.message(title, body)
       this.counter++
     })
 
     Notimatica.on('popover:hide', () => {
       this.$refs.popover.hide()
-      this.counter--
+      this.counter = 0
     })
 
     this.subscribed = Notimatica.isSubscribed()
@@ -92,9 +92,24 @@ export default {
      * @return {String}
      */
     tooltipMessage () {
-      return this.subscribed
-        ? this.tooltip.unsubscribe
-        : this.tooltip.subscribe
+      return this.popover && this.counter > 0
+        ? this.tooltip.message
+        : this.subscribed
+          ? this.tooltip.unsubscribe
+          : this.tooltip.subscribe
+    }
+  },
+  methods: {
+    /**
+     *
+     * @return {[type]}
+     */
+    processClick () {
+      if (this.popover) {
+        this.$refs.popover.show()
+      } else {
+        this.click()
+      }
     }
   }
 }

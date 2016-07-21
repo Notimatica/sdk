@@ -45,11 +45,17 @@ if (window.location.host === 'localhost:8081') {
 Notimatica.push(['init', options])
 
 $(function () {
-  $('.subscribe-link').on('click', function () {
+  $('.subscribe-link').on('click', function (e) {
+    e.preventDefault()
     Notimatica.push(['subscribe'])
   })
-  $('.unsubscribe-link').on('click', function () {
+  $('.unsubscribe-link').on('click', function (e) {
+    e.preventDefault()
     Notimatica.push(['unsubscribe'])
+  })
+  $('.show-message').on('click', function (e) {
+    e.preventDefault()
+    Notimatica.push(['emit', 'popover:show', 'You have a message!', 'Something in our SDK sent you a message'])
   })
 
   $('.toggle-options').on('click', function () {

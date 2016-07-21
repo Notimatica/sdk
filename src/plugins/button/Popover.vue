@@ -1,5 +1,5 @@
 <template>
-  <div class="notimatica-popover fade" :class="{in: popover.body}">
+  <div class="notimatica-popover fade" :class="{in: in && popover.body}">
     <div class="notimatica-popover-title" v-if="popover.title">{{ popover.title }}</div>
     <div class="notimatica-popover-content">{{{ popover.body }}}</div>
     <div class="notimatica-popover-close" @click="hide">x</div>
@@ -11,7 +11,7 @@ export default {
   props: ['position'],
   data () {
     return {
-      show: false,
+      in: false,
       popover: {
         title: '',
         body: ''
@@ -23,21 +23,30 @@ export default {
   },
   methods: {
     /**
-     * Show popover.
+     * Set message.
      *
      * @param  {String} title The title
      * @param  {String} body  The body
      */
-    show (title, body) {
+    message (title, body) {
       this.popover = { title, body }
+    },
+
+    /**
+     * Show popover.
+     */
+    show () {
+      this.in = true
     },
 
     /**
      * Hide popover.
      */
     hide () {
+      this.in = false
       this.popover.title = ''
       this.popover.body = ''
+      this.$parent.counter = 0
     }
   }
 }

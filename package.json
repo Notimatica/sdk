@@ -60,7 +60,8 @@
   "standard": {
     "globals": [
       "Notimatica",
-      "fetch"
+      "fetch",
+      "$"
     ]
   }
 }

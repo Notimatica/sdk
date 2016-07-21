@@ -29,7 +29,8 @@ const Plugin = class Plugin extends AbstractPlugin {
       popover: true,
       tooltip: {
         subscribe: 'Subscribe to notifications?',
-        unsubscribe: 'Unsubscribe from notifications?'
+        unsubscribe: 'Unsubscribe from notifications?',
+        message: 'We have a message for you'
       },
       click: () => {
         Notimatica.isSubscribed()
