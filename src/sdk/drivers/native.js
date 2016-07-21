@@ -38,14 +38,14 @@ module.exports = class Native extends AbstractDriver {
   register (subscription) {
     return this._register(subscription)
       // Save token
-      .then((token) => this.visitor.uuid(token))
+      .then((token) => Notimatica.visitor.uuid(token))
       // Emit success event
       .then((token) => {
         this.isSubscribed = true
         this.wasUnsubscribed = false
         Notimatica.emit('subscribe:success', token)
 
-        return this.visitor.unsubscribe(null)
+        return Notimatica.visitor.unsubscribe(null)
       })
       .catch((err) => Notimatica.emit('subscribe:fail', err))
   }
@@ -59,13 +59,13 @@ module.exports = class Native extends AbstractDriver {
     Notimatica.emit('unsubscribe:start')
 
     return this.provider.unsubscribe()
-      .then(() => this.visitor.uuid())
+      .then(() => Notimatica.visitor.uuid())
       .then((token) => this._unregister(token))
       .then(() => {
         this.isSubscribed = false
         this.wasUnsubscribed = true
-        this.visitor.uuid(null)
-        this.visitor.unsubscribe()
+        Notimatica.visitor.uuid(null)
+        Notimatica.visitor.unsubscribe()
       })
       .then(() => Notimatica.emit('unsubscribe:success'))
       .catch((err) => Notimatica.emit('unsubscribe:fail', err))
@@ -78,7 +78,7 @@ module.exports = class Native extends AbstractDriver {
    * @returns {Object}
    */
   _register (subscription) {
-    const env = this.visitor.env
+    const env = Notimatica.visitor.env
     const provider = this.provider.name
     const data = {
       provider: provider,

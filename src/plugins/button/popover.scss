@@ -1,7 +1,7 @@
 .notimatica-popover {
   position: fixed;
   z-index: 400002;
-  max-width: 276px;
+  max-width: 296px;
   padding: 1px;
   border: 1px solid #d3e0e9;
   border-radius: 6px;
@@ -40,7 +40,7 @@
     background-color: #f5f8fa;
     border-bottom: 1px solid #d3e0e9;
     border-radius: 5px 5px 0 0;
-    padding-right: 25px;
+    padding-right: 30px;
   }
   .notimatica-popover-content {
     background-color: #fff;
@@ -48,8 +48,8 @@
   }
   .notimatica-popover-close {
     position: absolute;
-    top: 9px;
-    right: 14px;
+    top: 3px;
+    right: 8px;
     z-index: 400003;
     cursor: pointer;
     color: #23527c;

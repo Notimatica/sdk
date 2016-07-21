@@ -4,9 +4,8 @@ const provider = class AbstractProvider {
    *
    * @param  {Object} options Options map
    */
-  constructor (options, visitor) {
+  constructor (options) {
     this.options = options
-    this.visitor = visitor
   }
 
   /**

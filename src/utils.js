@@ -156,17 +156,33 @@ export function findNode (element, fallback) {
 
 /**
  * Create DOM node by html string
- * @param  {String} htmlStr The html string
+ * @param  {String} html The html string
  * @return {Object}
  */
-export function createNode (htmlStr) {
+export function createNode (html) {
   const frag = document.createDocumentFragment()
   const temp = document.createElement('div')
 
-  temp.innerHTML = htmlStr
+  temp.innerHTML = html
   while (temp.firstChild) {
     frag.appendChild(temp.firstChild)
   }
 
   return frag
+}
+
+/**
+ * Return text string. Used for strings overriding.
+ *
+ * @param  {String} string String id.
+ * @return {String}
+ */
+export function t (string) {
+  const lang = Notimatica.visitor.env.language
+
+  return typeof Notimatica.strings[lang][string] !== 'undefined'
+    ? Notimatica.strings[lang][string]
+    : typeof Notimatica.strings[Notimatica.options.defaultLocale][string] !== 'undefined'
+      ? Notimatica.strings[Notimatica.options.defaultLocale][string]
+      : string
 }

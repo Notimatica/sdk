@@ -72,7 +72,7 @@ const provider = class Gcm extends AbstractProvider {
    * @return {Promise}
    */
   isSubscribed () {
-    return this.visitor.isSubscribed()
+    return Notimatica.visitor.isSubscribed()
   }
 
   /**
@@ -81,7 +81,7 @@ const provider = class Gcm extends AbstractProvider {
    * @return {Promise}
    */
   wasUnsubscribed () {
-    return this.visitor.wasUnsubscribed()
+    return Notimatica.visitor.wasUnsubscribed()
   }
 }
 

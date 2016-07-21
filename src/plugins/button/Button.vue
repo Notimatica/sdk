@@ -3,10 +3,11 @@
     class="notimatica-plugin-button"
     :class="{
       'notimatica-plugin-button-unsubscribe': subscribed,
-      'notimatica-plugin-button-subscribe': !subscribed
+      'notimatica-plugin-button-subscribe': !subscribed,
+      'notimatica-plugin-button-acting': acting
     }"
     :data-balloon-pos="tooltipPosition"
-    :data-balloon="tooltipMessage"
+    :data-balloon="t(tooltipMessage)"
     @click="processClick">
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
        viewBox="0 0 1920 1920" xml:space="preserve">
@@ -26,48 +27,73 @@
       <path class="notimatica-plugin-button-wave-2" d="M1497.4,728.9c56.3,59.7,90.9,140.1,90.9,228.5c0,90-35.9,171.8-94.1,231.9l39.9,34.4c0,0,1.6,2.7,4,6.4
         c68.1-70.7,110-166.8,110-272.7c0-105-41.2-200.3-108.3-270.8L1497.4,728.9z"/>
     </svg>
-    <div class="notimatica-plugin-button-counter" :class="{in: counter > 0 && popover}">{{ counter }}</div>
+    <div class="notimatica-plugin-button-counter" :class="{in: counter > 0}">{{ counter }}</div>
   </div>
 
-  <popover v-ref:popover :position="position" v-if="popover"></popover>
+  <div class="notimatica-popover fade" :class="{'in': popoverActive}" v-if="usePopover || counter > 0">
+    <div v-if="message.body">
+      <div class="notimatica-popover-title" v-if="message.title">{{ message.title }}</div>
+      <div class="notimatica-popover-content">{{{ message.body }}}</div>
+    </div>
+    <div v-else>
+      <div class="notimatica-popover-title">{{ t(tooltipMessage) }}</div>
+      <div class="notimatica-popover-content"><p>{{ t(popoverMessage) }}</p>
+        <button @click="click">{{ t(popoverButton) }}</button>
+      </div>
+    </div>
+    <div class="notimatica-popover-close" @click="hidePopover">&times;</div>
+  </div>
 </template>
 
 <script>
 require('./button.scss')
 
-import Popover from './Popover'
+import { t } from '../../utils'
 
 export default {
-  props: ['position', 'tooltip', 'popover', 'click'],
+  props: ['position', 'tooltip', 'usePopover', 'popover', 'click'],
   data () {
     return {
+      acting: false,
       subscribed: false,
-      counter: 0
+      counter: 0,
+      message: {
+        tilte: '',
+        body: ''
+      },
+      popoverActive: false
     }
   },
-  components: {
-    Popover
-  },
   ready () {
+    Notimatica.on('subscribe:start', () => {
+      this.acting = true
+    })
     Notimatica.on('subscribe:success', () => {
       this.subscribed = true
+      this.acting = false
+      this.hidePopover()
     })
 
+    Notimatica.on('unsubscribe:start', () => {
+      this.acting = true
+    })
     Notimatica.on('unsubscribe:success', () => {
       this.subscribed = false
+      this.acting = false
+      this.hidePopover()
     })
 
     Notimatica.on('popover:show', (title, body) => {
-      this.$refs.popover.message(title, body)
-      this.counter++
+      this.setMessage(title, body)
     })
 
     Notimatica.on('popover:hide', () => {
-      this.$refs.popover.hide()
-      this.counter = 0
+      this.hidePopover()
     })
 
     this.subscribed = Notimatica.isSubscribed()
+
+    Notimatica.emit('button:ready')
   },
   computed: {
     /**
@@ -92,24 +118,71 @@ export default {
      * @return {String}
      */
     tooltipMessage () {
-      return this.popover && this.counter > 0
-        ? this.tooltip.message
+      return this.counter > 0
+        ? 'tooltip.message'
         : this.subscribed
-          ? this.tooltip.unsubscribe
-          : this.tooltip.subscribe
+          ? 'tooltip.unsubscribe'
+          : 'tooltip.subscribe'
+    },
+
+    popoverMessage () {
+      return this.subscribed
+        ? 'popover.unsubscribe'
+        : 'popover.subscribe'
+    },
+
+    popoverButton () {
+      return this.subscribed
+        ? 'popover.button.unsubscribe'
+        : 'popover.button.subscribe'
     }
   },
   methods: {
     /**
-     *
-     * @return {[type]}
+     * Import t function from global scope.
+     */
+    t,
+
+    /**
+     * Process button click.
      */
     processClick () {
-      if (this.popover) {
-        this.$refs.popover.show()
+      if (this.usePopover || this.counter > 0) {
+        this.showPopover()
       } else {
         this.click()
       }
+    },
+
+    /**
+     * Set message.
+     *
+     * @param  {String} title The title
+     * @param  {String} body  The body
+     */
+    setMessage (title, body) {
+      this.message = { title, body }
+      this.counter++
+    },
+
+    /**
+     * Show popover.
+     */
+    showPopover () {
+      this.popoverActive = true
+    },
+
+    /**
+     * Hide popover.
+     */
+    hidePopover () {
+      this.popoverActive = false
+      this.counter = 0
+
+      setTimeout(() => {
+        this.message.title = ''
+        this.message.body = ''
+      }, 200)
     }
   }
 }

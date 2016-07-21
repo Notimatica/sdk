@@ -26,16 +26,30 @@ const Plugin = class Plugin extends AbstractPlugin {
       css: this.options.sdkPath + '/notimatica-button.css',
       cssTarget: 'head',
       position: 'bottom-right', // bottom-right, bottom-left, top-right, top-left
-      popover: true,
-      tooltip: {
-        subscribe: 'Subscribe to notifications?',
-        unsubscribe: 'Unsubscribe from notifications?',
-        message: 'We have a message for you'
-      },
+      usePopover: true,
       click: () => {
         Notimatica.isSubscribed()
           ? Notimatica.unsubscribe()
           : Notimatica.subscribe()
+      }
+    }
+  }
+
+  /**
+   * Default strings.
+   *
+   * @return {Object}
+   */
+  get strings () {
+    return {
+      'en': {
+        'popover.subsctribe': "Do you want to recieve desktop notifications from our site? Click Subscribe button",
+        'popover.unsubscribe': "If you don't want to recieve notifications anymore, click Unsubscribe button",
+        'popover.button.subscribe': 'Subscribe',
+        'popover.button.unsubscribe': 'Unsubscribe',
+        'tooltip.subsctribe': 'Subscribe to notifications?',
+        'tooltip.unsubscribe': 'Unsubscribe from notifications',
+        'tooltip.message': 'There is a message for you'
       }
     }
   }
@@ -48,7 +62,7 @@ const Plugin = class Plugin extends AbstractPlugin {
   get template () {
     /*eslint quotes: 0*/
     return `<div class="notimatica-reset notimatica-plugin-button-wrapper notimatica-plugin-button-${this.options.position}">
-      <button :position="position" :tooltip="tooltip" :popover="popover" :click="click"></button>
+      <button :position="position" :use-popover="usePopover" :click="click"></button>
     </div>`
   }
 
@@ -78,8 +92,7 @@ const Plugin = class Plugin extends AbstractPlugin {
       el: '.notimatica-plugin-button-wrapper',
       data: {
         position: this.options.position,
-        tooltip: this.options.tooltip,
-        popover: this.options.popover,
+        usePopover: this.options.usePopover,
         click: this.options.click
       },
       components: {

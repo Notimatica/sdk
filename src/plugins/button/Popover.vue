@@ -1,18 +1,24 @@
 <template>
-  <div class="notimatica-popover fade" :class="{in: in && popover.body}">
-    <div class="notimatica-popover-title" v-if="popover.title">{{ popover.title }}</div>
-    <div class="notimatica-popover-content">{{{ popover.body }}}</div>
-    <div class="notimatica-popover-close" @click="hide">x</div>
+  <div class="notimatica-popover fade" :class="{'in': in}">
+    <div v-if="message.body">
+      <div class="notimatica-popover-title" v-if="message.title">{{ popover.title }}</div>
+      <div class="notimatica-popover-content">{{{ popover.body }}}</div>
+    </div>
+    <div v-else>
+      <div class="notimatica-popover-title" v-if="message.title">{{ texts.subscribe }}</div>
+      <div class="notimatica-popover-content">{{ texts.subscribe }}</div>
+    </div>
+    <div class="notimatica-popover-close" @click="hide">&times;</div>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['position'],
+  props: ['position', 'texts'],
   data () {
     return {
       in: false,
-      popover: {
+      message: {
         title: '',
         body: ''
       }

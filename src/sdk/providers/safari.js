@@ -103,7 +103,7 @@ const provider = class Safari extends AbstractProvider {
     const permission = this.ready()
       .then((permissionData) => permissionData.permission === 'denied')
 
-    const visitor = this.visitor.wasUnsubscribed()
+    const visitor = Notimatica.visitor.wasUnsubscribed()
 
     return Promise.all([permission, visitor])
       .then((values) => {

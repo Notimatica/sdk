@@ -54,7 +54,9 @@ $button-width: 50px;
 
   &:hover {
     box-shadow: 0px 2px 5px -1px rgba(0,0,0,0.75);
+  }
 
+  &.notimatica-plugin-button-acting {
     .notimatica-plugin-button-wave-1 {
       @include animation(0s, 1000ms, 3, ring1, ease-out)
     }

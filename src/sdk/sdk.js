@@ -1,4 +1,5 @@
 import events from 'minivents'
+import Visitor from '../visitor'
 import { merge, isHttps } from '../utils'
 import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
 
@@ -6,6 +7,8 @@ const Notimatica = {
   _inited: false,
   _driver: null,
   _subscribed: false,
+  visitor: null,
+  strings: {},
   options: {
     debug: DEBUG,
     project: null,
@@ -17,7 +20,9 @@ const Notimatica = {
       height: POPUP_HEIGHT
     },
     plugins: {},
-    sdkPath: SDK_PATH
+    sdkPath: SDK_PATH,
+    strings: {},
+    defaultLocale: 'en'
   },
 
   /**
@@ -29,9 +34,12 @@ const Notimatica = {
     if (this._inited) return console.warn('Notimatica: SDK was already inited.')
 
     this.options = merge(this.options, options || {})
+    this.strings = merge(this.strings, this.options.strings)
+    delete this.options.strings
 
     if (this.options.project === null) return this.emit('error', 'Notimatica: Project ID is absent.')
 
+    this._prepareVisitor()
     this._prepareEvents()
     this._prepareDriver()
 
@@ -73,6 +81,13 @@ const Notimatica = {
   },
 
   /**
+   * Prepare visitor.
+   */
+  _prepareVisitor () {
+    this.visitor = new Visitor()
+  },
+
+  /**
    * Prepare popup.
    *
    * @param  {Object} visitor The visitor object.
@@ -89,6 +104,7 @@ const Notimatica = {
       console.info('Notimatica: SDK inited with:', this.options)
     })
     this.on('plugin:ready', (plugin) => {
+      this.strings = merge(plugin.strings, this.strings)
       plugin.init(this.options.plugins[plugin.name])
     })
     this.on('unsupported', (message) => {
