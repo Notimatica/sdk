@@ -37,7 +37,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     }),
     new webpack.optimize.OccurenceOrderPlugin(),
     // extract css into its own file
-    new ExtractTextPlugin(utils.assetsPath('notimatica-[name].css')),
+    new ExtractTextPlugin(utils.assetsPath('notimatica-[name].css'))
   ]
 })
 

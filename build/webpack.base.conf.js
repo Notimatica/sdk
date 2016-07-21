@@ -7,7 +7,7 @@ module.exports = {
   entry: {
     sdk: './src/sdk/entry.js',
     sw: './src/sw/entry.js',
-    button: './src/plugins/button.js'
+    button: './src/plugins/button/plugin.js'
   },
   output: {
     path: config.build.assetsRoot,
@@ -82,6 +82,10 @@ module.exports = {
     formatter: require('eslint-friendly-formatter')
   },
   vue: {
-    loaders: utils.cssLoaders()
+    loaders: utils.cssLoaders(),
+    // configure autoprefixer
+    autoprefixer: {
+      browsers: ['Firefox > 46', 'Chrome > 50', 'Safari > 7.1']
+    }
   }
 }

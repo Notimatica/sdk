@@ -1,39 +1,68 @@
 import { PROVIDERS_ENDPOINTS } from './defaults'
 
 /**
+ * If varible is string.
+ *
+ * @param  {*}  el The varible
+ * @return {Boolean}
+ */
+export function isString (varible) {
+  return typeof varible === 'string'
+}
+
+/**
+ * If varible is object.
+ *
+ * @param  {*}  el The varible
+ * @return {Boolean}
+ */
+export function isObject (varible) {
+  return varible instanceof Object
+}
+
+/**
+ * If varible is function.
+ *
+ * @param  {*}  el The varible
+ * @return {Boolean}
+ */
+export function isFunction (varible) {
+  return ({}).toString.call(varible) === '[object Function]'
+}
+
+/**
+ * If varible is array.
+ *
+ * @param  {*}  el The varible
+ * @return {Boolean}
+ */
+export function isArray (varible) {
+  return Array.isArray(varible)
+}
+
+/**
  * Make token from endpoint.
  *
  * @param   {String} endpoint The endpoint string
  * @param   {String} provider The provider name
  * @returns {String}
  */
-export var makeToken = function (endpoint, provider) {
-  let urls = []
-
-  if (provider !== undefined && PROVIDERS_ENDPOINTS[provider] !== undefined) {
-    urls.push(PROVIDERS_ENDPOINTS[provider])
-  } else {
-    for (let key in PROVIDERS_ENDPOINTS) {
-      if (PROVIDERS_ENDPOINTS.hasOwnProperty(key)) {
-        urls.push(PROVIDERS_ENDPOINTS[key])
-      }
-    }
+export function makeToken (endpoint, provider) {
+  if (provider === undefined || PROVIDERS_ENDPOINTS[provider] === undefined) {
+    return endpoint
   }
 
-  return endpoint.replace(new RegExp('^(' + urls.join('|') + ')'), '')
+  return endpoint.trim().replace(new RegExp('^(' + PROVIDERS_ENDPOINTS[provider] + ')'), '')
 }
 
 /**
- * Merge objects.
+ * Merges two (or more) objects, giving the last one precedence.
  *
  * @param {Object} target The target object
  * @param {Object} source The source object
  */
-export var merge = function (target, source) {
-  /* Merges two (or more) objects,
-   giving the last one precedence */
-
-  if (typeof target !== 'object') {
+export function merge (target, source) {
+  if (!isObject(target)) {
     target = {}
   }
 
@@ -41,7 +70,7 @@ export var merge = function (target, source) {
     if (source.hasOwnProperty(property)) {
       var sourceProperty = source[property]
 
-      if (typeof sourceProperty === 'object') {
+      if (isObject(sourceProperty)) {
         target[property] = merge(target[property], sourceProperty)
         continue
       }
@@ -62,7 +91,7 @@ export var merge = function (target, source) {
  *
  * @param {Object} object
  */
-export var extend = function (object) {
+export function extend (object) {
   merge(this, object)
 }
 
@@ -101,4 +130,43 @@ export function isHttps () {
   if (typeof window === 'undefined') return false
 
   return window.location.protocol === 'https:' || window.location.hostname === 'localhost'
+}
+
+/**
+ * Simple find in DOM helper
+ *
+ * @param  {String|Object} element  The element to search
+ * @param  {Object}        fallback Fallback element
+ * @return {Object}
+ */
+export function findNode (element, fallback) {
+  switch (true) {
+    case isString(element):
+      try {
+        return document.querySelectAll(element)
+      } catch (e) {}
+
+      return fallback
+    case element.nodeType:
+      return element
+    default:
+      return fallback
+  }
+}
+
+/**
+ * Create DOM node by html string
+ * @param  {String} htmlStr The html string
+ * @return {Object}
+ */
+export function createNode (htmlStr) {
+  const frag = document.createDocumentFragment()
+  const temp = document.createElement('div')
+
+  temp.innerHTML = htmlStr
+  while (temp.firstChild) {
+    frag.appendChild(temp.firstChild)
+  }
+
+  return frag
 }

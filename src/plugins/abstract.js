@@ -1,4 +1,4 @@
-import { merge } from '../utils'
+import { merge, findNode, createNode } from '../utils'
 
 module.exports = class AbstractPlugin {
   /**
@@ -30,7 +30,44 @@ module.exports = class AbstractPlugin {
     this.options = merge(this.defaults, options)
 
     if (this.options.autorun) {
-      this.prepare().then(() => this.play())
+      this.prepare()
+        .then(() => this.injectTemplate())
+        .then(() => this.injectCss())
+        .then(() => this.play())
+        .catch((err) => Notimatica.emit('error', err))
+    }
+  }
+
+  /**
+   * Inject plugin's css into dom.
+   *
+   * @return {Promise}
+   */
+  injectCss () {
+    return fetch(this.options.css)
+      .then((response) => {
+        if (response.status !== 200) {
+          throw new Error(`Can't load ${this.name} plugin css: ${this.options.css}`)
+        }
+
+        return response.text()
+      })
+      .then((css) => {
+        const target = findNode(this.options.cssTarget, document.head)
+        const style = document.createElement('style')
+        style.textContent = css
+        target.appendChild(style)
+      })
+  }
+
+  /**
+   * Inject plugin's template.
+   */
+  injectTemplate () {
+    if (this.template && this.options.target) {
+      const target = findNode(this.options.cssTarget, document.body)
+      this.$wrapper = createNode(this.template)
+      target.appendChild(this.$wrapper)
     }
   }
 }

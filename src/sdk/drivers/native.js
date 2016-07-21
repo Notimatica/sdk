@@ -42,6 +42,7 @@ module.exports = class Native extends AbstractDriver {
       // Emit success event
       .then((token) => {
         this.isSubscribed = true
+        this.wasUnsubscribed = false
         Notimatica.emit('subscribe:success', token)
 
         return this.visitor.unsubscribe(null)
@@ -62,6 +63,7 @@ module.exports = class Native extends AbstractDriver {
       .then((token) => this._unregister(token))
       .then(() => {
         this.isSubscribed = false
+        this.wasUnsubscribed = true
         this.visitor.uuid(null)
         this.visitor.unsubscribe()
       })
