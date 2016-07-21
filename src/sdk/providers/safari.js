@@ -19,13 +19,14 @@ const provider = class Safari extends AbstractProvider {
    * @return {Boolean}
    */
   pushSupported () {
-    if (typeof this.options.safariWebId === 'undefined') {
-      Notimatica.emit('warning', 'Safari is unsupported due to lack of safariWebId in Notimatica options.')
-
-      return false
-    }
-
-    return 'safari' in window && 'pushNotification' in window.safari
+    return false
+    // if (typeof this.options.safariWebId === 'undefined') {
+    //   Notimatica.emit('warning', 'Safari is unsupported due to lack of safariWebId in Notimatica options.')
+    //
+    //   return false
+    // }
+    //
+    // return 'safari' in window && 'pushNotification' in window.safari
   }
 
   /**
