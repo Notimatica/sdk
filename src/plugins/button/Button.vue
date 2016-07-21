@@ -139,11 +139,6 @@ export default {
   },
   methods: {
     /**
-     * Import t function from global scope.
-     */
-    t,
-
-    /**
      * Process button click.
      */
     processClick () {
