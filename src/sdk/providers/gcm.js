@@ -43,8 +43,9 @@ const provider = class Gcm extends AbstractProvider {
     return this.ready()
       .then(() => this.registration.pushManager.subscribe({ userVisibleOnly: true }))
       .then((subscription) => {
-        Notimatica.emit('subscribe:subscription', subscription)
-        return subscription
+        Notimatica.emit('subscribe:subscription-received', subscription.endpoint)
+
+        return subscription.endpoint
       })
   }
 
@@ -63,6 +64,24 @@ const provider = class Gcm extends AbstractProvider {
 
         return subscription
       })
+  }
+
+  /**
+   * If user was subscribed.
+   *
+   * @return {Promise}
+   */
+  isSubscribed () {
+    return Notimatica.visitor.isSubscribed()
+  }
+
+  /**
+   * If user was unsubscribed.
+   *
+   * @return {Promise}
+   */
+  wasUnsubscribed () {
+    return Notimatica.visitor.wasUnsubscribed()
   }
 }
 

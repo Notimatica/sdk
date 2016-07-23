@@ -50,7 +50,7 @@ var NotimaticaServiceWorker = {
                 }
               })
             })
-            .catch((err) => console.error('Notimatica: payload error', err))
+            .catch((err) => NotimaticaServiceWorker.log('Notimatica: payload error', err))
         })
     )
   },

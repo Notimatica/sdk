@@ -1,4 +1,3 @@
-import Visitor from '../../visitor'
 import { PROVIDER_CHROME, PROVIDER_FIREFOX, PROVIDER_SAFARI, PROVIDER_UNKNOWN } from '../../defaults'
 
 module.exports = class AbstractDriver {
@@ -10,10 +9,9 @@ module.exports = class AbstractDriver {
   constructor (options) {
     this.options = options
 
-    this._prepareVisitor()
     this._prepareProvider()
 
-    Notimatica.emit('driver:create', this)
+    Notimatica.emit('driver:ready', this)
   }
 
   /**
@@ -27,12 +25,12 @@ module.exports = class AbstractDriver {
       wasUnsubscribed: false
     }
 
-    return this.visitor.isSubscribed()
+    return this.provider.isSubscribed()
       .then((isSubscribed) => {
         this.isSubscribed = isSubscribed
         ready.isSubscribed = isSubscribed
 
-        return this.visitor.wasUnsubscribed()
+        return this.provider.wasUnsubscribed()
       })
       .then((wasUnsubscribed) => {
         this.wasUnsubscribed = wasUnsubscribed
@@ -52,18 +50,11 @@ module.exports = class AbstractDriver {
   }
 
   /**
-   * Prepare visitor.
-   */
-  _prepareVisitor () {
-    this.visitor = new Visitor()
-  }
-
-  /**
    * Detect provider from browser.
    */
   _prepareProvider () {
     let provider
-    switch (this.visitor.env.browser) {
+    switch (Notimatica.visitor.env.browser) {
       case 'Chrome':
         provider = PROVIDER_CHROME
         break

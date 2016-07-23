@@ -1,37 +1,68 @@
 import { PROVIDERS_ENDPOINTS } from './defaults'
 
 /**
- * Make token from endpoint.
- * @param {String} endpoint
- * @param {String} provider
- * @returns {String}
+ * If varible is string.
+ *
+ * @param  {*}  el The varible
+ * @return {Boolean}
  */
-export var makeToken = function (endpoint, provider) {
-  let urls = []
-
-  if (provider !== undefined && PROVIDERS_ENDPOINTS[provider] !== undefined) {
-    urls.push(PROVIDERS_ENDPOINTS[provider])
-  } else {
-    for (let key in PROVIDERS_ENDPOINTS) {
-      if (PROVIDERS_ENDPOINTS.hasOwnProperty(key)) {
-        urls.push(PROVIDERS_ENDPOINTS[key])
-      }
-    }
-  }
-
-  return endpoint.replace(new RegExp('^(' + urls.join('|') + ')'), '')
+export function isString (varible) {
+  return typeof varible === 'string'
 }
 
 /**
- * Merge objects.
- * @param {Object} target
- * @param {Object} source
+ * If varible is object.
+ *
+ * @param  {*}  el The varible
+ * @return {Boolean}
  */
-export var merge = function (target, source) {
-  /* Merges two (or more) objects,
-   giving the last one precedence */
+export function isObject (varible) {
+  return varible instanceof Object
+}
 
-  if (typeof target !== 'object') {
+/**
+ * If varible is function.
+ *
+ * @param  {*}  el The varible
+ * @return {Boolean}
+ */
+export function isFunction (varible) {
+  return ({}).toString.call(varible) === '[object Function]'
+}
+
+/**
+ * If varible is array.
+ *
+ * @param  {*}  el The varible
+ * @return {Boolean}
+ */
+export function isArray (varible) {
+  return Array.isArray(varible)
+}
+
+/**
+ * Make token from endpoint.
+ *
+ * @param   {String} endpoint The endpoint string
+ * @param   {String} provider The provider name
+ * @returns {String}
+ */
+export function makeToken (endpoint, provider) {
+  if (provider === undefined || PROVIDERS_ENDPOINTS[provider] === undefined) {
+    return endpoint
+  }
+
+  return endpoint.trim().replace(new RegExp('^(' + PROVIDERS_ENDPOINTS[provider] + ')'), '')
+}
+
+/**
+ * Merges two (or more) objects, giving the last one precedence.
+ *
+ * @param {Object} target The target object
+ * @param {Object} source The source object
+ */
+export function merge (target, source) {
+  if (!isObject(target)) {
     target = {}
   }
 
@@ -39,7 +70,7 @@ export var merge = function (target, source) {
     if (source.hasOwnProperty(property)) {
       var sourceProperty = source[property]
 
-      if (typeof sourceProperty === 'object') {
+      if (isObject(sourceProperty)) {
         target[property] = merge(target[property], sourceProperty)
         continue
       }
@@ -57,16 +88,18 @@ export var merge = function (target, source) {
 
 /**
  * Extend object.
+ *
  * @param {Object} object
  */
-export var extend = function (object) {
+export function extend (object) {
   merge(this, object)
 }
 
 /**
  * Get property recursively by 'foo.bar' syntax.
- * @param {String} propertyName
- * @param {Object} object
+ *
+ * @param   {String} propertyName The property name
+ * @param   {Object} object       The object
  * @returns {*}
  */
 export function getProperty (propertyName, object) {
@@ -97,4 +130,59 @@ export function isHttps () {
   if (typeof window === 'undefined') return false
 
   return window.location.protocol === 'https:' || window.location.hostname === 'localhost'
+}
+
+/**
+ * Simple find in DOM helper
+ *
+ * @param  {String|Object} element  The element to search
+ * @param  {Object}        fallback Fallback element
+ * @return {Object}
+ */
+export function findNode (element, fallback) {
+  switch (true) {
+    case isString(element):
+      try {
+        return document.querySelectAll(element)
+      } catch (e) {}
+
+      return fallback
+    case element.nodeType:
+      return element
+    default:
+      return fallback
+  }
+}
+
+/**
+ * Create DOM node by html string
+ * @param  {String} html The html string
+ * @return {Object}
+ */
+export function createNode (html) {
+  const frag = document.createDocumentFragment()
+  const temp = document.createElement('div')
+
+  temp.innerHTML = html
+  while (temp.firstChild) {
+    frag.appendChild(temp.firstChild)
+  }
+
+  return frag
+}
+
+/**
+ * Return text string. Used for strings overriding.
+ *
+ * @param  {String} string String id.
+ * @return {String}
+ */
+export function t (string) {
+  const lang = Notimatica.visitor.env.language
+
+  return typeof Notimatica.strings[lang][string] !== 'undefined'
+    ? Notimatica.strings[lang][string]
+    : typeof Notimatica.strings[Notimatica.options.defaultLocale][string] !== 'undefined'
+      ? Notimatica.strings[Notimatica.options.defaultLocale][string]
+      : string
 }

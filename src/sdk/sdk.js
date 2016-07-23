@@ -1,4 +1,5 @@
 import events from 'minivents'
+import Visitor from '../visitor'
 import { merge, isHttps } from '../utils'
 import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
 
@@ -6,19 +7,23 @@ const Notimatica = {
   _inited: false,
   _driver: null,
   _subscribed: false,
+  visitor: null,
   options: {
     debug: DEBUG,
     project: null,
     tags: [],
-    autoSubscribe: true,
+    autoSubscribe: false,
     usePopup: false,
     popup: {
       width: POPUP_WIGHT,
       height: POPUP_HEIGHT
     },
     plugins: {},
-    sdkPath: SDK_PATH
+    sdkPath: SDK_PATH,
+    strings: {},
+    defaultLocale: 'en'
   },
+  strings: {},
 
   /**
    * Init SDK.
@@ -26,26 +31,29 @@ const Notimatica = {
    * @param {Object} options
    */
   init (options) {
-    if (Notimatica._inited) return console.warn('Notimatica: SDK was already inited.')
+    if (this._inited) return console.warn('Notimatica: SDK was already inited.')
 
-    Notimatica.options = merge(Notimatica.options, options || {})
+    this.options = merge(this.options, options || {})
+    this.strings = merge(this.strings, this.options.strings)
+    delete this.options.strings
 
-    if (Notimatica.options.project === null) return Notimatica.emit('error', 'Notimatica: Project ID is absent.')
+    if (this.options.project === null) return this.emit('error', 'Notimatica: Project ID is absent.')
 
-    Notimatica._prepareEvents()
-    Notimatica._prepareDriver()
+    this._prepareVisitor()
+    this._prepareEvents()
+    this._prepareDriver()
 
-    if (Notimatica.pushSupported()) {
-      Notimatica._driver.ready()
+    if (this.pushSupported()) {
+      this._driver.ready()
         .then(({isSubscribed, wasUnsubscribed}) => {
-          Notimatica._ready()
+          this._ready()
 
-          if (Notimatica.options.autoSubscribe && !Notimatica._usePopup() && !wasUnsubscribed && !isSubscribed) {
-            Notimatica._driver.subscribe()
+          if (this.options.autoSubscribe && !this._usePopup() && !wasUnsubscribed && !isSubscribed) {
+            this._driver.subscribe()
           }
         })
     } else {
-      Notimatica.emit('unsupported', 'Notimatica: Push notifications are not yet available for your browser.')
+      this.emit('unsupported')
     }
   },
 
@@ -53,23 +61,33 @@ const Notimatica = {
    * SDK is ready.
    */
   _ready () {
-    Notimatica._loadPlugins()
-    Notimatica._inited = true
-    Notimatica.emit('ready')
+    this._loadPlugins()
+    this._inited = true
+    this.emit('ready')
   },
 
   /**
    * Load enabled plugins.
    */
   _loadPlugins () {
-    for (let name in Notimatica.options.plugins) {
-      const head = document.getElementsByTagName('head')[0]
-      const script = document.createElement('script')
-      script.type = 'text/javascript'
-      script.src = Notimatica.options.sdkPath + '/notimatica-' + name + '.js'
-      script.async = 'true'
-      head.appendChild(script)
+    for (let name in this.options.plugins) {
+      if (this.options.plugins[name].enable) {
+        const head = document.head
+        const script = document.createElement('script')
+
+        script.type = 'text/javascript'
+        script.src = this.options.sdkPath + '/notimatica-' + name + '.js'
+        script.async = 'true'
+        head.appendChild(script)
+      }
     }
+  },
+
+  /**
+   * Prepare visitor.
+   */
+  _prepareVisitor () {
+    this.visitor = new Visitor()
   },
 
   /**
@@ -78,76 +96,71 @@ const Notimatica = {
    * @param  {Object} visitor The visitor object.
    */
   _prepareDriver () {
-    const driver = Notimatica._usePopup() ? DRIVER_POPUP : DRIVER_NATIVE
+    const driver = this._usePopup() ? DRIVER_POPUP : DRIVER_NATIVE
     const Driver = require('./drivers/' + driver)
 
-    Notimatica._driver = new Driver(Notimatica.options)
+    this._driver = new Driver(this.options)
   },
 
   _prepareEvents () {
-    Notimatica.on('ready', function () {
-      console.info('Notimatica: SDK inited with:', Notimatica.options)
+    this.on('ready', () => {
+      console.info('Notimatica: SDK inited with:', this.options)
     })
-    Notimatica.on('unsupported', function (message) {
+    this.on('plugin:ready', (plugin) => {
+      this.strings = merge(plugin.strings, this.strings)
+      plugin.init(this.options.plugins[plugin.name])
+    })
+    this.on('unsupported', (message) => {
+      console.warn('Notimatica: Push notifications are not yet available for your browser.')
+    })
+    this.on('warning', (message) => {
       console.warn('Notimatica: ' + message)
     })
-    Notimatica.on('warning', function (message) {
-      console.warn('Notimatica: ' + message)
-    })
-    Notimatica.on('error', function (message) {
-      console.error('Notimatica: ' + message)
-    })
-    Notimatica.on('plugin:ready', function (plugin) {
-      plugin.init(Notimatica.options.plugins[plugin.name])
+    this.on('error', (error) => {
+      console.error('Notimatica: ', error)
     })
 
-    if (Notimatica.options.debug) {
-      Notimatica.on('api:call', function (method, url, data) {
-        console.log('Notimatica: API call', method, url, data)
+    if (this.options.debug) {
+      this.on('driver:ready', (driver) => {
+        console.log('Notimatica: Driver is ready', driver)
       })
-      Notimatica.on('api:fail', function (status, data) {
-        console.error('Notimatica: API call failed', status, data)
-      })
-      Notimatica.on('driver:create', function (driver) {
-        console.log('Notimatica: Driver created', driver)
-      })
-      Notimatica.on('subscribe:start', function () {
+      this.on('subscribe:start', () => {
         console.log('Notimatica: Start subscribing.')
       })
-      Notimatica.on('subscribe:success', function (token) {
+      this.on('subscribe:success', (token) => {
         console.log('Notimatica: User subscribed with token', token)
       })
-      Notimatica.on('subscribe:subscription', function (subscription) {
+      this.on('subscribe:subscription', (subscription) => {
         console.log('Notimatica: Subscription recieved', subscription)
       })
-      Notimatica.on('subscribe:fail', function (err) {
+      this.on('subscribe:fail', (err) => {
         console.error('Notimatica: Subscription failed', err)
       })
-      Notimatica.on('register:start', function (data) {
+      this.on('register:start', (data) => {
         console.log('Notimatica: Start registering subscriber', data)
       })
-      Notimatica.on('register:success', function (data) {
+      this.on('register:success', (data) => {
         console.log('Notimatica: Subscriber registered:', data)
       })
-      Notimatica.on('register:fail', function (err) {
+      this.on('register:fail', (err) => {
         console.error('Notimatica: Registration failed', err)
       })
-      Notimatica.on('unsubscribe:start', function () {
+      this.on('unsubscribe:start', () => {
         console.log('Notimatica: Start unsubscribing.')
       })
-      Notimatica.on('unsubscribe:success', function () {
+      this.on('unsubscribe:success', () => {
         console.log('Notimatica: User unsubscribed.')
       })
-      Notimatica.on('unsubscribe:fail', function (err) {
+      this.on('unsubscribe:fail', (err) => {
         console.error('Notimatica: Unsubscription failed', err)
       })
-      Notimatica.on('unregister:start', function (data) {
+      this.on('unregister:start', (data) => {
         console.log('Notimatica: Start removing registration', data)
       })
-      Notimatica.on('unregister:success', function () {
+      this.on('unregister:success', () => {
         console.log('Notimatica: Registration removed.')
       })
-      Notimatica.on('unregister:fail', function (err) {
+      this.on('unregister:fail', (err) => {
         console.error('Notimatica: Removing registration failed', err)
       })
     }
@@ -159,19 +172,18 @@ const Notimatica = {
    * @returns {Boolean}
    */
   pushSupported () {
-    return Notimatica._driver.pushSupported()
+    return this._driver.pushSupported()
   },
 
   /**
    * Register service worker.
    */
   subscribe () {
-    if (!Notimatica.pushSupported()) {
-      Notimatica.emit('subscribe:fail', 'Web push unsupported by browser.')
-      return
+    if (!this.pushSupported()) {
+      return this.emit('subscribe:fail', 'Web push unsupported by browser.')
     }
 
-    Notimatica._driver.subscribe()
+    this._driver.subscribe()
   },
 
   /**
@@ -180,7 +192,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   _usePopup () {
-    return !isHttps() || Notimatica.options.usePopup
+    return !isHttps() || this.options.usePopup
   },
 
   /**
@@ -189,12 +201,11 @@ const Notimatica = {
    * @returns {Promise}
    */
   unsubscribe () {
-    if (Notimatica.isUnsubscribed()) {
-      Notimatica.emit('unsubscribe:success')
-      return
+    if (this.isUnsubscribed()) {
+      return this.emit('unsubscribe:success')
     }
 
-    Notimatica._driver.unsubscribe()
+    this._driver.unsubscribe()
   },
 
   /**
@@ -203,7 +214,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   isSubscribed () {
-    return Notimatica._driver.isSubscribed
+    return this._driver.isSubscribed && !this._driver.wasUnsubscribed
   },
 
   /**
@@ -212,7 +223,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   isUnsubscribed () {
-    return !Notimatica._driver.isSubscribed
+    return !this.isSubscribed()
   },
 
   /**
@@ -225,7 +236,7 @@ const Notimatica = {
       item()
     } else {
       const functionName = item.shift()
-      Notimatica[functionName].apply(null, item)
+      this[functionName].apply(this, item)
     }
   },
 
@@ -236,7 +247,7 @@ const Notimatica = {
    */
   _processRegisteredActions (array) {
     for (let i = 0; i < array.length; i++) {
-      Notimatica.push(array[i])
+      this.push(array[i])
     }
   }
 }
