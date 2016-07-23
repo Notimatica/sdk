@@ -110,7 +110,9 @@ SDK has an ability to connect plugins.
 
 Simple way to provide user action button to subscribe to notifications. With nice popover to interact with user.
 
-<a href="src/plugins/README.md">Readme</a>
+![button screenshot](static/screenshot-button.png)
+
+[README](src/plugins/README.md)
 
 ## Example
 
