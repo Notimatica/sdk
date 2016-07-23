@@ -112,7 +112,7 @@ Simple way to provide user action button to subscribe to notifications. With nic
 
 ![button screenshot](static/screenshot-button.png)
 
-[README](src/plugins/README.md)
+[README](src/plugins/button/README.md)
 
 ## Example
 
