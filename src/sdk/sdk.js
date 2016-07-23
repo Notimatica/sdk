@@ -8,12 +8,11 @@ const Notimatica = {
   _driver: null,
   _subscribed: false,
   visitor: null,
-  strings: {},
   options: {
     debug: DEBUG,
     project: null,
     tags: [],
-    autoSubscribe: true,
+    autoSubscribe: false,
     usePopup: false,
     popup: {
       width: POPUP_WIGHT,
@@ -24,6 +23,7 @@ const Notimatica = {
     strings: {},
     defaultLocale: 'en'
   },
+  strings: {},
 
   /**
    * Init SDK.
@@ -53,7 +53,7 @@ const Notimatica = {
           }
         })
     } else {
-      this.emit('unsupported', 'Notimatica: Push notifications are not yet available for your browser.')
+      this.emit('unsupported')
     }
   },
 
@@ -71,12 +71,15 @@ const Notimatica = {
    */
   _loadPlugins () {
     for (let name in this.options.plugins) {
-      const head = document.head
-      const script = document.createElement('script')
-      script.type = 'text/javascript'
-      script.src = this.options.sdkPath + '/notimatica-' + name + '.js'
-      script.async = 'true'
-      head.appendChild(script)
+      if (this.options.plugins[name].enable) {
+        const head = document.head
+        const script = document.createElement('script')
+
+        script.type = 'text/javascript'
+        script.src = this.options.sdkPath + '/notimatica-' + name + '.js'
+        script.async = 'true'
+        head.appendChild(script)
+      }
     }
   },
 
@@ -108,7 +111,7 @@ const Notimatica = {
       plugin.init(this.options.plugins[plugin.name])
     })
     this.on('unsupported', (message) => {
-      console.warn('Notimatica: ' + message)
+      console.warn('Notimatica: Push notifications are not yet available for your browser.')
     })
     this.on('warning', (message) => {
       console.warn('Notimatica: ' + message)
@@ -118,14 +121,8 @@ const Notimatica = {
     })
 
     if (this.options.debug) {
-      this.on('api:call', (method, url, data) => {
-        console.log('Notimatica: API call', method, url, data)
-      })
-      this.on('api:fail', (status, data) => {
-        console.error('Notimatica: API call failed', status, data)
-      })
-      this.on('driver:create', (driver) => {
-        console.log('Notimatica: Driver created', driver)
+      this.on('driver:ready', (driver) => {
+        console.log('Notimatica: Driver is ready', driver)
       })
       this.on('subscribe:start', () => {
         console.log('Notimatica: Start subscribing.')

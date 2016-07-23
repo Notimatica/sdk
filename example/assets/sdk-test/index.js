@@ -33,6 +33,7 @@ var options = {
   ],
   plugins: {
     button: {
+      enable: true,
       css: '/notimatica-button.css'
     }
   }
@@ -58,7 +59,10 @@ $(function () {
     Notimatica.push(['emit', 'popover:show', 'You have a message!', 'Something in our SDK sent you a message'])
   })
 
-  $('.toggle-options').on('click', function () {
-    $('options').toggle()
+  $('.send-notification').on('click', function () {
+    Notimatica.push(['emit', 'self-notification', {
+      title: $('#title').val(),
+      body: $('#body').val()
+    }])
   })
 })

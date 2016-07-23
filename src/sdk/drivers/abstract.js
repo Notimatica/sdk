@@ -11,7 +11,7 @@ module.exports = class AbstractDriver {
 
     this._prepareProvider()
 
-    Notimatica.emit('driver:create', this)
+    Notimatica.emit('driver:ready', this)
   }
 
   /**

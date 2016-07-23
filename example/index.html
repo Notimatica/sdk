@@ -29,19 +29,51 @@
     <div class="row">
       <div class="col-md-12">
         <div class="page-header">
-          <h1>Notimatica SDK</h1>
+          <h1>SDK Test Page <small> for <mark class="provider"></mark></small></h1>
         </div>
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">Test Notimatica SDK for <mark class="provider"></mark></h3>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingOne">
+              <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                  SDK options
+                </a>
+              </h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+              <div class="panel-body">
+                <code class="options"></code>
+              </div>
+            </div>
           </div>
-          <div class="panel-body">
-            <code class="options"></code>
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingTwo">
+              <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                  Send test notification
+                </a>
+              </h4>
+            </div>
+            <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+              <div class="panel-body">
+                <div class="form-group">
+                  <label for="title">Title</label>
+                  <input type="title" class="form-control" id="title" placeholder="Tilte" value="Hey!">
+                </div>
+                <div class="form-group">
+                  <label for="body">Body</label>
+                  <input type="body" class="form-control" id="body" placeholder="Body" value="Hello world">
+                </div>
+                <button class="btn btn-primary send-notification">Send notification</button>
+              </div>
+            </div>
           </div>
-          <div class="panel-footer">
-            <a href="#" class="subscribe-link hidden">Subscribe</a>
-            <a href="#" class="unsubscribe-link hidden">Unsubscribe</a>
-            <a href="#" class="show-message">Show message</a>
+          <div class="panel panel-default">
+            <div class="panel-footer">
+              <a href="#" class="subscribe-link hidden">Subscribe</a>
+              <a href="#" class="unsubscribe-link hidden">Unsubscribe</a>
+              <a href="#" class="show-message">Show message</a>
+            </div>
           </div>
         </div>
       </div>
@@ -50,6 +82,7 @@
 
   <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script src="/assets/sdk-test/index.js"></script>
 </body>
 </html>

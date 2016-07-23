@@ -1,6 +1,5 @@
 @import "../../assets/mixins/animation";
 @import "../../assets/tooltip";
-@import "./popover";
 
 $button-height: 50px;
 $button-width: 50px;
@@ -140,3 +139,6 @@ $button-width: 50px;
 	50% { opacity: 1; }
 	100% { opacity: 0; }
 }
+
+
+@import "./popover";

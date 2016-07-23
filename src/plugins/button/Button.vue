@@ -36,8 +36,8 @@
       <div class="notimatica-popover-content">{{{ message.body }}}</div>
     </div>
     <div v-else>
-      <div class="notimatica-popover-title">{{ tooltipMessage }}</div>
-      <div class="notimatica-popover-content"><p>{{ popoverMessage }}</p>
+      <div class="notimatica-popover-content">
+        <p>{{ popoverMessage }}</p>
         <button @click="click">{{ popoverButton }}</button>
       </div>
     </div>
@@ -69,24 +69,27 @@ export default {
       this.acting = true
     })
     Notimatica.on('subscribe:success', () => {
-      this.subscribed = true
-      this.acting = false
       this.hidePopover()
+      setTimeout(() => {
+        this.subscribed = true
+        this.acting = false
+      }, 200)
     })
 
     Notimatica.on('unsubscribe:start', () => {
       this.acting = true
     })
     Notimatica.on('unsubscribe:success', () => {
-      this.subscribed = false
-      this.acting = false
       this.hidePopover()
+      setTimeout(() => {
+        this.subscribed = false
+        this.acting = false
+      }, 200)
     })
 
     Notimatica.on('popover:show', (title, body) => {
       this.setMessage(title, body)
     })
-
     Notimatica.on('popover:hide', () => {
       this.hidePopover()
     })

@@ -61,7 +61,9 @@
     "globals": [
       "Notimatica",
       "fetch",
-      "$"
+      "$",
+      "self",
+      "clients"
     ]
   }
 }
