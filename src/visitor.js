@@ -1,14 +1,13 @@
 import env from './env'
 import Storage from './storage'
-import { UUID_STORAGE_NAME, UNSUBSCRIBED_STORAGE_NAME } from './defaults'
 
 module.exports = class Visitor {
   /**
-   * Constructor
+   * Constructor.
    */
   constructor () {
-    this.env = env
-    this.storage = new Storage(this.env.localStorage)
+    this.env = window ? env : {}
+    this.storage = Storage
   }
 
   /**
@@ -18,15 +17,16 @@ module.exports = class Visitor {
    */
   uuid (uuid) {
     if (uuid) {
-      return this.storage.set(UUID_STORAGE_NAME, uuid)
+      return this.storage.set('key_value', { key: 'subscriber', value: uuid })
     }
 
     if (typeof uuid === 'undefined') {
-      return this.storage.get(UUID_STORAGE_NAME)
+      return this.storage.get('key_value', 'subscriber')
+        .then((value) => (value) ? value.value : null)
     }
 
     if (uuid === null) {
-      return this.storage.delete(UUID_STORAGE_NAME)
+      return this.storage.remove('key_value', 'subscriber')
     }
   }
 
@@ -46,8 +46,8 @@ module.exports = class Visitor {
    * @return {Promise}
    */
   wasUnsubscribed () {
-    return this.storage.get(UNSUBSCRIBED_STORAGE_NAME)
-      .then((value) => !!value)
+    return this.storage.get('key_value', 'unsubscribed')
+      .then((value) => (value) ? !!value.value : false)
   }
 
   /**
@@ -58,11 +58,11 @@ module.exports = class Visitor {
    */
   unsubscribe (value) {
     if (typeof value === 'undefined') {
-      return this.storage.set(UNSUBSCRIBED_STORAGE_NAME, 1)
+      return this.storage.set('key_value', { key: 'unsubscribed', value: 1 })
     }
 
     if (value === null) {
-      return this.storage.delete(UNSUBSCRIBED_STORAGE_NAME)
+      return this.storage.remove('key_value', 'unsubscribed')
     }
   }
 }

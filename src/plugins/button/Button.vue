@@ -34,12 +34,16 @@
     <div v-if="message.body">
       <div class="notimatica-popover-title" v-if="message.title">{{ message.title }}</div>
       <div class="notimatica-popover-content">{{{ message.body }}}</div>
+      <div class="clearfix"></div>
     </div>
     <div v-else>
       <div class="notimatica-popover-content">
         <p>{{ popoverMessage }}</p>
+      </div>
+      <div class="notimatica-popover-footer">
         <button @click="click">{{ popoverButton }}</button>
       </div>
+      <div class="clearfix"></div>
     </div>
     <div class="notimatica-popover-close" @click="hidePopover">&times;</div>
   </div>

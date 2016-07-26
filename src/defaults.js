@@ -29,5 +29,5 @@ export const POPUP_HEIGHT = 450
 export const POPUP_WIGHT = 550
 
 export const AUTOSUBSCRIBE = true
-export const UUID_STORAGE_NAME = 'notimatica_uuid'
-export const UNSUBSCRIBED_STORAGE_NAME = 'notimatica_unsubscribed'
+export const DB_VERSION = 1
+export const DB_NAME = 'notimatica'

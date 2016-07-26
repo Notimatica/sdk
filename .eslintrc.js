@@ -18,6 +18,11 @@ module.exports = {
     'btoa': false,
     'fetch': false,
     'localStorage': false,
+    'indexedDB': false,
+    'mozIndexedDB': false,
+    'webkitIndexedDB': false,
+    'msIndexedDB': false,
+    'openDatabase': false,
     'console': false,
     '$': false,
     'self': false,
@@ -28,6 +33,7 @@ module.exports = {
     'Notimatica': false,
     'registeredActions': false,
     'swfobject': false,
-    'screen': false
+    'screen': false,
+    'URL': false
   }
 }

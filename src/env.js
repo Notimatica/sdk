@@ -2,9 +2,9 @@ let unknown = false
 
 // screen
 let screenSize = ''
-if (screen.width) {
-  const width = (screen.width) ? screen.width : ''
-  const height = (screen.height) ? screen.height : ''
+if (window.screen.width) {
+  const width = (window.screen.width) ? window.screen.width : ''
+  const height = (window.screen.height) ? window.screen.height : ''
   screenSize += '' + width + ' x ' + height
 }
 
@@ -150,16 +150,21 @@ switch (os) {
 // flash (you'll need to include swfobject)
 /* script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js" */
 let flashVersion = unknown
-if (typeof swfobject !== 'undefined') {
-  let fv = swfobject.getFlashPlayerVersion()
+if (typeof window.swfobject !== 'undefined') {
+  let fv = window.swfobject.getFlashPlayerVersion()
   if (fv.major > 0) {
     flashVersion = fv.major + '.' + fv.minor + ' r' + fv.release
   }
 }
 
 let localStorage = unknown
-if (typeof Storage !== 'undefined') {
+if (typeof window.Storage !== 'undefined') {
   localStorage = true
+}
+
+let indexedDB = unknown
+if (window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB) {
+  indexedDB = true
 }
 
 let language = unknown
@@ -172,6 +177,7 @@ language = navigator.language
 let timezone = new Date().getTimezoneOffset() * -60
 
 export default {
+  env: 'browser',
   screen: screenSize,
   browser: browser,
   browserVersion: version,
@@ -182,6 +188,7 @@ export default {
   cookies: cookieEnabled,
   flashVersion: flashVersion,
   localStorage: localStorage,
+  indexedDB: indexedDB,
   language: language,
   timezone: timezone
 }

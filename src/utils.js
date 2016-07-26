@@ -48,11 +48,19 @@ export function isArray (varible) {
  * @returns {String}
  */
 export function makeToken (endpoint, provider) {
-  if (provider === undefined || PROVIDERS_ENDPOINTS[provider] === undefined) {
-    return endpoint
+  let urls = []
+
+  if (provider !== undefined && PROVIDERS_ENDPOINTS[provider] !== undefined) {
+    urls.push(PROVIDERS_ENDPOINTS[provider])
+  } else {
+    for (let key in PROVIDERS_ENDPOINTS) {
+      if (PROVIDERS_ENDPOINTS.hasOwnProperty(key)) {
+        urls.push(PROVIDERS_ENDPOINTS[key])
+      }
+    }
   }
 
-  return endpoint.trim().replace(new RegExp('^(' + PROVIDERS_ENDPOINTS[provider] + ')'), '')
+  return endpoint.replace(new RegExp('^(' + urls.join('|') + ')'), '')
 }
 
 /**

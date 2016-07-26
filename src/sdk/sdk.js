@@ -11,6 +11,7 @@ const Notimatica = {
   options: {
     debug: DEBUG,
     project: null,
+    safariWebId: null,
     tags: [],
     autoSubscribe: false,
     usePopup: false,
@@ -21,7 +22,8 @@ const Notimatica = {
     plugins: {},
     sdkPath: SDK_PATH,
     strings: {},
-    defaultLocale: 'en'
+    defaultLocale: 'en',
+    webhooks: {}
   },
   strings: {},
 
@@ -45,13 +47,14 @@ const Notimatica = {
 
     if (this.pushSupported()) {
       this._driver.ready()
-        .then(({isSubscribed, wasUnsubscribed}) => {
+        .then(({ isSubscribed, wasUnsubscribed }) => {
           this._ready()
 
           if (this.options.autoSubscribe && !this._usePopup() && !wasUnsubscribed && !isSubscribed) {
             this._driver.subscribe()
           }
         })
+        .catch((err) => this.emit('error', err))
     } else {
       this.emit('unsupported')
     }
@@ -88,6 +91,18 @@ const Notimatica = {
    */
   _prepareVisitor () {
     this.visitor = new Visitor()
+
+    let save = [
+      { key: 'debug', value: this.options.debug },
+      { key: 'project', value: this.options.project },
+      { key: 'webhooks', value: this.options.webhooks },
+      { key: 'page_title', value: document.title },
+      { key: 'base_url', value: document.location.origin }
+    ]
+
+    Promise.all(save.map((value) => {
+      return this.visitor.storage.set('key_value', value)
+    }))
   },
 
   /**
@@ -100,8 +115,12 @@ const Notimatica = {
     const Driver = require('./drivers/' + driver)
 
     this._driver = new Driver(this.options)
+    this.visitor.storage.set('key_value', { key: 'provider', value: this._driver.provider.name })
   },
 
+  /**
+   * Prepare SDK events.
+   */
   _prepareEvents () {
     this.on('ready', () => {
       console.info('Notimatica: SDK inited with:', this.options)

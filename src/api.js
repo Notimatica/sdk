@@ -1,6 +1,6 @@
 import { VERSION, API_URL, POSTMAN_URL } from './defaults'
 
-export const httpCall = function (method, url, data, headers) {
+export const httpCall = function (method, url, data, headers, cors = true) {
   headers = Object.assign({
     'Content-type': 'application/json',
     'Accept': 'application/json'
@@ -8,8 +8,9 @@ export const httpCall = function (method, url, data, headers) {
 
   return fetch(url, {
     method,
-    headers,
+    headers: cors ? headers : {},
     cache: 'no-cache',
+    mode: cors ? 'cors' : 'no-cors',
     body: JSON.stringify(data)
   })
     .then((response) => {
@@ -41,10 +42,7 @@ export const unsubscribe = function (project, data) {
   return apiCall('api', 'delete', `/v1/projects/${project}/subscribers`, data)
 }
 
-export const sendTestMessage = function (project, data) {
-  return apiCall('api', 'post', `/v1/projects/${project}/notifications`, data)
-}
-
 export const getPayload = function (token) {
   return apiCall('postman', 'get', '/v1/notifications/payload?token=' + encodeURIComponent(token))
+    .then(res => res.payload)
 }
