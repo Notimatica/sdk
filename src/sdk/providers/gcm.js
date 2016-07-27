@@ -42,11 +42,8 @@ const provider = class Gcm extends AbstractProvider {
   subscribe () {
     return this.ready()
       .then(() => this.registration.pushManager.subscribe({ userVisibleOnly: true }))
-      .then((subscription) => {
-        Notimatica.emit('subscribe:subscription-received', subscription.endpoint)
-
-        return subscription.endpoint
-      })
+      .then((subscription) => subscription.endpoint)
+      .then((endpoint) => Notimatica.emit('subscribe:subscription-received'))
   }
 
   /**
@@ -57,13 +54,10 @@ const provider = class Gcm extends AbstractProvider {
   unsubscribe () {
     return this.ready()
       .then((subscription) => {
-        if (subscription) {
-          subscription.unsubscribe()
-          this.registration.unregister()
-        }
-
-        return subscription
+        if (subscription) subscription.unsubscribe()
       })
+      .then(() => this.registration.unregister())
+      .then(() => Notimatica.emit('subscribe:subscription-removed'))
   }
 
   /**

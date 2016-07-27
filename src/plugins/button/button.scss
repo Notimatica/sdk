@@ -1,28 +1,9 @@
+@import "../../assets/common";
 @import "../../assets/mixins/animation";
 @import "../../assets/tooltip";
 
 $button-height: 50px;
 $button-width: 50px;
-
-.notimatica-reset {
-  margin: 0;
-  padding:0;
-  border: 0;
-  outline: 0;
-  font-size: 100%;
-  vertical-align: baseline;
-  background: transparent;
-  line-height: 1;
-  text-align: start;
-  text-decoration: none;
-  text-shadow: none;
-  text-transform: none;
-  letter-spacing: normal;
-  word-break: normal;
-  word-spacing: normal;
-  word-wrap: normal;
-  white-space: normal;
-}
 
 .notimatica-plugin-button {
   position: fixed;

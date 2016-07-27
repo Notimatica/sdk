@@ -13,6 +13,9 @@ module.exports = class Native extends AbstractDriver {
     Notimatica.on('subscribe:subscription-received', (subscription) => {
       this.register(subscription)
     })
+    Notimatica.on('subscribe:subscription-removed', () => {
+      this.unregister()
+    })
 
     return this.provider.ready()
       .then(() => super.ready())
@@ -37,16 +40,7 @@ module.exports = class Native extends AbstractDriver {
    */
   register (subscription) {
     return this._register(subscription)
-      // Save token
-      .then((token) => Notimatica.visitor.uuid(token))
-      // Emit success event
-      .then((token) => {
-        this.isSubscribed = true
-        this.wasUnsubscribed = false
-        Notimatica.emit('subscribe:success', token)
-
-        return Notimatica.visitor.unsubscribe(null)
-      })
+      .then((uuid) => this._finishSubscription(uuid))
       .catch((err) => Notimatica.emit('subscribe:fail', err))
   }
 
@@ -59,15 +53,17 @@ module.exports = class Native extends AbstractDriver {
     Notimatica.emit('unsubscribe:start')
 
     return this.provider.unsubscribe()
-      .then(() => Notimatica.visitor.uuid())
-      .then((token) => this._unregister(token))
-      .then(() => {
-        this.isSubscribed = false
-        this.wasUnsubscribed = true
-        Notimatica.visitor.uuid(null)
-        Notimatica.visitor.unsubscribe()
-      })
-      .then(() => Notimatica.emit('unsubscribe:success'))
+  }
+
+  /**
+   * Unregister user from Notimatica.
+   *
+   * @return {Promise}
+   */
+  unregister () {
+    return Notimatica.visitor.uuid()
+      .then((uuid) => this._unregister(uuid))
+      .then(() => this._finishUnsubscription())
       .catch((err) => Notimatica.emit('unsubscribe:fail', err))
   }
 
@@ -75,7 +71,7 @@ module.exports = class Native extends AbstractDriver {
    * Call notimatica API to register subscriber.
    *
    * @param   {Object} subscription
-   * @returns {Object}
+   * @returns {Promise}
    */
   _register (subscription) {
     const env = Notimatica.visitor.env

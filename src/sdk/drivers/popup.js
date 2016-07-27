@@ -9,31 +9,14 @@ module.exports = class Popup extends AbstractDriver {
    */
   ready () {
     Notimatica.on('popup:subscribed', (data) => {
-      Notimatica.visitor.token(data.token)
-        .then(() => {
-          Notimatica._subscribed = true
-          Notimatica.emit('subscribe:success', data.token)
-        })
+      return this._finishSubscription(data.token)
     })
 
     Notimatica.on('popup:unsubscribed', () => {
-      Notimatica.visitor.token(null)
-        .then(() => {
-          Notimatica._subscribed = false
-          Notimatica.emit('unsubscribe:success')
-        })
+      return this._finishUnsubscription()
     })
 
     return super.ready()
-  }
-
-  /**
-   * If user is subscribed.
-   *
-   * @return {Boolean}
-   */
-  isSubscribed () {
-    return !!this.token
   }
 
   /**

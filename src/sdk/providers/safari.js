@@ -78,12 +78,9 @@ const provider = class Safari extends AbstractProvider {
             'You are unsubscribed',
             'Now you can open notifications preferences and remove this site from the list.'
           )
-
-          Promise.resolve()
-        } else {
-          Promise.reject()
         }
       })
+      .then(() => Notimatica.emit('subscribe:subscription-removed'))
   }
 
   /**

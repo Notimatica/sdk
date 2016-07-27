@@ -50,6 +50,41 @@ module.exports = class AbstractDriver {
   }
 
   /**
+   * As well as Notimatica subscriber uuid obtained,
+   * finish subscription process.
+   *
+   * @param  {String} uuid The uuid
+   * @return {Promise}
+   */
+  _finishSubscription (uuid) {
+    this.isSubscribed = true
+    this.wasUnsubscribed = false
+
+    return Promise.all([
+      Notimatica.visitor.uuid(uuid),
+      Notimatica.visitor.unsubscribe(null)
+    ])
+    .then((uuid) => Notimatica.emit('subscribe:success', uuid))
+  }
+
+  /**
+   * As well as subscription removed and user unregistered from Notimatica,
+   * finish unsubscribtion process.
+   *
+   * @return {Promise}
+   */
+  _finishUnsubscription () {
+    this.isSubscribed = false
+    this.wasUnsubscribed = true
+
+    return Promise.all([
+      Notimatica.visitor.uuid(null),
+      Notimatica.visitor.unsubscribe()
+    ])
+    .then(() => Notimatica.emit('unsubscribe:success'))
+  }
+
+  /**
    * Detect provider from browser.
    */
   _prepareProvider () {

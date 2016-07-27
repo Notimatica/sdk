@@ -94,6 +94,7 @@ const Notimatica = {
 
     let save = [
       { key: 'debug', value: this.options.debug },
+      { key: 'autosubscibe', value: this.options.autoSubscibe },
       { key: 'project', value: this.options.project },
       { key: 'webhooks', value: this.options.webhooks },
       { key: 'page_title', value: document.title },
@@ -128,6 +129,9 @@ const Notimatica = {
     this.on('plugin:ready', (plugin) => {
       this.strings = merge(plugin.strings, this.strings)
       plugin.init(this.options.plugins[plugin.name])
+    })
+    this.on('autosubscibe:disable', (plugin) => {
+      this.storage.set('key_value', { key: 'autosubscibe', value: false })
     })
     this.on('unsupported', (message) => {
       console.warn('Notimatica: Push notifications are not yet available for your browser.')

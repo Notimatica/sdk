@@ -30,20 +30,21 @@
     <div class="notimatica-plugin-button-counter" :class="{in: counter > 0}">{{ counter }}</div>
   </div>
 
-  <div class="notimatica-popover fade" :class="{'in': popoverActive}" v-if="usePopover || counter > 0">
+  <div class="notimatica-popover notimatica-fade" :class="{'in': popoverActive}" v-if="usePopover || counter > 0">
     <div v-if="message.body">
       <div class="notimatica-popover-title" v-if="message.title">{{ message.title }}</div>
       <div class="notimatica-popover-content">{{{ message.body }}}</div>
-      <div class="clearfix"></div>
+      <div class="notimatica-clearfix"></div>
     </div>
     <div v-else>
       <div class="notimatica-popover-content">
-        <p>{{ popoverMessage }}</p>
+        {{ popoverMessage }}
       </div>
       <div class="notimatica-popover-footer">
-        <button @click="click">{{ popoverButton }}</button>
+        <button @click="click" class="notimatica-pull-left action">{{ popoverButtonAction }}</button>
+        <button @click="cancel" class="notimatica-pull-right cancel">{{ popoverButtonCancel }}</button>
+        <div class="clearfix"></div>
       </div>
-      <div class="clearfix"></div>
     </div>
     <div class="notimatica-popover-close" @click="hidePopover">&times;</div>
   </div>
@@ -144,14 +145,23 @@ export default {
     },
 
     /**
-     * Get popover button.
+     * Get action popover button.
      *
      * @return {String}
      */
-    popoverButton () {
+    popoverButtonAction () {
       return this.subscribed
         ? t('popover.button.unsubscribe')
         : t('popover.button.subscribe')
+    },
+
+    /**
+     * Get cancel popover button.
+     *
+     * @return {String}
+     */
+    popoverButtonCancel () {
+      return t('popover.button.cancel')
     }
   },
   methods: {
@@ -164,6 +174,14 @@ export default {
       } else {
         this.click()
       }
+    },
+
+    /**
+     * Process button click.
+     */
+    cancel () {
+      this.hidePopover()
+      Notimatica.emit('autosubscibe:disable')
     },
 
     /**
