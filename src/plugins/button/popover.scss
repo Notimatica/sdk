@@ -42,18 +42,27 @@
       color: #fff;
       background-color: #00c385;
       border-color: #00aa74;
-        &:hover {
-          color: #fff;
-          background-color: #009062;
-          border-color: #006c4a;
-        }
+      &:hover {
+        background-color: #009062;
+        border-color: #006c4a;
+      }
+    }
+
+    &.cancel {
+      color: $text-color;
+      background-color: #fff;
+      border-color: $border-color;
+      &:hover {
+        background-color: #f5fbff;
+        border-color: $border-color;
+      }
     }
   }
 }
 
 .notimatica-popover-title,
 .notimatica-popover-content {
-  padding: 9px 14px;
+  padding: 10px 16px;
 }
 .notimatica-popover-title {
   background-color: #f5f8fa;
@@ -66,7 +75,9 @@
   border-radius: 0 0 5px 5px;
 }
 .notimatica-popover-footer {
-  padding: 9px 14px;
+  margin: 0 16px;
+  padding: 10px 0;
+  border-top: 1px solid #d3e0e9;
 }
 .notimatica-popover-close {
   position: absolute;

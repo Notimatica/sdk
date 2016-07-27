@@ -38,7 +38,7 @@
     </div>
     <div v-else>
       <div class="notimatica-popover-content">
-        {{ popoverMessage }}
+        {{{ popoverMessage }}}
       </div>
       <div class="notimatica-popover-footer">
         <button @click="click" class="notimatica-pull-left action">{{ popoverButtonAction }}</button>
@@ -100,6 +100,13 @@ export default {
     })
 
     this.subscribed = Notimatica.isSubscribed()
+
+    if (!this.subscribed) {
+      Notimatica.autorun()
+        .then((autorun) => {
+          if (autorun) this.showPopover()
+        })
+    }
 
     Notimatica.emit('button:ready')
   },
@@ -181,7 +188,7 @@ export default {
      */
     cancel () {
       this.hidePopover()
-      Notimatica.emit('autosubscibe:disable')
+      Notimatica.emit('autorun:disable')
     },
 
     /**

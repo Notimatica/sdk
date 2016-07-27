@@ -94,23 +94,6 @@ const provider = class Safari extends AbstractProvider {
   }
 
   /**
-   * If user was unsubscribed.
-   *
-   * @return {Promise}
-   */
-  wasUnsubscribed () {
-    const permission = this.ready()
-      .then((permissionData) => permissionData.permission === 'denied')
-
-    const visitor = Notimatica.visitor.wasUnsubscribed()
-
-    return Promise.all([permission, visitor])
-      .then((values) => {
-        return values[0] || values[1]
-      })
-  }
-
-  /**
    * Helper to request permission to subscribe.
    */
   _requestPermission () {

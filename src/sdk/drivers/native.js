@@ -5,20 +5,40 @@ import { makeToken } from '../../utils'
 
 module.exports = class Native extends AbstractDriver {
   /**
-   * Ready.
-   *
-   * @return {Promise}
+   * Prepare driver.
    */
-  ready () {
+  prepare () {
     Notimatica.on('subscribe:subscription-received', (subscription) => {
       this.register(subscription)
     })
+
     Notimatica.on('subscribe:subscription-removed', () => {
       this.unregister()
     })
 
-    return this.provider.ready()
-      .then(() => super.ready())
+    return Promise.all([
+      this.provider.isSubscribed(),
+      Notimatica.visitor.isSubscribed()
+    ])
+      .then(([ providerSubscribed, notimaticaSubscribed ]) => {
+        if (providerSubscribed) {
+          if (!notimaticaSubscribed) {
+            this.silent = true
+            this.subscribe()
+          }
+
+          this.isSubscribed = true
+        } else {
+          if (notimaticaSubscribed) {
+            this.silent = true
+            this.unsubscribe()
+          }
+
+          this.isSubscribed = false
+        }
+
+        return this.isSubscribed
+      })
   }
 
   /**
@@ -27,7 +47,7 @@ module.exports = class Native extends AbstractDriver {
    * @return {Promise}
    */
   subscribe () {
-    Notimatica.emit('subscribe:start')
+    if (!this.silent) Notimatica.emit('subscribe:start')
 
     return this.provider.subscribe()
   }
@@ -41,7 +61,9 @@ module.exports = class Native extends AbstractDriver {
   register (subscription) {
     return this._register(subscription)
       .then((uuid) => this._finishSubscription(uuid))
-      .catch((err) => Notimatica.emit('subscribe:fail', err))
+      .catch((err) => {
+        if (!this.silent) Notimatica.emit('subscribe:fail', err)
+      })
   }
 
   /**
@@ -50,7 +72,7 @@ module.exports = class Native extends AbstractDriver {
    * @return {Promise}
    */
   unsubscribe () {
-    Notimatica.emit('unsubscribe:start')
+    if (!this.silent) Notimatica.emit('unsubscribe:start')
 
     return this.provider.unsubscribe()
   }
@@ -64,7 +86,9 @@ module.exports = class Native extends AbstractDriver {
     return Notimatica.visitor.uuid()
       .then((uuid) => this._unregister(uuid))
       .then(() => this._finishUnsubscription())
-      .catch((err) => Notimatica.emit('unsubscribe:fail', err))
+      .catch((err) => {
+        if (!this.silent) Notimatica.emit('unsubscribe:fail', err)
+      })
   }
 
   /**
@@ -92,16 +116,16 @@ module.exports = class Native extends AbstractDriver {
       tags: this.options.tags
     }
 
-    Notimatica.emit('register:start', data)
+    if (!this.silent) Notimatica.emit('register:start', data)
 
     return subscribe(this.options.project, data)
       .then((data) => {
-        Notimatica.emit('register:success', data)
+        if (!this.silent) Notimatica.emit('register:success', data)
 
         return data.subscriber.uuid
       })
       .catch((err) => {
-        Notimatica.emit('register:fail', err)
+        if (!this.silent) Notimatica.emit('register:fail', err)
         throw new Error('Registration failed.')
       })
   }
@@ -119,12 +143,14 @@ module.exports = class Native extends AbstractDriver {
       uuid
     }
 
-    Notimatica.emit('unregister:start', data)
+    if (!this.silent) Notimatica.emit('unregister:start', data)
 
     return unsubscribe(this.options.project, data)
-      .then(() => Notimatica.emit('unregister:success'))
+      .then(() => {
+        if (!this.silent) Notimatica.emit('unregister:success')
+      })
       .catch((err) => {
-        Notimatica.emit('unregister:fail', err)
+        if (!this.silent) Notimatica.emit('unregister:fail', err)
         throw new Error('Failed to unregister.')
       })
   }

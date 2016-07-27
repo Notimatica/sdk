@@ -43,7 +43,7 @@ const Plugin = class Plugin extends AbstractPlugin {
   get strings () {
     return {
       'en': {
-        'popover.subscribe': "Do you want to recieve desktop notifications from our site? Click Subscribe button!",
+        'popover.subscribe': "Do you want to recieve desktop notifications from us? Click Subscribe button!",
         'popover.unsubscribe': "If you don't want to recieve notifications anymore, click Unsubscribe button.",
         'popover.button.subscribe': 'Subscribe',
         'popover.button.unsubscribe': 'Unsubscribe',

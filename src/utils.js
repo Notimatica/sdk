@@ -41,6 +41,17 @@ export function isArray (varible) {
 }
 
 /**
+ * Return Part of the string after search.
+ *
+ * @param  {String} string Hystack
+ * @param  {String} search Needle
+ * @return {String}
+ */
+export function strAfter (string, search) {
+  return string.substr(string.indexOf(search) + search.length)
+}
+
+/**
  * Make token from endpoint.
  *
  * @param   {String} endpoint The endpoint string

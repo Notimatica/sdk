@@ -1,7 +1,7 @@
 import Storage from '../storage'
 import { getPayload, httpCall } from '../api'
 import { VERSION } from '../defaults'
-import { makeToken } from '../utils'
+import { makeToken, strAfter } from '../utils'
 
 var NSW = {
   _inited: false,
@@ -165,17 +165,41 @@ var NSW = {
 
     const url = event.notification.data.url
 
+    let urlOrigin = null
+    try {
+      urlOrigin = new URL(url).origin
+    } catch (e) {}
+
     event.notification.close()
 
     if (url) {
       return event.waitUntil(
-        clients.matchAll({ type: 'window' })
-          .then((windowClients) => {
-            windowClients.forEach((client) => {
-              if (client.url === url && 'focus' in client) {
+        Promise.all([
+          clients.matchAll({ type: 'window', includeUncontrolled: true }),
+          this.storage.get('key_value', 'match_exact_url')
+        ])
+          .then(([windowClients, matchExactUrl]) => {
+            matchExactUrl = matchExactUrl !== undefined
+              ? matchExactUrl.value
+              : true
+
+            for (let client of windowClients) {
+              if ('focus' in client) {
+                let clientUrl = (client.frameType && client.frameType === 'nested')
+                  ? decodeURIComponent(strAfter(client.url, '?to='))
+                  : client.url
+
+                let clientOrigin = new URL(clientUrl).origin
+
+                if (matchExactUrl) {
+                  if (clientUrl === url) return client.focus()
+                } else {
+                  if (clientOrigin === urlOrigin) return client.focus()
+                }
+
                 return client.focus()
               }
-            })
+            }
 
             if (clients.openWindow) return clients.openWindow(url)
           })

@@ -8,6 +8,7 @@ module.exports = class AbstractDriver {
    */
   constructor (options) {
     this.options = options
+    this.silent = false
 
     this._prepareProvider()
 
@@ -15,30 +16,9 @@ module.exports = class AbstractDriver {
   }
 
   /**
-   * Ready.
-   *
-   * @return {Promise}
+   * Prepare driver.
    */
-  ready () {
-    let ready = {
-      isSubscribed: false,
-      wasUnsubscribed: false
-    }
-
-    return this.provider.isSubscribed()
-      .then((isSubscribed) => {
-        this.isSubscribed = isSubscribed
-        ready.isSubscribed = isSubscribed
-
-        return this.provider.wasUnsubscribed()
-      })
-      .then((wasUnsubscribed) => {
-        this.wasUnsubscribed = wasUnsubscribed
-        ready.wasUnsubscribed = wasUnsubscribed
-
-        return ready
-      })
-  }
+  prepare () {}
 
   /**
    * Check if push notifications supported.
@@ -58,13 +38,12 @@ module.exports = class AbstractDriver {
    */
   _finishSubscription (uuid) {
     this.isSubscribed = true
-    this.wasUnsubscribed = false
 
-    return Promise.all([
-      Notimatica.visitor.uuid(uuid),
-      Notimatica.visitor.unsubscribe(null)
-    ])
-    .then((uuid) => Notimatica.emit('subscribe:success', uuid))
+    return Notimatica.visitor.uuid(uuid)
+      .then((uuid) => {
+        if (!this.silent) Notimatica.emit('subscribe:success', uuid)
+        this.silent = false
+      })
   }
 
   /**
@@ -75,13 +54,12 @@ module.exports = class AbstractDriver {
    */
   _finishUnsubscription () {
     this.isSubscribed = false
-    this.wasUnsubscribed = true
 
-    return Promise.all([
-      Notimatica.visitor.uuid(null),
-      Notimatica.visitor.unsubscribe()
-    ])
-    .then(() => Notimatica.emit('unsubscribe:success'))
+    return Notimatica.visitor.uuid(null)
+      .then(() => {
+        if (!this.silent) Notimatica.emit('unsubscribe:success')
+        this.silent = false
+      })
   }
 
   /**

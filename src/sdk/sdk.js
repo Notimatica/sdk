@@ -12,13 +12,15 @@ const Notimatica = {
     debug: DEBUG,
     project: null,
     safariWebId: null,
+    subdomain: null,
     tags: [],
-    autoSubscribe: false,
+    autorun: false,
     usePopup: false,
     popup: {
       width: POPUP_WIGHT,
       height: POPUP_HEIGHT
     },
+    matchExactUrl: true,
     plugins: {},
     sdkPath: SDK_PATH,
     strings: {},
@@ -39,25 +41,24 @@ const Notimatica = {
     this.strings = merge(this.strings, this.options.strings)
     delete this.options.strings
 
-    if (this.options.project === null) return this.emit('error', 'Notimatica: Project ID is absent.')
+    if (this.options.project === null) return console.error('Notimatica: Project ID is absent.')
 
-    this._prepareVisitor()
     this._prepareEvents()
-    this._prepareDriver()
+    this._prepareVisitor()
+      .then(() => this._prepareDriver())
+      .then(() => this.autorun())
+      .then((autorun) => {
+        this._ready()
 
-    if (this.pushSupported()) {
-      this._driver.ready()
-        .then(({ isSubscribed, wasUnsubscribed }) => {
-          this._ready()
-
-          if (this.options.autoSubscribe && !this._usePopup() && !wasUnsubscribed && !isSubscribed) {
-            this._driver.subscribe()
-          }
-        })
-        .catch((err) => this.emit('error', err))
-    } else {
-      this.emit('unsupported')
-    }
+        if (autorun && this.isUnsubscribed() && !this._usePopup()) {
+          return this._driver.subscribe()
+        }
+      })
+      .catch((err) => {
+        err.message === 'unsupported'
+          ? this.emit('unsupported')
+          : this.emit('error', err)
+      })
   },
 
   /**
@@ -79,7 +80,7 @@ const Notimatica = {
         const script = document.createElement('script')
 
         script.type = 'text/javascript'
-        script.src = this.options.sdkPath + '/notimatica-' + name + '.js'
+        script.src = `${this.options.sdkPath}/notimatica-${name}.js`
         script.async = 'true'
         head.appendChild(script)
       }
@@ -94,14 +95,14 @@ const Notimatica = {
 
     let save = [
       { key: 'debug', value: this.options.debug },
-      { key: 'autosubscibe', value: this.options.autoSubscibe },
       { key: 'project', value: this.options.project },
       { key: 'webhooks', value: this.options.webhooks },
+      { key: 'match_exact_url', value: this.options.matchExactUrl },
       { key: 'page_title', value: document.title },
       { key: 'base_url', value: document.location.origin }
     ]
 
-    Promise.all(save.map((value) => {
+    return Promise.all(save.map((value) => {
       return this.visitor.storage.set('key_value', value)
     }))
   },
@@ -110,31 +111,30 @@ const Notimatica = {
    * Prepare popup.
    *
    * @param  {Object} visitor The visitor object.
+   * @return {Promise}
    */
   _prepareDriver () {
     const driver = this._usePopup() ? DRIVER_POPUP : DRIVER_NATIVE
     const Driver = require('./drivers/' + driver)
 
     this._driver = new Driver(this.options)
-    this.visitor.storage.set('key_value', { key: 'provider', value: this._driver.provider.name })
+
+    if (!this._driver.pushSupported()) throw new Error('unsupported')
+
+    return this._driver.prepare()
+      .then(() => this.visitor.storage.set('key_value', { key: 'provider', value: this._driver.provider.name }))
   },
 
   /**
    * Prepare SDK events.
    */
   _prepareEvents () {
-    this.on('ready', () => {
-      console.info('Notimatica: SDK inited with:', this.options)
-    })
     this.on('plugin:ready', (plugin) => {
       this.strings = merge(plugin.strings, this.strings)
       plugin.init(this.options.plugins[plugin.name])
     })
-    this.on('autosubscibe:disable', (plugin) => {
-      this.storage.set('key_value', { key: 'autosubscibe', value: false })
-    })
-    this.on('unsupported', (message) => {
-      console.warn('Notimatica: Push notifications are not yet available for your browser.')
+    this.on('autorun:disable', (plugin) => {
+      this.visitor.storage.set('key_value', { key: 'autorun', value: false })
     })
     this.on('warning', (message) => {
       console.warn('Notimatica: ' + message)
@@ -144,8 +144,17 @@ const Notimatica = {
     })
 
     if (this.options.debug) {
+      this.on('ready', () => {
+        console.info('Notimatica: SDK inited with:', this.options)
+      })
       this.on('driver:ready', (driver) => {
         console.log('Notimatica: Driver is ready', driver)
+      })
+      this.on('iframe:ready', () => {
+        console.log('Notimatica: Iframe is ready')
+      })
+      this.on('unsupported', (message) => {
+        console.warn('Notimatica: Push notifications are not yet available for your browser.')
       })
       this.on('subscribe:start', () => {
         console.log('Notimatica: Start subscribing.')
@@ -199,6 +208,16 @@ const Notimatica = {
   },
 
   /**
+   * Autorun enabled.
+   *
+   * @return {Promise}
+   */
+  autorun () {
+    return this.visitor.storage.get('key_value', 'autorun')
+      .then((autorun) => (autorun) ? autorun.value : this.options.autorun)
+  },
+
+  /**
    * Register service worker.
    */
   subscribe () {
@@ -237,7 +256,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   isSubscribed () {
-    return this._driver.isSubscribed && !this._driver.wasUnsubscribed
+    return this._driver.isSubscribed
   },
 
   /**
@@ -247,6 +266,33 @@ const Notimatica = {
    */
   isUnsubscribed () {
     return !this.isSubscribed()
+  },
+
+  /**
+   * Reset notifications history.
+   *
+   * @return {Promise}
+   */
+  resetHistory () {
+    return this.visitor.storage.removeAll('notifications')
+  },
+
+  /**
+   * Reset notifications history.
+   *
+   * @return {Promise}
+   */
+  resetState () {
+    return this.visitor.storage.removeAll('key_value')
+  },
+
+  /**
+   * Reset everything.
+   *
+   * @return {Promise}
+   */
+  resetAll () {
+    return this.visitor.storage.reset()
   },
 
   /**
