@@ -40,7 +40,7 @@ module.exports = class AbstractDriver {
     this.isSubscribed = true
 
     return Notimatica.visitor.uuid(uuid)
-      .then((uuid) => {
+      .then(() => {
         if (!this.silent) Notimatica.emit('subscribe:success', uuid)
         this.silent = false
       })
