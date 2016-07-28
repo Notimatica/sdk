@@ -70,7 +70,7 @@ export default class LocalStorage {
   /**
    * Get table value.
    *
-   * @param  {String}        table The table
+   * @param  {String}        table The table name
    * @param  {String|Number} id    The table id
    * @return {Promise}
    */
@@ -93,7 +93,7 @@ export default class LocalStorage {
   /**
    * Get all table values.
    *
-   * @param  {String} table The table
+   * @param  {String} table The table name
    * @return {Promise}
    */
   getAll (table) {
@@ -106,7 +106,7 @@ export default class LocalStorage {
   /**
    * Remove id from the table.
    *
-   * @param  {String}        table The table
+   * @param  {String}        table The table name
    * @param  {String|Number} id    The table id
    * @return {Promise}
    */
@@ -132,7 +132,7 @@ export default class LocalStorage {
   /**
    * Clear the table.
    *
-   * @param  {String} table The table
+   * @param  {String} table The table name
    * @return {Promise}
    */
   removeAll (table) {

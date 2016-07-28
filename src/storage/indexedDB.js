@@ -82,7 +82,7 @@ export default class IndexedDBStorage {
   /**
    * Get table value.
    *
-   * @param  {String}        table The table
+   * @param  {String}        table The table name
    * @param  {String|Number} id    The table id
    * @return {Promise}
    */
@@ -111,7 +111,7 @@ export default class IndexedDBStorage {
   /**
    * Get all table values.
    *
-   * @param  {String} table The table
+   * @param  {String} table The table name
    * @return {Promise}
    */
   getAll (table) {
@@ -139,7 +139,7 @@ export default class IndexedDBStorage {
   /**
    * Remove id from the table.
    *
-   * @param  {String}        table The table
+   * @param  {String}        table The table name
    * @param  {String|Number} id    The table id
    * @return {Promise}
    */
@@ -164,7 +164,7 @@ export default class IndexedDBStorage {
   /**
    * Clear the table.
    *
-   * @param  {String} table The table
+   * @param  {String} table The table name
    * @return {Promise}
    */
   removeAll (table) {
