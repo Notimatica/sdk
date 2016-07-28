@@ -186,7 +186,7 @@ var NSW = {
             for (let client of windowClients) {
               if ('focus' in client) {
                 let clientUrl = (client.frameType && client.frameType === 'nested')
-                  ? decodeURIComponent(strAfter(client.url, '?to='))
+                  ? decodeURIComponent(strAfter(client.url, '?parent='))
                   : client.url
 
                 let clientOrigin = new URL(clientUrl).origin

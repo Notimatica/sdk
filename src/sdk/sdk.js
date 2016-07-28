@@ -91,18 +91,14 @@ const Notimatica = {
   _prepareVisitor () {
     this.visitor = new Visitor()
 
-    let save = [
+    return this.visitor.storage.setAll('key_value', [
       { key: 'debug', value: this.options.debug },
       { key: 'project', value: this.options.project },
       { key: 'webhooks', value: this.options.webhooks },
       { key: 'match_exact_url', value: this.options.matchExactUrl },
       { key: 'page_title', value: document.title },
       { key: 'base_url', value: document.location.origin }
-    ]
-
-    return Promise.all(save.map((value) => {
-      return this.visitor.storage.set('key_value', value)
-    }))
+    ])
   },
 
   /**

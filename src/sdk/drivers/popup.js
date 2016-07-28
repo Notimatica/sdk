@@ -1,5 +1,5 @@
 import AbstractDriver from './abstract'
-import { POPUP_URL } from '../../defaults'
+import { toQueryString } from '../../utils'
 
 module.exports = class Popup extends AbstractDriver {
   /**
@@ -69,8 +69,12 @@ module.exports = class Popup extends AbstractDriver {
     return new Promise((resolve) => {
       const body = document.body
       const iframe = document.createElement('iframe')
+      const query = {
+        tags: this.options.tags,
+        parent: document.location.href
+      }
 
-      iframe.src = `https://${this.options.subdomain}.notimatica.io/http-iframe?top=${encodeURIComponent(document.location.href)}`
+      iframe.src = `https://${this.options.subdomain}.notimatica.io/http-iframe?${toQueryString(query)}`
       iframe.name = 'notimatica-iframe'
       iframe.style = 'width:0; height:0; border:0; border:none'
       body.appendChild(iframe)
@@ -120,10 +124,16 @@ module.exports = class Popup extends AbstractDriver {
    * Open popup.
    *
    * @param  {String} project The project uuid
+   * @return {Promise}
    */
   _openPopup (project) {
     return new Promise((resolve) => {
-      const href = `${POPUP_URL}/${project}`
+      const query = {
+        tags: this.options.tags
+      }
+
+      const href = `https://${this.options.subdomain}.notimatica.io/?${toQueryString(query)}`
+
       window.open(href, 'notimatica', `width=${this.options.popup.width},height=${this.options.popup.height}`)
 
       resolve()

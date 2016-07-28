@@ -62,9 +62,7 @@ export default class LocalStorage {
    * @return {Promise}
    */
   setAll (table, values) {
-    return Promise.all(values.map((value) => {
-      return this.set(table, value)
-    }))
+    return Promise.all(values.map((value) => this.set(table, value)))
   }
 
   /**

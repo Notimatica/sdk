@@ -52,6 +52,24 @@ export function strAfter (string, search) {
 }
 
 /**
+ * Convert key-value object to escaped query string.
+ *
+ * @param  {Object} params Params
+ * @return {String}
+ */
+export function toQueryString (params, glue = '&') {
+  const esc = encodeURIComponent
+
+  return Object.keys(params)
+    .map((key) => {
+      let query = esc(key)
+      if (isString(params[key])) return `${query}=${esc(params[key])}`
+      if (isArray(params[key])) return params[key].map((value) => `${query}[]=${esc(value)}`).join(glue)
+    })
+    .join(glue)
+}
+
+/**
  * Make token from endpoint.
  *
  * @param   {String} endpoint The endpoint string
@@ -164,7 +182,6 @@ export function findNode (element, fallback) {
       try {
         return document.querySelectAll(element)
       } catch (e) {}
-
       return fallback
     case element.nodeType:
       return element

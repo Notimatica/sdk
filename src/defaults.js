@@ -21,7 +21,6 @@ export const PROVIDERS_ENDPOINTS = {
 export const API_URL = 'https://api.notimatica.io'
 export const POSTMAN_URL = 'https://postman.notimatica.io'
 export const CDN_URL = 'https://cdn.notimatica.io'
-export const POPUP_URL = 'https://notimatica.io/subscribe'
 
 export const SDK_PATH = CDN_URL + '/sdks/latest'
 
