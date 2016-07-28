@@ -38,19 +38,19 @@ export default class IndexedDBStorage {
   }
 
   /**
-   * Set value to the entity.
+   * Set value to the table.
    *
-   * @param  {String} entity The entity name
-   * @param  {Object} value  The value
+   * @param  {String} table The table name
+   * @param  {Object} value The value
    * @return {Promise}
    */
-  set (entity, value) {
+  set (table, value) {
     return this.connect()
       .then((database) => new Promise((resolve, reject) => {
         try {
           const request = database
-            .transaction([entity], 'readwrite')
-            .objectStore(entity)
+            .transaction([table], 'readwrite')
+            .objectStore(table)
             .put(value)
 
           request.onsuccess = () => {
@@ -67,19 +67,32 @@ export default class IndexedDBStorage {
   }
 
   /**
-   * Get entity value.
+   * Set multiple values.
    *
-   * @param  {String}        entity The entity
-   * @param  {String|Number} id     The entity id
+   * @param  {String} table  The table
+   * @param  {Array}  values Array of values
    * @return {Promise}
    */
-  get (entity, id) {
+  setAll (table, values) {
+    return Promise.all(values.map((value) => {
+      return this.set(table, value)
+    }))
+  }
+
+  /**
+   * Get table value.
+   *
+   * @param  {String}        table The table
+   * @param  {String|Number} id    The table id
+   * @return {Promise}
+   */
+  get (table, id) {
     return this.connect()
       .then((database) => new Promise((resolve, reject) => {
         try {
           const request = database
-            .transaction([entity], 'readwrite')
-            .objectStore(entity)
+            .transaction([table], 'readwrite')
+            .objectStore(table)
             .get(id)
 
           request.onsuccess = (event) => {
@@ -96,18 +109,18 @@ export default class IndexedDBStorage {
   }
 
   /**
-   * Get all entity values.
+   * Get all table values.
    *
-   * @param  {String} entity The entity
+   * @param  {String} table The table
    * @return {Promise}
    */
-  getAll (entity) {
+  getAll (table) {
     return this.connect()
       .then((database) => new Promise((resolve, reject) => {
         try {
           const request = database
-            .transaction([entity], 'readwrite')
-            .objectStore(entity)
+            .transaction([table], 'readwrite')
+            .objectStore(table)
             .getAll()
 
           request.onsuccess = (event) => {
@@ -124,18 +137,18 @@ export default class IndexedDBStorage {
   }
 
   /**
-   * Remove id from the entity.
+   * Remove id from the table.
    *
-   * @param  {String}        entity The entity
-   * @param  {String|Number} id     The entity id
+   * @param  {String}        table The table
+   * @param  {String|Number} id    The table id
    * @return {Promise}
    */
-  remove (entity, id) {
+  remove (table, id) {
     return this.connect()
       .then((database) => new Promise((resolve, reject) => {
         const request = database
-          .transaction([entity], 'readwrite')
-          .objectStore(entity)
+          .transaction([table], 'readwrite')
+          .objectStore(table)
           .delete(id)
 
         request.onsuccess = () => {
@@ -149,17 +162,17 @@ export default class IndexedDBStorage {
   }
 
   /**
-   * Clear the entity.
+   * Clear the table.
    *
-   * @param  {String} entity The entity
+   * @param  {String} table The table
    * @return {Promise}
    */
-  removeAll (entity) {
+  removeAll (table) {
     return this.connect()
       .then((database) => new Promise((resolve, reject) => {
         const request = database
-          .transaction([entity], 'readwrite')
-          .objectStore(entity)
+          .transaction([table], 'readwrite')
+          .objectStore(table)
           .clear()
 
         request.onsuccess = () => {
@@ -180,8 +193,8 @@ export default class IndexedDBStorage {
   reset () {
     return this.connect()
       .then((database) => new Promise((resolve, reject) => {
-        return Promise.all(this.options.tables.map((entity) => {
-          return this.removeAll(entity)
+        return Promise.all(this.options.tables.map((table) => {
+          return this.removeAll(table)
         }))
       })
     )

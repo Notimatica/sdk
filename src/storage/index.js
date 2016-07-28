@@ -1,4 +1,4 @@
-import IndexedDBStorage from './indexedDB'
+import IndexedDB from './indexedDB'
 import LocalStorage from './localStorage'
 import { DB_VERSION, DB_NAME } from '../defaults'
 
@@ -11,7 +11,8 @@ const options = {
   ]
 }
 
-// Don't use window due to it's absence in SW scope
+// Don't use window due to it's absence in SW scope.
+// indexedDB is preferable with localStorage fallback
 export default (indexedDB || webkitIndexedDB || mozIndexedDB || msIndexedDB)
-  ? new IndexedDBStorage(options)
+  ? new IndexedDB(options)
   : new LocalStorage(options)

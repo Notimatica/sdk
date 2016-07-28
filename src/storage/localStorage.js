@@ -1,12 +1,44 @@
 export default class LocalStorage {
-  set (entity, value) {
+  /**
+   * Constructor.
+   *
+   * @param  {Object} options Options
+   */
+  constructor (options) {
+    this.options = options
+  }
+
+  /**
+   * Get table key.
+   *
+   * @param  {String} table The table name
+   * @return {String}
+   */
+  _key (table) {
+    for (var i = 0; i < this.options.tables.length; i++) {
+      if (this.options.tables[i].name === table) return this.options.tables[i].key
+    }
+
+    throw new Error(`Undefined table '${table}'`)
+  }
+
+  /**
+   * Set value to the table.
+   *
+   * @param  {String} table The table name
+   * @param  {Object} value The value
+   * @return {Promise}
+   */
+  set (table, value) {
+    const key = this._key()
+
     return new Promise((resolve, reject) => {
-      const stored = JSON.parse(localStorage.getItem(entity)) || []
+      const stored = JSON.parse(localStorage.getItem(table)) || []
       let updated = false
       const length = stored.length
 
       for (let i = 0; i < length; i++) {
-        if (stored[i].id === value.id) {
+        if (stored[i][key] === value[key]) {
           updated = true
           stored[i] = value
         }
@@ -16,52 +48,79 @@ export default class LocalStorage {
         stored.push(value)
       }
 
-      localStorage.setItem(entity, JSON.stringify(stored))
+      localStorage.setItem(table, JSON.stringify(stored))
 
       resolve(value)
     })
   }
 
-  setAll (entity, values) {
-    const all = []
-    values.forEach(value => {
-      all.push(this.set(entity, value))
-    })
-
-    return Promise.all(all)
+  /**
+   * Set multiple values.
+   *
+   * @param  {String} table  The table
+   * @param  {Array}  values Array of values
+   * @return {Promise}
+   */
+  setAll (table, values) {
+    return Promise.all(values.map((value) => {
+      return this.set(table, value)
+    }))
   }
 
-  get (entity, id) {
+  /**
+   * Get table value.
+   *
+   * @param  {String}        table The table
+   * @param  {String|Number} id    The table id
+   * @return {Promise}
+   */
+  get (table, id) {
+    const key = this._key()
+
     return new Promise((resolve, reject) => {
-      const stored = JSON.parse(localStorage.getItem(entity))
+      const stored = JSON.parse(localStorage.getItem(table))
       const length = stored ? stored.length : 0
 
       for (let i = 0; i < length; i++) {
-        if (stored[i].id === id) {
+        if (stored[i][key] === id) {
           resolve(stored[i])
-          return
         }
       }
       resolve(null)
     })
   }
 
-  getAll (entity) {
+  /**
+   * Get all table values.
+   *
+   * @param  {String} table The table
+   * @return {Promise}
+   */
+  getAll (table) {
     return new Promise((resolve, reject) => {
-      const value = localStorage.getItem(entity)
+      const value = localStorage.getItem(table)
       resolve(value ? JSON.parse(value) : [])
     })
   }
 
-  remove (entity, id) {
+  /**
+   * Remove id from the table.
+   *
+   * @param  {String}        table The table
+   * @param  {String|Number} id    The table id
+   * @return {Promise}
+   */
+  remove (table, id) {
+    const key = this._key()
+
     return new Promise((resolve, reject) => {
-      const stored = JSON.parse(localStorage.getItem(entity))
+      const stored = JSON.parse(localStorage.getItem(table))
       const length = stored.length
 
       for (let i = 0; i < length; i++) {
-        if (stored[i].id === id) {
+        if (stored[i][key] === id) {
           stored.splice(i, 1)
-          localStorage.setItem(entity, JSON.stringify(stored))
+          localStorage.setItem(table, JSON.stringify(stored))
           break
         }
       }
@@ -70,14 +129,16 @@ export default class LocalStorage {
     })
   }
 
-  removeAll (entity) {
+  /**
+   * Clear the table.
+   *
+   * @param  {String} table The table
+   * @return {Promise}
+   */
+  removeAll (table) {
     return new Promise((resolve, reject) => {
-      localStorage.removeItem(entity)
+      localStorage.removeItem(table)
       resolve()
     })
-  }
-
-  close () {
-    // There is nothing to do
   }
 }
