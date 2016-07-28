@@ -5,6 +5,15 @@ import { makeToken } from '../../utils'
 
 module.exports = class Native extends AbstractDriver {
   /**
+   * Driver name.
+   *
+   * @return {String}
+   */
+  get name () {
+    return 'native'
+  }
+
+  /**
    * Prepare driver.
    */
   prepare () {
@@ -36,9 +45,8 @@ module.exports = class Native extends AbstractDriver {
 
           this.isSubscribed = false
         }
-
-        return this.isSubscribed
       })
+      .then(() => Notimatica.emit('driver:ready', this))
   }
 
   /**

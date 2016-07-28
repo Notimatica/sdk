@@ -16,17 +16,20 @@ module.exports = class Visitor {
    * @return {Promise}
    */
   uuid (uuid) {
-    if (uuid) {
-      return this.storage.set('key_value', { key: 'subscriber', value: uuid })
-    }
-
-    if (typeof uuid === 'undefined') {
-      return this.storage.get('key_value', 'subscriber')
-        .then((value) => (value) ? value.value : null)
-    }
-
-    if (uuid === null) {
-      return this.storage.remove('key_value', 'subscriber')
+    switch (true) {
+      case uuid === undefined: // Retrieve uuid
+        return (this._uuid !== undefined)
+          ? Promise.resolve(this.uuid)
+          : this.storage.get('key_value', 'subscriber')
+              .then((value) => (value) ? value.value : null)
+              .then((uuid) => {
+                this._uuid = uuid
+                return uuid
+              })
+      case uuid === null: // Unset uuid
+        return this.storage.remove('key_value', 'subscriber')
+      default: // Set uuid
+        return this.storage.set('key_value', { key: 'subscriber', value: uuid })
     }
   }
 
@@ -38,31 +41,5 @@ module.exports = class Visitor {
   isSubscribed () {
     return this.uuid()
       .then((uuid) => !!uuid)
-  }
-
-  /**
-   * If user was unsubscribed.
-   *
-   * @return {Promise}
-   */
-  wasUnsubscribed () {
-    return this.storage.get('key_value', 'unsubscribed')
-      .then((value) => (value) ? !!value.value : false)
-  }
-
-  /**
-   * Unsubscribe visitor.
-   *
-   * @param  {Null} value Action.
-   * @return {Promise}
-   */
-  unsubscribe (value) {
-    if (typeof value === 'undefined') {
-      return this.storage.set('key_value', { key: 'unsubscribed', value: 1 })
-    }
-
-    if (value === null) {
-      return this.storage.remove('key_value', 'unsubscribed')
-    }
   }
 }

@@ -10,6 +10,16 @@ module.exports = class Popup extends AbstractDriver {
     super(options)
     this.iframeLoaded = false
   }
+
+  /**
+   * Driver name.
+   *
+   * @return {String}
+   */
+  get name () {
+    return 'popup'
+  }
+
   /**
    * Prepare driver.
    */
@@ -24,13 +34,39 @@ module.exports = class Popup extends AbstractDriver {
       return this._finishUnsubscription()
     })
 
-    Notimatica.on('iframe:ready', () => {
+    Notimatica.on('iframe:ready', (iframeUuid) => {
       this.iframeLoaded = true
+
+      if (iframeUuid) {
+        Notimatica.visitor.uuid()
+          .then((uuid) => {
+            if (iframeUuid !== uuid) {
+              this.silent = true
+              return this._finishSubscription(uuid)
+            }
+          })
+          .then(() => Notimatica.emit('driver:ready', this))
+      } else {
+        Notimatica.emit('driver:ready', this)
+      }
     })
 
-    return new Promise((resolve) => {
-      this._preparePostEvents()
+    this._preparePostEvents()
 
+    return this._prepareIframe()
+      .then(() => Notimatica.visitor.isSubscribed())
+      .then((isSubscribed) => {
+        this.isSubscribed = isSubscribed
+      })
+  }
+
+  /**
+   * Insert iframe to the page to track active clients.
+   *
+   * @return {Promise}
+   */
+  _prepareIframe () {
+    return new Promise((resolve) => {
       const body = document.body
       const iframe = document.createElement('iframe')
 
@@ -38,8 +74,6 @@ module.exports = class Popup extends AbstractDriver {
       iframe.name = 'notimatica-iframe'
       iframe.style = 'width:0; height:0; border:0; border:none'
       body.appendChild(iframe)
-
-      resolve()
     })
   }
 
@@ -51,7 +85,7 @@ module.exports = class Popup extends AbstractDriver {
     const eventer = window[eventMethod]
     const messageEvent = eventMethod === 'attachEvent' ? 'onmessage' : 'message'
 
-    eventer(messageEvent, function (event) {
+    eventer(messageEvent, (event) => {
       if (event.origin.indexOf(`https://${this.options.subdomain}.notimatica.io`) === -1) return
 
       Notimatica.emit(event.data.event, event.data.data)
@@ -66,7 +100,7 @@ module.exports = class Popup extends AbstractDriver {
   subscribe () {
     Notimatica.emit('subscribe:start')
 
-    return this._open(this.options.project)
+    return this._openPopup(this.options.project)
       .catch((err) => Notimatica.emit('subscribe:fail', err))
   }
 
@@ -78,7 +112,7 @@ module.exports = class Popup extends AbstractDriver {
   unsubscribe () {
     Notimatica.emit('unsubscribe:start')
 
-    return this._open(this.options.project)
+    return this._openPopup(this.options.project)
       .catch((err) => Notimatica.emit('unsubscribe:fail', err))
   }
 
@@ -87,7 +121,7 @@ module.exports = class Popup extends AbstractDriver {
    *
    * @param  {String} project The project uuid
    */
-  _open (project) {
+  _openPopup (project) {
     return new Promise((resolve) => {
       const href = `${POPUP_URL}/${project}`
       window.open(href, 'notimatica', `width=${this.options.popup.width},height=${this.options.popup.height}`)

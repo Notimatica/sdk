@@ -6,7 +6,6 @@ import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH
 const Notimatica = {
   _inited: false,
   _driver: null,
-  _subscribed: false,
   visitor: null,
   options: {
     debug: DEBUG,
@@ -46,14 +45,6 @@ const Notimatica = {
     this._prepareEvents()
     this._prepareVisitor()
       .then(() => this._prepareDriver())
-      .then(() => this.autorun())
-      .then((autorun) => {
-        this._ready()
-
-        if (autorun && this.isUnsubscribed() && !this._usePopup()) {
-          return this._driver.subscribe()
-        }
-      })
       .catch((err) => {
         err.message === 'unsupported'
           ? this.emit('unsupported')
@@ -62,12 +53,19 @@ const Notimatica = {
   },
 
   /**
-   * SDK is ready.
+   * Driver is ready, SDK is good to go.
    */
   _ready () {
     this._loadPlugins()
     this._inited = true
     this.emit('ready')
+
+    this.autorun()
+      .then((autorun) => {
+        if (autorun && this.isUnsubscribed() && !this._usePopup()) {
+          return this._driver.subscribe()
+        }
+      })
   },
 
   /**
@@ -129,6 +127,9 @@ const Notimatica = {
    * Prepare SDK events.
    */
   _prepareEvents () {
+    this.on('driver:ready', (driver) => {
+      this._ready()
+    })
     this.on('plugin:ready', (plugin) => {
       this.strings = merge(plugin.strings, this.strings)
       plugin.init(this.options.plugins[plugin.name])
@@ -150,8 +151,8 @@ const Notimatica = {
       this.on('driver:ready', (driver) => {
         console.log('Notimatica: Driver is ready', driver)
       })
-      this.on('iframe:ready', () => {
-        console.log('Notimatica: Iframe is ready')
+      this.on('iframe:ready', (uuid) => {
+        console.log('Notimatica: Iframe is ready', uuid)
       })
       this.on('unsupported', (message) => {
         console.warn('Notimatica: Push notifications are not yet available for your browser.')
@@ -201,7 +202,7 @@ const Notimatica = {
   /**
    * Check if push notifications supported.
    *
-   * @returns {Boolean}
+   * @return {Boolean}
    */
   pushSupported () {
     return this._driver.pushSupported()
@@ -298,7 +299,7 @@ const Notimatica = {
   /**
    * Implement array's push method to handle push calls.
    *
-   * @param  {Array|Function} item Method call. [method_name, args...]
+   * @param {Array|Function} item Method call. [method_name, args...]
    */
   push (item) {
     if (typeof item === 'function') {
@@ -312,7 +313,7 @@ const Notimatica = {
   /**
    * Handle already registered actions.
    *
-   * @param  {Array} array History of calls
+   * @param {Array} array History of calls
    */
   _processRegisteredActions (array) {
     for (let i = 0; i < array.length; i++) {

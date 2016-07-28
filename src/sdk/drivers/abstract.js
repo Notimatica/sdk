@@ -11,14 +11,14 @@ module.exports = class AbstractDriver {
     this.silent = false
 
     this._prepareProvider()
-
-    Notimatica.emit('driver:ready', this)
   }
 
   /**
    * Prepare driver.
    */
-  prepare () {}
+  prepare () {
+    Notimatica.emit('driver:ready', this)
+  }
 
   /**
    * Check if push notifications supported.
