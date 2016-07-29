@@ -56,7 +56,7 @@ var NSW = {
                 .then(() => Promise.all([
                   NSW.storage.set('notifications', payload),
                   NSW.storage.set('key_value', {
-                    key: 'fallback_notification',
+                    key: 'fallbackNotification',
                     value: payload
                   })
                 ]))
@@ -96,7 +96,7 @@ var NSW = {
    * @return {Promise}
    */
   showFallbackNotification () {
-    NSW.storage.get('key_value', 'fallback_notification')
+    NSW.storage.get('key_value', 'fallbackNotification')
       .then((notification) => {
         if (!notification) throw new Error('No fallback notification')
 
@@ -108,8 +108,8 @@ var NSW = {
         NSW.debug('Display backup notification')
 
         return Promise.all([
-          NSW.storage.get('key_value', 'page_title'),
-          NSW.storage.get('key_value', 'base_url'),
+          NSW.storage.get('key_value', 'pageTitle'),
+          NSW.storage.get('key_value', 'baseUrl'),
           NSW.storage.get('key_value', 'project')
         ]).then(([title, url, project]) => {
           return NSW.showNotification({
@@ -167,7 +167,7 @@ var NSW = {
     return event.waitUntil(
       Promise.all([
         self.clients.matchAll({ type: 'window', includeUncontrolled: true }), // Retrieve all subscribed tabs including iframes
-        NSW.storage.get('key_value', 'match_exact_url'), // Retrieve url match rule
+        NSW.storage.get('key_value', 'matchExactUrl'), // Retrieve url match rule
         getRedirect(notification.id) // Retrieve url to open on click
       ])
         .then(([ windowClients, matchExactUrl, url ]) => {
@@ -231,7 +231,7 @@ var NSW = {
   callWebhook (webhook, notification) {
     return Promise.all([
       NSW.storage.get('key_value', 'webhooks'),
-      NSW.storage.get('key_value', 'webhook_cors')
+      NSW.storage.get('key_value', 'webhooksCors')
     ])
       .then(([ webhooks, webhookCors ]) => {
         if (webhooks.value[webhook]) {

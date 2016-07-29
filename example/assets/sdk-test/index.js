@@ -48,7 +48,8 @@ var options = {
     'notification:show': 'http://localhost:8081/webhook/show',
     'notification:click': 'http://localhost:8081/webhook/click',
     'notification:close': 'http://localhost:8081/webhook/close'
-  }
+  },
+  webhooksCors: false
 }
 
 if (window.location.host === 'localhost:8081') {

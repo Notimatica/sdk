@@ -110,10 +110,10 @@ const Notimatica = {
       { key: 'debug', value: this.options.debug },
       { key: 'project', value: this.options.project },
       { key: 'webhooks', value: this.options.webhooks },
-      { key: 'webhook_cors', value: this.options.webhookCors },
-      { key: 'match_exact_url', value: this.options.matchExactUrl },
-      { key: 'page_title', value: document.title },
-      { key: 'base_url', value: document.location.origin }
+      { key: 'webhooksCors', value: this.options.webhooksCors },
+      { key: 'matchExactUrl', value: this.options.matchExactUrl },
+      { key: 'pageTitle', value: document.title },
+      { key: 'baseUrl', value: document.location.origin }
     ])
   },
 
