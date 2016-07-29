@@ -240,6 +240,7 @@ var NSW = {
         if (webhooks.value[webhook]) {
           const hook = webhooks.value[webhook]
           const data = {
+            event: webhook,
             title: notification.title,
             body: notification.body,
             project: notification.tag,
@@ -249,7 +250,10 @@ var NSW = {
 
           NSW.debug('Calling webhook', webhook, hook, data)
 
-          return httpCall('post', hook, data, { 'X-Notimatica-SDK': VERSION }, webhookCors.value)
+          return httpCall('post', hook, data, {
+            'X-Notimatica-SDK': VERSION,
+            'X-Notimatica-SDK-Event': webhook
+          }, webhookCors.value)
         }
       })
   }
