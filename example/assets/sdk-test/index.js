@@ -45,11 +45,11 @@ var options = {
     }
   },
   webhooks: {
-    'notification:show': 'https://subscribe.notimatica.io/go/7993e283-08cd-4148-8036-80a89efcf108',
-    'notification:click': 'https://subscribe.notimatica.io/go/7993e283-08cd-4148-8036-80a89efcf108',
-    'notification:close': 'https://subscribe.notimatica.io/go/7993e283-08cd-4148-8036-80a89efcf108'
+    'notification:show': 'http://localhost:8081/webhook/show',
+    'notification:click': 'http://localhost:8081/webhook/click',
+    'notification:close': 'http://localhost:8081/webhook/close'
   },
-  webhooksCors: false
+  webhooksCors: true
 }
 
 if (window.location.host === 'localhost:8081') {
