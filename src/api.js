@@ -26,6 +26,8 @@ export const httpCall = function (method, url, data, headers, cors = true) {
     .then((response) => {
       if (response.status >= 200 && response.status < 300) {
         return response.status !== 204 ? response.json() : response.text()
+      } else if (response.status === 0) {
+        return response.text()
       } else {
         return response.json()
           .then((data) => {
