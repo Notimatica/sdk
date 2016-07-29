@@ -19,7 +19,7 @@ module.exports = class Visitor {
     switch (true) {
       case uuid === undefined: // Retrieve uuid
         return (this._uuid !== undefined)
-          ? Promise.resolve(this.uuid)
+          ? Promise.resolve(this._uuid)
           : this.storage.get('key_value', 'subscriber')
               .then((value) => (value) ? value.value : null)
               .then((uuid) => {

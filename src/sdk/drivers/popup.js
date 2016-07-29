@@ -1,15 +1,9 @@
+import base64 from 'base64-js'
+import { TextEncoderLite } from 'text-encoder-lite-module'
 import AbstractDriver from './abstract'
-import { toQueryString } from '../../utils'
+import { toQueryString, t } from '../../utils'
 
 module.exports = class Popup extends AbstractDriver {
-  /**
-   * Constructor.
-   * @param  {Object} options Options
-   */
-  constructor (options) {
-    super(options)
-    this.iframeLoaded = false
-  }
 
   /**
    * Driver name.
@@ -26,38 +20,47 @@ module.exports = class Popup extends AbstractDriver {
   prepare () {
     if (!this.options.subdomain) throw new Error('You have to fill "subdomain" option to use popup fallback for HTTP site.')
 
+    this._prepareNotimaticaEvents()
+    this._preparePostEvents()
+
+    return this._prepareIframe()
+  }
+
+  /**
+   * Subscribe to SDK events.
+   */
+  _prepareNotimaticaEvents () {
     Notimatica.on('popup:subscribed', (data) => {
       return this._finishSubscription(data.token)
     })
-
     Notimatica.on('popup:unsubscribed', () => {
       return this._finishUnsubscription()
     })
 
     Notimatica.on('iframe:ready', (iframeUuid) => {
-      this.iframeLoaded = true
+      this.silent = true
 
-      if (iframeUuid) {
-        Notimatica.visitor.uuid()
-          .then((uuid) => {
-            if (iframeUuid !== uuid) {
-              this.silent = true
-              return this._finishSubscription(uuid)
-            }
-          })
-          .then(() => Notimatica.emit('driver:ready', this))
-      } else {
-        Notimatica.emit('driver:ready', this)
-      }
+      const action = iframeUuid
+        ? this._finishSubscription(iframeUuid)
+        : this._finishUnsubscription()
+
+      action.then(() => Notimatica.emit('driver:ready', this))
     })
+  }
 
-    this._preparePostEvents()
+  /**
+   * Subscribe to post events from popup and iframe.
+   */
+  _preparePostEvents () {
+    const eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent'
+    const eventer = window[eventMethod]
+    const messageEvent = eventMethod === 'attachEvent' ? 'onmessage' : 'message'
 
-    return this._prepareIframe()
-      .then(() => Notimatica.visitor.isSubscribed())
-      .then((isSubscribed) => {
-        this.isSubscribed = isSubscribed
-      })
+    eventer(messageEvent, (event) => {
+      if (event.origin.indexOf(`https://${this.options.subdomain}.notimatica.io`) === -1) return
+
+      Notimatica.emit(event.data.event, event.data.data)
+    }, false)
   }
 
   /**
@@ -79,21 +82,6 @@ module.exports = class Popup extends AbstractDriver {
       iframe.style = 'width:0; height:0; border:0; border:none'
       body.appendChild(iframe)
     })
-  }
-
-  /**
-   * Load events.
-   */
-  _preparePostEvents () {
-    const eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent'
-    const eventer = window[eventMethod]
-    const messageEvent = eventMethod === 'attachEvent' ? 'onmessage' : 'message'
-
-    eventer(messageEvent, (event) => {
-      if (event.origin.indexOf(`https://${this.options.subdomain}.notimatica.io`) === -1) return
-
-      Notimatica.emit(event.data.event, event.data.data)
-    }, false)
   }
 
   /**
@@ -128,15 +116,34 @@ module.exports = class Popup extends AbstractDriver {
    */
   _openPopup (project) {
     return new Promise((resolve) => {
-      const query = {
-        tags: this.options.tags
+      if (this._popup == null || this._popup.closed) {
+        let query = {
+          tags: this.options.tags,
+          language: Notimatica.visitor.env.language,
+          strings: {
+            [Notimatica.visitor.env.language]: {
+              'welcome': t('popup.welcome'),
+              'subscribe': t('popup.subscribe'),
+              'subscribed': t('popup.subscribed'),
+              'unsupported': t('popup.unsupported'),
+              'buttons.subscribe': t('popup.buttons.subscribe'),
+              'buttons.unsubscribe': t('popup.buttons.unsubscribe'),
+              'buttons.cancel': t('popup.buttons.cancel')
+            }
+          }
+        }
+
+        query = base64.fromByteArray(new TextEncoderLite('utf-8').encode(JSON.stringify(query)))
+
+        this._popup = window.open(
+          `https://${this.options.subdomain}.notimatica.io/?options=${query}`,
+          'notimatica_popup',
+          `width=${this.options.popup.width},height=${this.options.popup.height},toolbar=0,resizable=0,scrollbars=0,location=0,menubar=0,status=0`)
+      } else {
+        this._popup.focus()
       }
 
-      const href = `https://${this.options.subdomain}.notimatica.io/?${toQueryString(query)}`
-
-      window.open(href, 'notimatica', `width=${this.options.popup.width},height=${this.options.popup.height}`)
-
-      resolve()
+      resolve(this._popup)
     })
   }
 }

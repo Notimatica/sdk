@@ -1,12 +1,13 @@
 import Storage from '../storage'
-import { getPayload, httpCall } from '../api'
+import logs from '../logs'
+import { getPayload, getRedirect, httpCall } from '../api'
 import { VERSION } from '../defaults'
-import { makeToken, strAfter } from '../utils'
+import { makeToken, getQueryParameter } from '../utils'
 
 var NSW = {
   _inited: false,
+  _debug: typeof process.env.NODE_ENV !== 'undefined' && process.env.NODE_ENV !== 'production',
   visitor: null,
-  debug: typeof process.env.NODE_ENV !== 'undefined' && process.env.NODE_ENV !== 'production',
 
   /**
    * Init SW.
@@ -20,13 +21,13 @@ var NSW = {
       NSW.storage = Storage
       NSW.storage.get('key_value', 'debug')
         .then((debug) => {
-          if (debug !== null) NSW.debug = debug
+          if (debug !== null) NSW._debug = debug
         })
 
       NSW._inited = true
     }
 
-    NSW.log('Notimatica: ServiceWorker inited')
+    NSW.debug('ServiceWorker inited')
 
     return NSW
   },
@@ -38,7 +39,7 @@ var NSW = {
    * @return {Object}
    */
   onPushReceived (event) {
-    NSW.log('Notimatica: message received', event)
+    NSW.debug('Message received', event)
 
     return event.waitUntil(
       self.registration.pushManager.getSubscription()
@@ -49,25 +50,20 @@ var NSW = {
 
           return getPayload(token)
             .then((payload) => {
-              NSW.log('Notimatica: payload received', payload)
+              NSW.debug('Payload received', payload)
 
-              NSW.storage.get('notifications', payload.id)
-                .then((value) => {
-                  if (value) throw new Error('Already seen')
-
-                  NSW.showNotification(payload)
-                    .then(() => Promise.all([
-                      NSW.storage.set('notifications', payload),
-                      NSW.storage.set('key_value', {
-                        key: 'fallback_notification',
-                        value: payload
-                      })
-                    ]))
-                    .then(() => NSW.processWebHook('notification:show', payload))
-                })
+              NSW.showNotification(payload)
+                .then(() => Promise.all([
+                  NSW.storage.set('notifications', payload),
+                  NSW.storage.set('key_value', {
+                    key: 'fallback_notification',
+                    value: payload
+                  })
+                ]))
+                .then(() => NSW.callWebhook('notification:show', payload))
             })
             .catch((err) => {
-              NSW.log('Notimatica: payload error:', err)
+              NSW.debug('Payload error', err)
 
               if (!self.UNSUBSCRIBED_FROM_NOTIFICATIONS) {
                 return NSW.showFallbackNotification()
@@ -88,9 +84,7 @@ var NSW = {
       body: payload.body,
       icon: NSW.ensureImageResourceHttps(payload.icon),
       tag: payload.tag,
-      data: {
-        url: payload.url
-      }
+      data: payload
     }
 
     return self.registration.showNotification(payload.title, notification)
@@ -102,21 +96,21 @@ var NSW = {
    * @return {Promise}
    */
   showFallbackNotification () {
-    this.storage.get('key_value', 'fallback_notification')
+    NSW.storage.get('key_value', 'fallback_notification')
       .then((notification) => {
         if (!notification) throw new Error('No fallback notification')
 
-        NSW.log('Notimatica: display fallback notification')
+        NSW.debug('Display fallback notification')
 
         NSW.showNotification(notification.value)
       })
       .catch(() => {
-        NSW.log('Notimatica: display backup notification')
+        NSW.debug('Display backup notification')
 
         return Promise.all([
-          this.storage.get('key_value', 'page_title'),
-          this.storage.get('key_value', 'base_url'),
-          this.storage.get('key_value', 'project')
+          NSW.storage.get('key_value', 'page_title'),
+          NSW.storage.get('key_value', 'base_url'),
+          NSW.storage.get('key_value', 'project')
         ]).then(([title, url, project]) => {
           return NSW.showNotification({
             body: 'You have an update.',
@@ -161,93 +155,103 @@ var NSW = {
    * @return {Object}
    */
   onNotificationClicked (event) {
-    NSW.log('Notimatica: click ', event.notification.data.url)
+    NSW.debug('Click', event.notification.data)
 
-    const url = event.notification.data.url
-
-    let urlOrigin = null
-    try {
-      urlOrigin = new URL(url).origin
-    } catch (e) {}
+    const notification = event.notification.data
+    notification.action = event.action
 
     event.notification.close()
 
-    if (url) {
-      return event.waitUntil(
-        Promise.all([
-          clients.matchAll({ type: 'window', includeUncontrolled: true }),
-          this.storage.get('key_value', 'match_exact_url')
-        ])
-          .then(([windowClients, matchExactUrl]) => {
-            matchExactUrl = matchExactUrl !== undefined
-              ? matchExactUrl.value
-              : true
-
-            for (let client of windowClients) {
-              if ('focus' in client) {
-                let clientUrl = (client.frameType && client.frameType === 'nested')
-                  ? decodeURIComponent(strAfter(client.url, '?parent='))
-                  : client.url
-
-                let clientOrigin = new URL(clientUrl).origin
-
-                if (matchExactUrl) {
-                  if (clientUrl === url) return client.focus()
-                } else {
-                  if (clientOrigin === urlOrigin) return client.focus()
-                }
-
-                return client.focus()
-              }
-            }
-
-            if (clients.openWindow) return clients.openWindow(url)
-          })
-      )
-    }
-  },
-
-  onNotificationClosed (event) {
-    NSW.log('Notimatica: close ', event.notification.data)
+    if (!notification.url) return
 
     return event.waitUntil(
-      NSW.processWebHook('notification:closed', event.notification.data)
+      Promise.all([
+        self.clients.matchAll({ type: 'window', includeUncontrolled: true }), // Retrieve all subscribed tabs including iframes
+        NSW.storage.get('key_value', 'match_exact_url'), // Retrieve url match rule
+        getRedirect(notification.id) // Retrieve url to open on click
+      ])
+        .then(([ windowClients, matchExactUrl, url ]) => {
+          matchExactUrl = matchExactUrl !== undefined
+            ? matchExactUrl.value
+            : true
+
+          let urlOrigin = null
+          try {
+            urlOrigin = new URL(url).origin
+          } catch (e) {}
+
+          for (let client of windowClients) {
+            if ('focus' in client) {
+              // If client is iframe, search for parent url in GET param 'parent'
+              // Or return client's url itself
+              let clientUrl = (client.frameType && client.frameType === 'nested')
+                ? getQueryParameter('parent', client.url)
+                : client.url
+
+              let clientOrigin = new URL(clientUrl).origin
+
+              // If matchExactUrl=true, match full client url with full click url,
+              // or match their origins
+              if (matchExactUrl) {
+                if (clientUrl === url) return client.focus()
+              } else {
+                if (clientOrigin === urlOrigin) return client.focus()
+              }
+            }
+          }
+
+          // If no client found, open new url
+          if (clients.openWindow) return clients.openWindow(url)
+        })
+        .then(() => NSW.callWebhook('notification:click', notification))
+      )
+  },
+
+  /**
+   * On close event.
+   *
+   * @param  {Object} event The event
+   * @return {Promise}
+   */
+  onNotificationClosed (event) {
+    NSW.debug('Close', event.notification.data)
+
+    return event.waitUntil(
+      NSW.callWebhook('notification:closed', event.notification.data)
     )
   },
 
   /**
-   * Process webhook
+   * Call webhook.
    *
    * @param  {String} webhook      The webhook id
    * @param  {Object} notification The notification
    * @return {Promise}
    */
-  processWebHook (webhook, notification) {
+  callWebhook (webhook, notification) {
     return Promise.all([
-      NSW.storage.get('key_value', 'webhook:' + webhook),
-      NSW.storage.get('key_value', 'cors'),
-      NSW.storage.get('key_value', 'subscriber')
+      NSW.storage.get('key_value', 'webhooks'),
+      NSW.storage.get('key_value', 'webhook_cors')
     ])
-      .then(([webhook, cors, subscriber]) => {
-        if (webhook) {
-          return httpCall('post', webhook.url, {
+      .then(([ webhooks, webhookCors ]) => {
+        if (webhooks.value[webhook]) {
+          const hook = webhooks.value[webhook]
+          const data = {
             title: notification.title,
             body: notification.body,
-            tag: notification.tag,
-            subsciber: subscriber
-          }, { 'X-Notimatica-SDK': VERSION }, cors)
+            project: notification.tag,
+            subsciber: notification.subscriber,
+            action: notification.action || 'self'
+          }
+
+          NSW.debug('Calling webhook', webhook, hook, data)
+
+          return httpCall('post', hook, data, { 'X-Notimatica-SDK': VERSION }, webhookCors.value)
         }
       })
-  },
-
-  /**
-   * Log message.
-   */
-  log () {
-    if (NSW.debug) {
-      console.log.apply(console, arguments)
-    }
   }
 }
+
+logs(NSW, 'Notimatica SW: ')
 
 module.exports = NSW.init()

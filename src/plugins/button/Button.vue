@@ -99,6 +99,10 @@ export default {
       this.hidePopover()
     })
 
+    Notimatica.on('popup:close', () => {
+      this.hidePopover()
+    })
+
     this.subscribed = Notimatica.isSubscribed()
 
     if (!this.subscribed) {

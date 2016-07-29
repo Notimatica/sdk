@@ -208,17 +208,47 @@ export function createNode (html) {
 }
 
 /**
+ * Get query parameter.
+ *
+ * @param  {[type]} name [description]
+ * @param  {[type]} url  [description]
+ * @return {[type]}
+ */
+export function getQueryParameter (name, url) {
+  if (!url) url = window.location.href
+
+  name = name.replace(/[\[\]]/g, '\\$&')
+  const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)')
+  const results = regex.exec(url)
+
+  if (!results) return null
+  if (!results[2]) return ''
+  return decodeURIComponent(results[2].replace(/\+/g, ' '))
+}
+
+/**
+ * Get visitor locale.
+ *
+ * @return {String}
+ */
+export function locale () {
+  const l = Notimatica.visitor.env.language
+
+  return typeof Notimatica.strings[l] !== 'undefined'
+    ? l
+    : Notimatica.options.defaultLocale
+}
+
+/**
  * Return text string. Used for strings overriding.
  *
  * @param  {String} string String id.
  * @return {String}
  */
 export function t (string) {
-  const lang = Notimatica.visitor.env.language
+  const l = locale()
 
-  return typeof Notimatica.strings[lang][string] !== 'undefined'
-    ? Notimatica.strings[lang][string]
-    : typeof Notimatica.strings[Notimatica.options.defaultLocale][string] !== 'undefined'
-      ? Notimatica.strings[Notimatica.options.defaultLocale][string]
-      : string
+  return typeof Notimatica.strings[l][string] !== 'undefined'
+    ? Notimatica.strings[l][string]
+    : string
 }

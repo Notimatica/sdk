@@ -1,4 +1,5 @@
 import events from 'minivents'
+import logs from '../logs'
 import Visitor from '../visitor'
 import { merge, isHttps } from '../utils'
 import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
@@ -6,6 +7,7 @@ import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH
 const Notimatica = {
   _inited: false,
   _driver: null,
+  _debug: DEBUG,
   visitor: null,
   options: {
     debug: DEBUG,
@@ -24,9 +26,20 @@ const Notimatica = {
     sdkPath: SDK_PATH,
     strings: {},
     defaultLocale: 'en',
-    webhooks: {}
+    webhooks: {},
+    webhookCors: true
   },
-  strings: {},
+  strings: {
+    en: {
+      'popup.welcome': 'Subscraibe to {project}',
+      'popup.subscribe': 'Do you want to receive notifications from {project}?',
+      'popup.subscribed': 'You are subscribed to notifications from {project}.',
+      'popup.unsupported': 'Your browser don\'t support push notifications.',
+      'popup.buttons.subscribe': 'Subscribe',
+      'popup.buttons.unsubscribe': 'Unsubscribe',
+      'popup.buttons.cancel': 'Cancel'
+    }
+  },
 
   /**
    * Init SDK.
@@ -34,13 +47,15 @@ const Notimatica = {
    * @param {Object} options
    */
   init (options) {
-    if (this._inited) return console.warn('Notimatica: SDK was already inited.')
+    if (this._inited) return this.warn('SDK was already inited.')
 
     this.options = merge(this.options, options || {})
     this.strings = merge(this.strings, this.options.strings)
     delete this.options.strings
 
-    if (this.options.project === null) return console.error('Notimatica: Project ID is absent.')
+    this._debug = this.options.debug
+
+    if (this.options.project === null) return this.error('Project ID is absent.')
 
     this._prepareEvents()
     this._prepareVisitor()
@@ -95,6 +110,7 @@ const Notimatica = {
       { key: 'debug', value: this.options.debug },
       { key: 'project', value: this.options.project },
       { key: 'webhooks', value: this.options.webhooks },
+      { key: 'webhook_cors', value: this.options.webhookCors },
       { key: 'match_exact_url', value: this.options.matchExactUrl },
       { key: 'page_title', value: document.title },
       { key: 'base_url', value: document.location.origin }
@@ -124,6 +140,7 @@ const Notimatica = {
    */
   _prepareEvents () {
     this.on('driver:ready', (driver) => {
+      this.debug('Driver is ready', driver)
       this._ready()
     })
     this.on('plugin:ready', (plugin) => {
@@ -134,63 +151,60 @@ const Notimatica = {
       this.visitor.storage.set('key_value', { key: 'autorun', value: false })
     })
     this.on('warning', (message) => {
-      console.warn('Notimatica: ' + message)
+      this.warn('Attantion', message)
     })
     this.on('error', (error) => {
-      console.error('Notimatica: ', error)
+      this.error('Error', error)
     })
 
     if (this.options.debug) {
       this.on('ready', () => {
-        console.info('Notimatica: SDK inited with:', this.options)
-      })
-      this.on('driver:ready', (driver) => {
-        console.log('Notimatica: Driver is ready', driver)
+        this.debug('SDK inited with:', this.options)
       })
       this.on('iframe:ready', (uuid) => {
-        console.log('Notimatica: Iframe is ready', uuid)
+        this.debug('Iframe is ready', uuid)
       })
       this.on('unsupported', (message) => {
-        console.warn('Notimatica: Push notifications are not yet available for your browser.')
+        this.warn('Push notifications are not yet available for your browser.')
       })
       this.on('subscribe:start', () => {
-        console.log('Notimatica: Start subscribing.')
+        this.debug('Start subscribing.')
       })
       this.on('subscribe:success', (token) => {
-        console.log('Notimatica: User subscribed with token', token)
+        this.debug('User subscribed with token', token)
       })
       this.on('subscribe:subscription', (subscription) => {
-        console.log('Notimatica: Subscription recieved', subscription)
+        this.debug('Subscription recieved', subscription)
       })
       this.on('subscribe:fail', (err) => {
-        console.error('Notimatica: Subscription failed', err)
+        this.error('Subscription failed', err)
       })
       this.on('register:start', (data) => {
-        console.log('Notimatica: Start registering subscriber', data)
+        this.debug('Start registering subscriber', data)
       })
       this.on('register:success', (data) => {
-        console.log('Notimatica: Subscriber registered:', data)
+        this.debug('Subscriber registered:', data)
       })
       this.on('register:fail', (err) => {
-        console.error('Notimatica: Registration failed', err)
+        this.error('Registration failed', err)
       })
       this.on('unsubscribe:start', () => {
-        console.log('Notimatica: Start unsubscribing.')
+        this.debug('Start unsubscribing.')
       })
       this.on('unsubscribe:success', () => {
-        console.log('Notimatica: User unsubscribed.')
+        this.debug('User unsubscribed.')
       })
       this.on('unsubscribe:fail', (err) => {
-        console.error('Notimatica: Unsubscription failed', err)
+        this.error('Unsubscription failed', err)
       })
       this.on('unregister:start', (data) => {
-        console.log('Notimatica: Start removing registration', data)
+        this.debug('Start removing registration', data)
       })
       this.on('unregister:success', () => {
-        console.log('Notimatica: Registration removed.')
+        this.debug('Registration removed.')
       })
       this.on('unregister:fail', (err) => {
-        console.error('Notimatica: Removing registration failed', err)
+        this.error('Removing registration failed', err)
       })
     }
   },
@@ -319,5 +333,6 @@ const Notimatica = {
 }
 
 events(Notimatica)
+logs(Notimatica, 'Notimatica SDK: ')
 
 module.exports = Notimatica

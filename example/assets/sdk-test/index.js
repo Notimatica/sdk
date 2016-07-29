@@ -26,7 +26,6 @@ var options = {
   safariWebId: 'web.io.notimatica',
   debug: true,
   autorun: false,
-  usePopup: true,
   subdomain: 'subscribe',
   tags: [
     123456789,
@@ -36,8 +35,19 @@ var options = {
   plugins: {
     button: {
       enable: true,
-      css: '/notimatica-button.css'
+      css: '/notimatica-button.css',
+      usePopover: false
     }
+  },
+  strings: {
+    en: {
+      'popup.welcome': 'Subcribing to {project}'
+    }
+  },
+  webhooks: {
+    'notification:show': 'http://localhost:8081/webhook/show',
+    'notification:click': 'http://localhost:8081/webhook/click',
+    'notification:close': 'http://localhost:8081/webhook/close'
   }
 }
 
