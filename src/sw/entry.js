@@ -241,6 +241,7 @@ var NSW = {
           const hook = webhooks.value[webhook]
           const data = {
             event: webhook,
+            notification: notification.id,
             title: notification.title,
             body: notification.body,
             project: notification.tag,
