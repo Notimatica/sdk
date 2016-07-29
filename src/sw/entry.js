@@ -216,8 +216,11 @@ var NSW = {
   onNotificationClosed (event) {
     NSW.debug('Close', event.notification.data)
 
+    let notification = event.notification.data
+    notification.action = '_close'
+
     return event.waitUntil(
-      NSW.callWebhook('notification:closed', event.notification.data)
+      NSW.callWebhook('notification:close', notification)
     )
   },
 
@@ -241,7 +244,7 @@ var NSW = {
             body: notification.body,
             project: notification.tag,
             subsciber: notification.subscriber,
-            action: notification.action || 'self'
+            action: notification.action || '_click'
           }
 
           NSW.debug('Calling webhook', webhook, hook, data)
