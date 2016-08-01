@@ -23,15 +23,19 @@ Options should be set in `init` function.
 | Name | Type | Default value | Description |
 |------|------|---------------|-------------|
 | `project` | String | `null` | Your project UUID |
+| `subdomain` | String | `null` | Subdomain to handle HTTP fallback |
 | `debug` | Boolean | `false` | Send debug messages to the console |
 | `tags` | Array | `[]` | Additional set of tags for the user |
-| `autoSubscribe` | Boolean | `false` | Do you want to start subscription process right after page load. For HTTP sites always `false`. |
+| `autorun` | Boolean | `false` | Do you want to start subscription process right after page load. For HTTP sites always `false`. |
 | `usePopup` | Boolean | `false` | Force subscribing via HTTP fallback popup. For HTTP sites always `true` |
 | `popup` | Object | `{ height: 450, width: 550 }` | HTTP fallback popup options. Height and width in pixels |
 | `plugins` | Object | `{}` | Map of plugins to enable and their options |
 | `strings` | Object | `{}` | Map of localization strings. Mainly used when you want to localize string from plugins |
 | `defaultLocale` | String | `'en'` | Default locale to use |
 | `sdkPath` | String | `'https://cdn.notimatica.io/sdks/latest'` | Where to get SDK files |
+| `matchExactUrl` | Boolean | `true` | URL comparison strategy for opening new tab on notification click |
+| `webhooks` | Object | `{}` | Map of webhooks to push for multiple notifications events |
+| `webhookCors` | Boolean | `false` | If your webhooks support CORS requests |
 
 ### API
 
@@ -74,6 +78,10 @@ Internal events:
 
 | Event | Description |
 |-------|-------------|
+| `driver:ready` | {Object} driver | Push notifications driver inited and ready |
+| `plugin:ready` | {Object} plugin | Plugin was loaded and ready to init |
+| `autorun:disable` | - | If SDK should disable autorun forever |
+| `iframe:ready` | - | If HTTP fallback iframe is loaded |
 | `subscribe:subscription` | {String} browser's endpoint | Driver received browser's endpoint |
 | `register:start` | {Object} user's data | SDK makes attempt to register user in Notimatica |
 | `register:success` | {Object} Notimatica user | Registration succeeded |
@@ -81,8 +89,6 @@ Internal events:
 | `unregister:start` | - | SDK makes attempt to unregister from Notimatica |
 | `unregister:success` | - | Notimatica forgot about user |
 | `unregister:fail` | {*} err | Notimatica failed to unregister user |
-| `driver:ready` | {Object} driver | Push notifications driver inited and ready |
-| `plugin:ready` | {Object} plugin | Plugin was loaded and ready to init |
 
 ### Localization
 
@@ -101,6 +107,8 @@ If you want to overwrite any of them or add your own language, add them to `stri
   }
 }
 ```
+
+Even HTTP fallback popup can be localized. Look for the popup.* strings in [/src/sdk/sdk.js](#)
 
 ### Plugins
 
