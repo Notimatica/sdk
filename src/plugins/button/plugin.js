@@ -68,15 +68,6 @@ const Plugin = class Plugin extends AbstractPlugin {
   }
 
   /**
-   * Return target node.
-   *
-   * @return {Object}
-   */
-  get target () {
-    return this.$vue
-  }
-
-  /**
    * Play widget.
    */
   play () {

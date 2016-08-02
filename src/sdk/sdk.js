@@ -27,11 +27,11 @@ const Notimatica = {
     strings: {},
     defaultLocale: 'en',
     webhooks: {},
-    webhookCors: true
+    webhooksCors: true
   },
   strings: {
     en: {
-      'popup.welcome': 'Subscraibe to {project}',
+      'popup.welcome': 'Subscribe to {project}',
       'popup.subscribe': 'Do you want to receive notifications from {project}?',
       'popup.subscribed': 'You are subscribed to notifications from {project}.',
       'popup.unsupported': 'Your browser don\'t support push notifications.',

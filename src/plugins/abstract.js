@@ -29,7 +29,7 @@ module.exports = class AbstractPlugin {
   init (options) {
     this.options = merge(this.defaults, options)
 
-    if (this.options.autorun) {
+    if (this.options.autorun === undefined || this.options.autorun === true) {
       this.prepare()
         .then(() => this.injectTemplate())
         .then(() => this.injectCss())
@@ -65,7 +65,7 @@ module.exports = class AbstractPlugin {
    */
   injectTemplate () {
     if (this.template && this.options.target) {
-      const target = findNode(this.options.cssTarget, document.body)
+      const target = findNode(this.options.target, document.body)
       this.$wrapper = createNode(this.template)
       target.appendChild(this.$wrapper)
     }
