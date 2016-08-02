@@ -25,7 +25,6 @@ export default class IndexedDBStorage {
         this.options.tables.map((table) => {
           this.db.createObjectStore(table.name, { keyPath: table.key })
         })
-        resolve(this.db)
       }
       request.onsuccess = (event) => {
         this.db = event.target.result

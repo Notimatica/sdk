@@ -18,31 +18,31 @@ $button-width: 50px;
   box-shadow: 0px 2px 5px -2px rgba(0,0,0,0.75);
   transition: all 0.2s linear;
 
-  &.notimatica-plugin-button-subscribe {
-    background-color: #00c385;
-    &:focus, &:active {
-      background-color: #009062;
-    }
-  }
-
-  &.notimatica-plugin-button-unsubscribe {
-    background-color: #f0ad4e;
-    &:focus, &:active {
-      background-color: #ec971f;
-    }
-  }
-
   &:hover {
     box-shadow: 0px 2px 5px -1px rgba(0,0,0,0.75);
   }
+}
 
-  &.notimatica-plugin-button-acting {
-    .notimatica-plugin-button-wave-1 {
-      @include animation(0s, 1000ms, 3, ring1, ease-out)
-    }
-    .notimatica-plugin-button-wave-2 {
-      @include animation(0s, 1000ms, 3, ring2, ease-out)
-    }
+.notimatica-plugin-button-subscribe {
+  background-color: #00c385;
+  &:focus, &:active {
+    background-color: #009062;
+  }
+}
+
+.notimatica-plugin-button-unsubscribe {
+  background-color: #f0ad4e;
+  &:focus, &:active {
+    background-color: #ec971f;
+  }
+}
+
+.notimatica-plugin-button-acting {
+  .notimatica-plugin-button-wave-1 {
+    @include animation(0s, 1000ms, 3, ring1, ease-out)
+  }
+  .notimatica-plugin-button-wave-2 {
+    @include animation(0s, 1000ms, 3, ring2, ease-out)
   }
 }
 
