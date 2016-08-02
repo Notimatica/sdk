@@ -12,7 +12,7 @@
 </head>
 ```
 
-More information is available at:
+More information is available at https://docs.notimatica.io/docs:
 
 * [SDK Installation](https://docs.notimatica.io/docs/sdk-installation)
 * [Plugins](https://docs.notimatica.io/docs/sdk-plugins)
