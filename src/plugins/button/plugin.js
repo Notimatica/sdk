@@ -23,7 +23,7 @@ const Plugin = class Plugin extends AbstractPlugin {
     return {
       autorun: true,
       target: 'body',
-      css: this.options.sdkPath + '/notimatica-button.css',
+      css: Notimatica.options.sdkPath + '/notimatica-button.css',
       cssTarget: 'head',
       position: 'bottom-right', // bottom-right, bottom-left, top-right, top-left
       usePopover: true,
