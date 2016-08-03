@@ -34,8 +34,7 @@ var options = {
   ],
   plugins: {
     button: {
-      enable: true,
-      css: '/notimatica-button.css'
+      enable: true
     }
   },
   strings: {
