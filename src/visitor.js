@@ -29,6 +29,7 @@ module.exports = class Visitor {
       case uuid === null: // Unset uuid
         return this.storage.remove('key_value', 'subscriber')
       default: // Set uuid
+        this._uuid = uuid
         return this.storage.set('key_value', { key: 'subscriber', value: uuid })
     }
   }

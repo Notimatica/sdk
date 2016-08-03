@@ -21,7 +21,7 @@ module.exports = class Native extends AbstractDriver {
       this.register(subscription)
     })
 
-    Notimatica.on('subscribe:subscription-removed', () => {
+    Notimatica.on('unsubscribe:subscription-removed', () => {
       this.unregister()
     })
 

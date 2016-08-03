@@ -57,7 +57,7 @@ const provider = class Gcm extends AbstractProvider {
         if (subscription) subscription.unsubscribe()
       })
       .then(() => this.registration.unregister())
-      .then(() => Notimatica.emit('subscribe:subscription-removed'))
+      .then(() => Notimatica.emit('unsubscribe:subscription-removed'))
   }
 
   /**

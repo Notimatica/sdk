@@ -77,7 +77,7 @@ const Notimatica = {
 
     this.autoSubscribe()
       .then((autoSubscribe) => {
-        if (autoSubscribe && this.isUnsubscribed() && !this._usePopup()) {
+        if (autoSubscribe && this.isUnsubscribed() && !this.usePopup()) {
           this.emit('autoSubscribe:start')
         }
       })
@@ -124,7 +124,7 @@ const Notimatica = {
    * @return {Promise}
    */
   _prepareDriver () {
-    const driver = this._usePopup() ? DRIVER_POPUP : DRIVER_NATIVE
+    const driver = this.usePopup() ? DRIVER_POPUP : DRIVER_NATIVE
     const Driver = require('./drivers/' + driver)
 
     this._driver = new Driver(this.options)
@@ -245,6 +245,15 @@ const Notimatica = {
   },
 
   /**
+   * Use popup or native subscription process.
+   *
+   * @return {Boolean}
+   */
+  usePopup () {
+    return !isHttps() || this.options.usePopup
+  },
+
+  /**
    * Register service worker.
    */
   subscribe () {
@@ -253,15 +262,6 @@ const Notimatica = {
     }
 
     this._driver.subscribe()
-  },
-
-  /**
-   * Use popup or native subscription process.
-   *
-   * @return {Boolean}
-   */
-  _usePopup () {
-    return !isHttps() || this.options.usePopup
   },
 
   /**
