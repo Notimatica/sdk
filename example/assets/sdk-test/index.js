@@ -35,8 +35,7 @@ var options = {
   plugins: {
     button: {
       enable: true,
-      css: '/notimatica-button.css',
-      usePopover: false
+      css: '/notimatica-button.css'
     }
   },
   strings: {

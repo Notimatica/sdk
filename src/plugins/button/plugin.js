@@ -47,7 +47,7 @@ const Plugin = class Plugin extends AbstractPlugin {
         'popover.unsubscribe': "If you don't want to recieve notifications anymore, click Unsubscribe button.",
         'popover.button.subscribe': 'Subscribe',
         'popover.button.unsubscribe': 'Unsubscribe',
-        'popover.button.cancel': 'Cancel',
+        'popover.button.cancel': 'Not now',
         'tooltip.subscribe': 'Subscribe to notifications',
         'tooltip.unsubscribe': 'Unsubscribe from notifications',
         'tooltip.message': 'There is a message for you'
