@@ -25,7 +25,7 @@ const provider = class Gcm extends AbstractProvider {
    * @return {Promise}
    */
   ready () {
-    return navigator.serviceWorker.register('notimatica-sw.js')
+    return navigator.serviceWorker.register('/notimatica-sw.js')
       .then(navigator.serviceWorker.ready)
       .then((registration) => {
         this.registration = registration
