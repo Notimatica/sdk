@@ -112,7 +112,7 @@ export default {
         })
     }
 
-    Notimatica.emit('button:ready')
+    Notimatica.emit('button.button:ready')
   },
   computed: {
     /**
@@ -138,10 +138,10 @@ export default {
      */
     tooltipMessage () {
       return this.counter > 0
-        ? t('tooltip.message')
+        ? t('button.tooltip.message')
         : this.subscribed
-          ? t('tooltip.unsubscribe')
-          : t('tooltip.subscribe')
+          ? t('button.tooltip.unsubscribe')
+          : t('button.tooltip.subscribe')
     },
 
     /**
@@ -151,8 +151,8 @@ export default {
      */
     popoverMessage () {
       return this.subscribed
-        ? t('popover.unsubscribe')
-        : t('popover.subscribe')
+        ? t('button.popover.unsubscribe')
+        : t('button.popover.subscribe')
     },
 
     /**
@@ -162,8 +162,8 @@ export default {
      */
     popoverButtonAction () {
       return this.subscribed
-        ? t('popover.button.unsubscribe')
-        : t('popover.button.subscribe')
+        ? t('button.popover.button.unsubscribe')
+        : t('button.popover.button.subscribe')
     },
 
     /**
@@ -172,7 +172,7 @@ export default {
      * @return {String}
      */
     popoverButtonCancel () {
-      return t('popover.button.cancel')
+      return t('button.popover.button.cancel')
     }
   },
   methods: {
@@ -192,7 +192,7 @@ export default {
      */
     cancel () {
       this.hidePopover()
-      Notimatica.emit('autorun:disable')
+      Notimatica.emit('button.autorun:disable')
     },
 
     /**

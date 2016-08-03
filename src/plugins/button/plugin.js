@@ -43,14 +43,14 @@ const Plugin = class Plugin extends AbstractPlugin {
   get strings () {
     return {
       'en': {
-        'popover.subscribe': "Do you want to recieve desktop notifications from us? Click Subscribe button!",
-        'popover.unsubscribe': "If you don't want to recieve notifications anymore, click Unsubscribe button.",
-        'popover.button.subscribe': 'Subscribe',
-        'popover.button.unsubscribe': 'Unsubscribe',
-        'popover.button.cancel': 'Not now',
-        'tooltip.subscribe': 'Subscribe to notifications',
-        'tooltip.unsubscribe': 'Unsubscribe from notifications',
-        'tooltip.message': 'There is a message for you'
+        'button.popover.subscribe': "Do you want to recieve desktop notifications from us? Click Subscribe button!",
+        'button.popover.unsubscribe': "If you don't want to recieve notifications anymore, click Unsubscribe button.",
+        'button.popover.button.subscribe': 'Subscribe',
+        'button.popover.button.unsubscribe': 'Unsubscribe',
+        'button.popover.button.cancel': 'Not now',
+        'button.tooltip.subscribe': 'Subscribe to notifications',
+        'button.tooltip.unsubscribe': 'Unsubscribe from notifications',
+        'button.tooltip.message': 'There is a message for you'
       }
     }
   }
