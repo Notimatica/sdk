@@ -1,5 +1,3 @@
-import { isString } from './utils'
-
 export default function Logs (target, prefix, style) {
   target = target || this
 
@@ -7,7 +5,7 @@ export default function Logs (target, prefix, style) {
     if (!target._debug) return
 
     args = Array.prototype.slice.call(args)
-    if (isString(args[0]) && prefix) {
+    if (typeof args[0] === 'string' && prefix) {
       let message = args.shift()
       message = [
         `%c${prefix}%c` + message,

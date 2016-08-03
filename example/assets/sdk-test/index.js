@@ -24,7 +24,7 @@ Notimatica.push(['on', 'unsubscribe:success', function () {
 var options = {
   project: '08823593-135f-5576-9a91-f3a0675aa1d2',
   debug: true,
-  autorun: false,
+  autoSubscribe: true,
   subdomain: 'subscribe',
   tags: [
     123456789,

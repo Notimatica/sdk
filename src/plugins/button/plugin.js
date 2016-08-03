@@ -71,6 +71,9 @@ const Plugin = class Plugin extends AbstractPlugin {
    * Play widget.
    */
   play () {
+    // Disable native autoSubscribe as we will handle it by ourselfs
+    Notimatica.off('autoSubscribe:start')
+
     this.$vue = this.$vue || this.build()
   }
 

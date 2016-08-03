@@ -1,5 +1,5 @@
 import Storage from '../storage'
-import logs from '../logs'
+import logs from '../mixins/logs'
 import { getPayload, getRedirect, httpCall } from '../api'
 import { VERSION } from '../defaults'
 import { makeToken, getQueryParameter } from '../utils'

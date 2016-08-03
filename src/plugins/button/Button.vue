@@ -103,14 +103,11 @@ export default {
       this.hidePopover()
     })
 
-    this.subscribed = Notimatica.isSubscribed()
+    Notimatica.on('autoSubscribe:start', () => {
+      this.showPopover()
+    })
 
-    if (!this.subscribed) {
-      Notimatica.autorun()
-        .then((autorun) => {
-          if (autorun) this.showPopover()
-        })
-    }
+    this.subscribed = Notimatica.isSubscribed()
 
     Notimatica.emit('button.button:ready')
   },
@@ -192,7 +189,7 @@ export default {
      */
     cancel () {
       this.hidePopover()
-      Notimatica.emit('button.autorun:disable')
+      Notimatica.emit('autoSubscribe:disable')
     },
 
     /**

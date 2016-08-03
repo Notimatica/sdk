@@ -1,5 +1,5 @@
 import events from 'minivents'
-import logs from '../logs'
+import logs from '../mixins/logs'
 import Visitor from '../visitor'
 import { merge, isHttps } from '../utils'
 import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
@@ -8,6 +8,7 @@ const Notimatica = {
   _inited: false,
   _driver: null,
   _debug: DEBUG,
+  _plugins: {},
   visitor: null,
   options: {
     debug: DEBUG,
@@ -15,7 +16,7 @@ const Notimatica = {
     safariWebId: null,
     subdomain: null,
     tags: [],
-    autorun: false,
+    autoSubscribe: false,
     usePopup: false,
     popup: {
       width: POPUP_WIGHT,
@@ -71,14 +72,13 @@ const Notimatica = {
    * Driver is ready, SDK is good to go.
    */
   _ready () {
-    this._loadPlugins()
     this._inited = true
     this.emit('ready')
 
-    this.autorun()
-      .then((autorun) => {
-        if (autorun && this.isUnsubscribed() && !this._usePopup()) {
-          return this._driver.subscribe()
+    this.autoSubscribe()
+      .then((autoSubscribe) => {
+        if (autoSubscribe && this.isUnsubscribed() && !this._usePopup()) {
+          this.emit('autoSubscribe:start')
         }
       })
   },
@@ -141,72 +141,88 @@ const Notimatica = {
   _prepareEvents () {
     this.on('driver:ready', (driver) => {
       this.debug('Driver is ready', driver)
-      this._ready()
+
+      // When driver is ready, load plugins.
+      this._loadPlugins()
     })
     this.on('plugin:ready', (plugin) => {
       this.strings = merge(plugin.strings, this.strings)
+
+      // Init plugin and only after that add it to the _plugins registry
+      // If every plugin is inited, run _ready, because we are...ready
       plugin.init(this.options.plugins[plugin.name])
+        .then(() => {
+          this.debug(`Plugin "${plugin.name}" inited`)
+
+          this._plugins[plugin.name] = plugin
+          if (Object.keys(this._plugins).length === Object.keys(this.options.plugins).length) {
+            this._ready()
+          }
+        })
     })
-    this.on('autorun:disable', (plugin) => {
-      this.visitor.storage.set('key_value', { key: 'autorun', value: false })
+    this.on('autoSubscribe:start', () => {
+      this.debug('Autosubscribing started')
+      this.subscribe()
+    })
+    this.on('autoSubscribe:disable', (plugin) => {
+      this.visitor.storage.set('key_value', { key: 'autoSubscribe', value: false })
     })
     this.on('warning', (message) => {
-      this.warn('Attantion', message)
+      this.warn('Attention', message)
     })
     this.on('error', (error) => {
       this.error('Error', error)
     })
 
-    if (this.options.debug) {
-      this.on('ready', () => {
-        this.debug('SDK inited with:', this.options)
-      })
-      this.on('iframe:ready', (uuid) => {
-        this.debug('Iframe is ready', uuid)
-      })
-      this.on('unsupported', (message) => {
-        this.warn('Push notifications are not yet available for your browser.')
-      })
-      this.on('subscribe:start', () => {
-        this.debug('Start subscribing.')
-      })
-      this.on('subscribe:success', (token) => {
-        this.debug('User subscribed with token', token)
-      })
-      this.on('subscribe:subscription', (subscription) => {
-        this.debug('Subscription recieved', subscription)
-      })
-      this.on('subscribe:fail', (err) => {
-        this.error('Subscription failed', err)
-      })
-      this.on('register:start', (data) => {
-        this.debug('Start registering subscriber', data)
-      })
-      this.on('register:success', (data) => {
-        this.debug('Subscriber registered:', data)
-      })
-      this.on('register:fail', (err) => {
-        this.error('Registration failed', err)
-      })
-      this.on('unsubscribe:start', () => {
-        this.debug('Start unsubscribing.')
-      })
-      this.on('unsubscribe:success', () => {
-        this.debug('User unsubscribed.')
-      })
-      this.on('unsubscribe:fail', (err) => {
-        this.error('Unsubscription failed', err)
-      })
-      this.on('unregister:start', (data) => {
-        this.debug('Start removing registration', data)
-      })
-      this.on('unregister:success', () => {
-        this.debug('Registration removed.')
-      })
-      this.on('unregister:fail', (err) => {
-        this.error('Removing registration failed', err)
-      })
-    }
+    // Debug
+    this.on('ready', () => {
+      this.debug('SDK is fully ready with:', this.options)
+    })
+    this.on('iframe:ready', (uuid) => {
+      this.debug('Iframe is ready', uuid)
+    })
+    this.on('unsupported', (message) => {
+      this.warn('Push notifications are not yet available for your browser.')
+    })
+    this.on('subscribe:start', () => {
+      this.debug('Start subscribing.')
+    })
+    this.on('subscribe:success', (token) => {
+      this.debug('User subscribed with token', token)
+    })
+    this.on('subscribe:subscription', (subscription) => {
+      this.debug('Subscription recieved', subscription)
+    })
+    this.on('subscribe:fail', (err) => {
+      this.error('Subscription failed', err)
+    })
+    this.on('register:start', (data) => {
+      this.debug('Start registering subscriber', data)
+    })
+    this.on('register:success', (data) => {
+      this.debug('Subscriber registered:', data)
+    })
+    this.on('register:fail', (err) => {
+      this.error('Registration failed', err)
+    })
+    this.on('unsubscribe:start', () => {
+      this.debug('Start unsubscribing.')
+    })
+    this.on('unsubscribe:success', () => {
+      this.debug('User unsubscribed.')
+    })
+    this.on('unsubscribe:fail', (err) => {
+      this.error('Unsubscription failed', err)
+    })
+    this.on('unregister:start', (data) => {
+      this.debug('Start removing registration', data)
+    })
+    this.on('unregister:success', () => {
+      this.debug('Registration removed.')
+    })
+    this.on('unregister:fail', (err) => {
+      this.error('Removing registration failed', err)
+    })
   },
 
   /**
@@ -219,13 +235,13 @@ const Notimatica = {
   },
 
   /**
-   * Autorun enabled.
+   * autoSubscribe enabled.
    *
    * @return {Promise}
    */
-  autorun () {
-    return this.visitor.storage.get('key_value', 'autorun')
-      .then((autorun) => (autorun) ? autorun.value : this.options.autorun)
+  autoSubscribe () {
+    return this.visitor.storage.get('key_value', 'autoSubscribe')
+      .then((autoSubscribe) => (autoSubscribe) ? autoSubscribe.value : this.options.autoSubscribe)
   },
 
   /**

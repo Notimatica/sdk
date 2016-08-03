@@ -30,11 +30,13 @@ module.exports = class AbstractPlugin {
     this.options = merge(this.defaults, options)
 
     if (this.options.autorun === undefined || this.options.autorun === true) {
-      this.prepare()
+      return this.prepare()
         .then(() => this.injectTemplate())
         .then(() => this.injectCss())
         .then(() => this.play())
         .catch((err) => Notimatica.emit('error', err))
+    } else {
+      return this.prepare()
     }
   }
 
