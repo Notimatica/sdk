@@ -200,7 +200,7 @@ export default {
      */
     setMessage (title, body) {
       this.message = { title, body }
-      this.counter++
+      this.counter = 1
     },
 
     /**

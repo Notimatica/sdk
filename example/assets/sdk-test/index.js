@@ -71,6 +71,10 @@ $(function () {
     e.preventDefault()
     Notimatica.push(['emit', 'popover:show', 'You have a message!', 'Something in our SDK sent you a message'])
   })
+  $('.reset-state').on('click', function (e) {
+    e.preventDefault()
+    Notimatica.push(['resetState'])
+  })
 
   $('.send-notification').on('click', function () {
     Notimatica.push(['emit', 'self-notification', {

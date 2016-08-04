@@ -84,10 +84,6 @@ class Plugin extends AbstractPlugin {
         $('.notimatica-prompt').addClass('in')
       })
 
-      Notimatica.on('subscribe:success', () => {
-        Notimatica.emit('autoSubscribe:disable')
-      })
-
       resolve()
     })
   }
@@ -111,7 +107,7 @@ class Plugin extends AbstractPlugin {
    */
   _hide () {
     $('.notimatica-prompt').removeClass('in')
-    Notimatica.emit('autoSubscribe:disable')
+    Notimatica.disableAutoSubscribe()
   }
 }
 

@@ -76,9 +76,9 @@ const Notimatica = {
     this._inited = true
     this.emit('ready')
 
-    this.autoSubscribe()
-      .then((autoSubscribe) => {
-        if (autoSubscribe && this.isUnsubscribed() && !this.usePopup()) {
+    this.autoSubscribeEnabled()
+      .then((autoSubscribeEnabled) => {
+        if (autoSubscribeEnabled && this.isUnsubscribed() && !this.usePopup()) {
           this.emit('autoSubscribe:start')
         }
       })
@@ -88,7 +88,7 @@ const Notimatica = {
    * Load enabled plugins.
    */
   _loadPlugins () {
-    this._enabledPlugins = filterObject(this.options.plugins, plugin => plugin.enable)
+    this._enabledPlugins = filterObject(this.options.plugins, (plugin) => plugin.enable)
 
     for (let name in Notimatica._enabledPlugins) {
       if (this.options.plugins[name].enable) {
@@ -168,7 +168,6 @@ const Notimatica = {
       this.subscribe()
     })
     this.on('autoSubscribe:disable', (plugin) => {
-      this.visitor.storage.set('key_value', { key: 'autoSubscribe', value: false })
     })
     this.on('warning', (message) => {
       this.warn('Attention', message)
@@ -238,13 +237,23 @@ const Notimatica = {
   },
 
   /**
-   * autoSubscribe enabled.
+   * If automatic subscribing enabled.
    *
    * @return {Promise}
    */
-  autoSubscribe () {
+  autoSubscribeEnabled () {
     return this.visitor.storage.get('key_value', 'autoSubscribe')
       .then((autoSubscribe) => (autoSubscribe) ? autoSubscribe.value : this.options.autoSubscribe)
+  },
+
+  /**
+   * Distable automatic subscribing.
+   *
+   * @return {Promise}
+   */
+  disableAutoSubscribe () {
+    this.debug('Automatic subscribing disabled')
+    this.visitor.storage.set('key_value', { key: 'autoSubscribe', value: false })
   },
 
   /**
@@ -304,6 +313,8 @@ const Notimatica = {
    * @return {Promise}
    */
   resetHistory () {
+    this.debug('History cleared')
+
     return this.visitor.storage.removeAll('notifications')
   },
 
@@ -313,6 +324,8 @@ const Notimatica = {
    * @return {Promise}
    */
   resetState () {
+    this.debug('State cleared')
+
     return this.visitor.storage.removeAll('key_value')
   },
 
@@ -322,6 +335,8 @@ const Notimatica = {
    * @return {Promise}
    */
   resetAll () {
+    this.debug('Full reset')
+
     return this.visitor.storage.reset()
   },
 
