@@ -133,6 +133,23 @@ export function extend (object) {
 }
 
 /**
+ * Filter object by predicate function.
+ *
+ * @param  {Object} object      The object
+ * @param  {Function} predicate The predicate function
+ * @return {Object}
+ */
+export function filterObject (object, predicate) {
+  return Object.keys(object)
+        .filter((key) => predicate(object[key]))
+        .reduce((res, key) => {
+          res[key] = object[key]
+
+          return res
+        }, {})
+}
+
+/**
  * Get property recursively by 'foo.bar' syntax.
  *
  * @param   {String} propertyName The property name

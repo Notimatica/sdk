@@ -1,13 +1,14 @@
 import events from 'minivents'
 import logs from '../mixins/logs'
 import Visitor from '../visitor'
-import { merge, isHttps } from '../utils'
+import { merge, isHttps, filterObject } from '../utils'
 import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
 
 const Notimatica = {
   _inited: false,
   _driver: null,
   _debug: DEBUG,
+  _enabledPlugins: {},
   _plugins: {},
   visitor: null,
   options: {
@@ -87,7 +88,9 @@ const Notimatica = {
    * Load enabled plugins.
    */
   _loadPlugins () {
-    for (let name in this.options.plugins) {
+    this._enabledPlugins = filterObject(this.options.plugins, plugin => plugin.enable)
+
+    for (let name in Notimatica._enabledPlugins) {
       if (this.options.plugins[name].enable) {
         const head = document.head
         const script = document.createElement('script')
@@ -155,7 +158,7 @@ const Notimatica = {
           this.debug(`Plugin "${plugin.name}" inited`)
 
           this._plugins[plugin.name] = plugin
-          if (Object.keys(this._plugins).length === Object.keys(this.options.plugins).length) {
+          if (this.allPluginsReady()) {
             this._ready()
           }
         })
@@ -320,6 +323,15 @@ const Notimatica = {
    */
   resetAll () {
     return this.visitor.storage.reset()
+  },
+
+  /**
+   * If all enabled plugins are ready.
+   *
+   * @return {Boolean}
+   */
+  allPluginsReady () {
+    return Object.keys(this._plugins).length === Object.keys(this._enabledPlugins).length
   },
 
   /**

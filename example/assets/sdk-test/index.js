@@ -33,6 +33,9 @@ var options = {
   ],
   plugins: {
     button: {
+      enable: false
+    },
+    prompt: {
       enable: true
     }
   },

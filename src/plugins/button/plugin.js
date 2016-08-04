@@ -4,7 +4,7 @@ import Vue from 'vue'
 import AbstractPlugin from '../abstract'
 import Button from './Button'
 
-const Plugin = class Plugin extends AbstractPlugin {
+class Plugin extends AbstractPlugin {
   /**
    * Plugin name.
    *
@@ -68,12 +68,23 @@ const Plugin = class Plugin extends AbstractPlugin {
   }
 
   /**
+   * Prepare to init.
+   *
+   * @return {Promise}
+   */
+  prepare () {
+    return new Promise((resolve) => {
+      // Disable native autoSubscribe as we will handle it by ourselfs
+      Notimatica.off('autoSubscribe:start')
+
+      resolve()
+    })
+  }
+
+  /**
    * Play widget.
    */
   play () {
-    // Disable native autoSubscribe as we will handle it by ourselfs
-    Notimatica.off('autoSubscribe:start')
-
     this.$vue = this.$vue || this.build()
   }
 

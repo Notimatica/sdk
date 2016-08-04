@@ -1,0 +1,77 @@
+@import "../../assets/common";
+@import "../../assets/mixins/arrows";
+
+.notimatica-prompt {
+  position: fixed;
+  z-index: 400002;
+  max-width: 396px;
+  padding: 1px;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  letter-spacing: .4px;
+  font-size: 14px;
+  line-height: 1.4;
+  background-color: #fff;
+  top: 10px;
+  left: 70px;
+  color: $text-color;
+
+  @include arrow-up($border-color, #fff, 10px, 15%);
+
+  button {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 300;
+    text-align: center;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.8;
+    border-radius: 4px;
+    -webkit-user-select: none;
+
+    &.action {
+      color: #fff;
+      background-color: #00c385;
+      border-color: #00aa74;
+      &:hover {
+        background-color: #009062;
+        border-color: #006c4a;
+      }
+    }
+
+    &.cancel {
+      color: $text-color;
+      background-color: #fff;
+      border-color: $border-color;
+      &:hover {
+        background-color: #f5fbff;
+        border-color: $border-color;
+      }
+    }
+  }
+}
+.notimatica-prompt-content {
+  border-radius: 0 0 5px 5px;
+  padding: 10px 16px;
+}
+.notimatica-prompt-footer {
+  margin: 0 16px;
+  padding: 10px 0;
+  border-top: 1px solid $border-color;
+}
+.notimatica-prompt-close {
+  position: absolute;
+  top: 3px;
+  right: 8px;
+  z-index: 400003;
+  cursor: pointer;
+  color: #23527c;
+  font-size: 14px;
+}

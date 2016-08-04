@@ -7,7 +7,8 @@ module.exports = {
   entry: {
     sdk: './src/sdk/entry.js',
     sw: './src/sw/entry.js',
-    button: './src/plugins/button/plugin.js'
+    button: './src/plugins/button/plugin.js',
+    prompt: './src/plugins/prompt/plugin.js'
   },
   output: {
     path: config.build.assetsRoot,

@@ -1,0 +1,96 @@
+@mixin arrow-up($borderColor, $backgroundColor, $height: 10px, $shifh: 50%) {
+  &:after, &:before {
+  	bottom: 100%;
+  	left: $shifh;
+  	border: solid transparent;
+  	content: " ";
+  	height: 0;
+  	width: 0;
+  	position: absolute;
+  	pointer-events: none;
+  }
+  &:after {
+  	border-color: transparentize($backgroundColor, 1);
+  	border-bottom-color: $backgroundColor;
+  	border-width: $height;
+  	margin-left: -$height;
+  }
+  &:before {
+  	border-color: transparentize($borderColor, 1);
+  	border-bottom-color: $borderColor;
+  	border-width: $height + 1;
+  	margin-left: -$height - 1;
+  }
+}
+@mixin arrow-down($borderColor, $backgroundColor, $height: 10px, $shifh: 50%) {
+  &:after, &:before {
+  	top: 100%;
+  	left: $shifh;
+  	border: solid transparent;
+  	content: " ";
+  	height: 0;
+  	width: 0;
+  	position: absolute;
+  	pointer-events: none;
+  }
+  &:after {
+  	border-color: transparentize($backgroundColor, 1);
+  	border-top-color: $backgroundColor;
+  	border-width: $height;
+  	margin-left: -$height;
+  }
+  &:before {
+  	border-color: transparentize($borderColor, 1);
+  	border-top-color: $borderColor;
+  	border-width: $height + 1;
+  	margin-left: -$height - 1;
+  }
+}
+@mixin arrow-left($borderColor, $backgroundColor, $height: 10px, $shifh: 50%) {
+  &:after, &:before {
+  	right: 100%;
+  	top: $shifh;
+  	border: solid transparent;
+  	content: " ";
+  	height: 0;
+  	width: 0;
+  	position: absolute;
+  	pointer-events: none;
+  }
+  &:after {
+  	border-color: transparentize($backgroundColor, 1);
+  	border-right-color: $backgroundColor;
+  	border-width: $height;
+  	margin-top: -$height;
+  }
+  &:before {
+  	border-color: transparentize($borderColor, 1);
+  	border-right-color: $borderColor;
+  	border-width: $height + 1;
+  	margin-top: -$height - 1;
+  }
+}
+@mixin arrow-right($borderColor, $backgroundColor, $height: 10px, $shifh: 50%) {
+  &:after, &:before {
+  	left: 100%;
+  	top: $shifh;
+  	border: solid transparent;
+  	content: " ";
+  	height: 0;
+  	width: 0;
+  	position: absolute;
+  	pointer-events: none;
+  }
+  &:after {
+  	border-color: transparentize($backgroundColor, 1);
+  	border-left-color: $backgroundColor;
+  	border-width: $height;
+  	margin-top: -$height;
+  }
+  &:before {
+  	border-color: transparentize($borderColor, 1);
+  	border-left-color: $borderColor;
+  	border-width: $height + 1;
+  	margin-top: -$height - 1;
+  }
+}
