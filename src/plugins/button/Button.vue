@@ -92,9 +92,10 @@ export default {
       }, 200)
     })
 
-    Notimatica.on('popover:show', (title, body) => {
+    Notimatica.on('user:message', (title, body) => {
       this.setMessage(title, body)
     })
+
     Notimatica.on('popover:hide', () => {
       this.hidePopover()
     })

@@ -167,7 +167,8 @@ const Notimatica = {
       this.debug('Autosubscribing started')
       this.subscribe()
     })
-    this.on('autoSubscribe:disable', (plugin) => {
+    this.on('user:message', (title, message) => {
+      this.debug([title, message].join(' - '))
     })
     this.on('warning', (message) => {
       this.warn('Attention', message)

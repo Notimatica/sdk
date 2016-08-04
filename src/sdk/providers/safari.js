@@ -74,7 +74,7 @@ const provider = class Safari extends AbstractProvider {
       .then((permissionData) => {
         if (permissionData.permission === 'granted') {
           Notimatica.emit(
-            'popover:show',
+            'user:message',
             'You are unsubscribed',
             'Now you can open notifications preferences and remove this site from the list.'
           )

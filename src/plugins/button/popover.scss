@@ -6,7 +6,7 @@ $popover-width: 396px;
 .notimatica-popover {
   position: fixed;
   z-index: 400002;
-  max-width: $popover-width;
+  width: $popover-width;
   padding: 1px;
   border: 1px solid $border-color;
   border-radius: 6px;

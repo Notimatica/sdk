@@ -3,6 +3,7 @@
 Snappy way to replace default browser subscription prompt. Particularly useful in the case of HTTP site.
 
 ## Installation
+
 ```html
 <script src="https://cdn.notimatica.io/sdks/latest/notimatica-sdk.js" async></script>
 <script>

@@ -33,9 +33,6 @@ var options = {
   ],
   plugins: {
     button: {
-      enable: false
-    },
-    prompt: {
       enable: true
     }
   },
@@ -69,7 +66,7 @@ $(function () {
   })
   $('.show-message').on('click', function (e) {
     e.preventDefault()
-    Notimatica.push(['emit', 'popover:show', 'You have a message!', 'Something in our SDK sent you a message'])
+    Notimatica.push(['emit', 'user:message', 'You have a message!', 'Something on our site needs you attention.'])
   })
   $('.reset-state').on('click', function (e) {
     e.preventDefault()
