@@ -2,7 +2,6 @@ init({
   emulate: true,
   debug: true,
   autoSubscribe: true,
-  subdomain: 'subscribe',
   tags: [
     123456789,
     'foo',
@@ -22,8 +21,7 @@ init({
     'notification:show': 'http://localhost:8081/webhook/show',
     'notification:click': 'http://localhost:8081/webhook/click',
     'notification:close': 'http://localhost:8081/webhook/close'
-  },
-  webhooksCors: true
+  }
 })
 
 $(function () {
