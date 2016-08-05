@@ -2,7 +2,7 @@ import events from 'minivents'
 import logs from '../mixins/logs'
 import Visitor from '../visitor'
 import { merge, isHttps, filterObject } from '../utils'
-import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
+import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, DRIVER_EMULATE, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
 
 const Notimatica = {
   _inited: false,
@@ -58,7 +58,7 @@ const Notimatica = {
 
     this._debug = this.options.debug
 
-    if (this.options.project === null) return this.error('Project ID is absent.')
+    if (this.options.project === null && !this.options.emulate) return this.error('Project ID is absent.')
 
     this._prepareEvents()
     this._prepareVisitor()
@@ -128,7 +128,11 @@ const Notimatica = {
    * @return {Promise}
    */
   _prepareDriver () {
-    const driver = this.usePopup() ? DRIVER_POPUP : DRIVER_NATIVE
+    const driver = this.options.emulate
+      ? DRIVER_EMULATE
+      : this.usePopup()
+        ? DRIVER_POPUP
+          : DRIVER_NATIVE
     const Driver = require('./drivers/' + driver)
 
     this._driver = new Driver(this.options)
@@ -275,11 +279,9 @@ const Notimatica = {
       return this.emit('subscribe:fail', 'Web push unsupported by browser.')
     }
 
-    if (this.isSubscribed() || this.options.emulate) {
-      return this.emit('subscribe:success')
+    if (!this.isSubscribed()) {
+      this._driver.subscribe()
     }
-
-    this._driver.subscribe()
   },
 
   /**
@@ -292,11 +294,9 @@ const Notimatica = {
       return this.emit('unsubscribe:fail', 'Web push unsupported by browser.')
     }
 
-    if (this.isUnsubscribed() || this.options.emulate) {
-      return this.emit('unsubscribe:success')
+    if (!this.isUnsubscribed()) {
+      this._driver.unsubscribe()
     }
-
-    this._driver.unsubscribe()
   },
 
   /**

@@ -15,6 +15,8 @@ module.exports = class Native extends AbstractDriver {
 
   /**
    * Prepare driver.
+   *
+   * @return {Promise}
    */
   prepare () {
     Notimatica.on('subscribe:subscription-received', (subscription) => {

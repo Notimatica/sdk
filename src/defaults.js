@@ -7,6 +7,7 @@ export const ENV_SW = 'sw'
 
 export const DRIVER_NATIVE = 'native'
 export const DRIVER_POPUP = 'popup'
+export const DRIVER_EMULATE = 'emulate'
 
 export const PROVIDER_CHROME = 'chrome'
 export const PROVIDER_FIREFOX = 'firefox'

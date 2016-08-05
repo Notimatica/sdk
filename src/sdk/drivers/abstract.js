@@ -8,6 +8,7 @@ module.exports = class AbstractDriver {
    */
   constructor (options) {
     this.options = options
+    this.isSubscribed = false
     this.silent = false
 
     this._prepareProvider()
@@ -15,9 +16,11 @@ module.exports = class AbstractDriver {
 
   /**
    * Prepare driver.
+   *
+   * @return {Promise}
    */
   prepare () {
-    Notimatica.emit('driver:ready', this)
+    return Promise.resolve(Notimatica.emit('driver:ready', this))
   }
 
   /**
