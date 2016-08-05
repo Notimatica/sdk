@@ -55,7 +55,7 @@ class Plugin extends AbstractPlugin {
    */
   get template () {
     /*eslint quotes: 0*/
-    return `<div class="notimatica-reset notimatica-plugin-button-wrapper">
+    return `<div class="notimatica-reset notimatica-plugin-wrapper notimatica-plugin-prompt-wrapper">
       <div class="notimatica-prompt notimatica-fade">
           <div class="notimatica-prompt-content">
             ${t('prompt.subscribe')}

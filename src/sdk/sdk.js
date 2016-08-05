@@ -9,9 +9,10 @@ const Notimatica = {
   _driver: null,
   _debug: DEBUG,
   _enabledPlugins: {},
-  _plugins: {},
+  _plugins: [],
   visitor: null,
   options: {
+    emulate: false,
     debug: DEBUG,
     project: null,
     safariWebId: null,
@@ -157,7 +158,7 @@ const Notimatica = {
         .then(() => {
           this.debug(`Plugin "${plugin.name}" inited`)
 
-          this._plugins[plugin.name] = plugin
+          this._plugins.push(plugin)
           if (this.allPluginsReady()) {
             this._ready()
           }
@@ -274,6 +275,10 @@ const Notimatica = {
       return this.emit('subscribe:fail', 'Web push unsupported by browser.')
     }
 
+    if (this.isSubscribed() || this.options.emulate) {
+      return this.emit('subscribe:success')
+    }
+
     this._driver.subscribe()
   },
 
@@ -283,7 +288,11 @@ const Notimatica = {
    * @returns {Promise}
    */
   unsubscribe () {
-    if (this.isUnsubscribed()) {
+    if (!this.pushSupported()) {
+      return this.emit('unsubscribe:fail', 'Web push unsupported by browser.')
+    }
+
+    if (this.isUnsubscribed() || this.options.emulate) {
       return this.emit('unsubscribe:success')
     }
 
@@ -331,6 +340,23 @@ const Notimatica = {
   },
 
   /**
+   * Reset SDK. The only way to fire init method again.
+   */
+  resetSDK () {
+    // Clear events
+    this.off()
+
+    this.visitor = null
+    this._inited = false
+    this._debug = DEBUG
+    this._driver = null
+    this._enabledPlugins = null
+
+    this._plugins.forEach((plugin) => plugin.destroy())
+    this._plugins = []
+  },
+
+  /**
    * Reset everything.
    *
    * @return {Promise}
@@ -347,7 +373,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   allPluginsReady () {
-    return Object.keys(this._plugins).length === Object.keys(this._enabledPlugins).length
+    return this._plugins.length === Object.keys(this._enabledPlugins).length
   },
 
   /**

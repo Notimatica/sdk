@@ -62,7 +62,7 @@ class Plugin extends AbstractPlugin {
    */
   get template () {
     /*eslint quotes: 0*/
-    return `<div class="notimatica-reset notimatica-plugin-button-wrapper notimatica-plugin-button-${this.options.position}">
+    return `<div class="notimatica-reset notimatica-plugin-wrapper notimatica-plugin-button-wrapper notimatica-plugin-button-${this.options.position}">
       <button :position="position" :use-popover="usePopover" :click="click"></button>
     </div>`
   }

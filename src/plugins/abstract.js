@@ -8,6 +8,8 @@ module.exports = class AbstractPlugin {
    */
   constructor () {
     this.options = {}
+    this.wrapper = null
+    this.cssWrapper = null
 
     Notimatica.emit('plugin:ready', this)
   }
@@ -18,7 +20,7 @@ module.exports = class AbstractPlugin {
    * @return {Promise}
    */
   prepare () {
-    return new Promise(function (resolve) { resolve() })
+    return Promise.resolve()
   }
 
   /**
@@ -46,30 +48,42 @@ module.exports = class AbstractPlugin {
    * @return {Promise}
    */
   injectCss () {
-    return fetch(this.options.css)
-      .then((response) => {
-        if (response.status !== 200) {
-          throw new Error(`Can't load ${this.name} plugin css: ${this.options.css}`)
-        }
+    if (this.options.css) {
+      return fetch(this.options.css)
+        .then((response) => {
+          if (response.status !== 200) {
+            throw new Error(`Can't load ${this.name} plugin css: ${this.options.css}`)
+          }
 
-        return response.text()
-      })
-      .then((css) => {
-        const target = findNode(this.options.cssTarget, document.head)
-        const style = document.createElement('style')
-        style.textContent = css
-        target.appendChild(style)
-      })
+          return response.text()
+        })
+        .then((css) => {
+          const target = findNode(this.options.cssTarget, document.head)[0]
+          this.cssWrapper = document.createElement('style')
+          this.cssWrapper.textContent = css
+          target.appendChild(this.cssWrapper)
+        })
+    } else {
+      return Promise.resolve()
+    }
   }
 
   /**
    * Inject plugin's template.
    */
   injectTemplate () {
-    if (this.template && this.options.target) {
-      const target = findNode(this.options.target, document.body)
-      this.$wrapper = createNode(this.template)
-      target.appendChild(this.$wrapper)
+    if (this.template) {
+      const target = findNode(this.options.target, document.body)[0]
+      this.wrapper = target.appendChild(createNode(this.template))
     }
+  }
+
+  /**
+   * Destroy plugin.
+   */
+  destroy () {
+    findNode('.notimatica-plugin-wrapper')
+      .forEach((node) => node.remove())
+    this.cssWrapper.remove()
   }
 }

@@ -197,7 +197,7 @@ export function findNode (element, fallback) {
   switch (true) {
     case isString(element):
       try {
-        return document.querySelectAll(element)
+        return document.querySelectorAll(element)
       } catch (e) {}
       return fallback
     case element.nodeType:

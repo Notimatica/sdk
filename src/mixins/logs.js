@@ -1,4 +1,9 @@
 export default function Logs (target, prefix, style) {
+  const css = {
+    normal: 'color:black;font-weight:normal;',
+    prefix: style || 'color:#fdbd2c;font-weight:bold;'
+  }
+
   target = target || this
 
   target.log = function (type, args) {
@@ -9,8 +14,8 @@ export default function Logs (target, prefix, style) {
       let message = args.shift()
       message = [
         `%c${prefix}%c` + message,
-        'color:#fdbd2c;font-weight:bold;',
-        'color:black;font-weight:normal;'
+        css.prefix,
+        css.normal
       ]
       args = message.concat(args)
     }
