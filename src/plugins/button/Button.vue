@@ -190,7 +190,7 @@ export default {
      */
     cancel () {
       this.hidePopover()
-      Notimatica.emit('autoSubscribe:disable')
+      Notimatica.disableAutoSubscribe()
     },
 
     /**
