@@ -1,4 +1,4 @@
-init({
+var options = {
   emulate: true,
   debug: true,
   autoSubscribe: true,
@@ -14,7 +14,7 @@ init({
   },
   strings: {
     en: {
-      'popup.welcome': 'Subcribing to {project}'
+      'popup.welcome': 'Subscribing to {project}'
     }
   },
   webhooks: {
@@ -22,7 +22,9 @@ init({
     'notification:click': 'http://localhost:8081/webhook/click',
     'notification:close': 'http://localhost:8081/webhook/close'
   }
-})
+}
+
+init(options)
 
 $(function () {
   $('.subscribe-link').on('click', function (e) {
@@ -46,6 +48,6 @@ $(function () {
     e.preventDefault()
 
     Notimatica.push(['resetSDK'])
-    init()
+    init(options)
   })
 })

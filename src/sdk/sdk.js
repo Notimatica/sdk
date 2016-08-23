@@ -79,7 +79,7 @@ const Notimatica = {
 
     this.autoSubscribeEnabled()
       .then((autoSubscribeEnabled) => {
-        if (autoSubscribeEnabled && this.isUnsubscribed() && !this.usePopup()) {
+        if (autoSubscribeEnabled && this.isUnsubscribed() && !this.shouldUsePopup()) {
           this.emit('autoSubscribe:start')
         }
       })
@@ -130,7 +130,7 @@ const Notimatica = {
   _prepareDriver () {
     const driver = this.options.emulate
       ? DRIVER_EMULATE
-      : this.usePopup()
+      : this.shouldUsePopup()
         ? DRIVER_POPUP
           : DRIVER_NATIVE
     const Driver = require('./drivers/' + driver)
@@ -234,6 +234,15 @@ const Notimatica = {
   },
 
   /**
+   * Use popup or native subscription process.
+   *
+   * @return {Boolean}
+   */
+  shouldUsePopup () {
+    return !isHttps() || this.options.usePopup
+  },
+
+  /**
    * Check if push notifications supported.
    *
    * @return {Boolean}
@@ -260,15 +269,6 @@ const Notimatica = {
   disableAutoSubscribe () {
     this.debug('Automatic subscribing disabled')
     this.visitor.storage.set('key_value', { key: 'autoSubscribe', value: false })
-  },
-
-  /**
-   * Use popup or native subscription process.
-   *
-   * @return {Boolean}
-   */
-  usePopup () {
-    return !isHttps() || this.options.usePopup
   },
 
   /**
@@ -315,6 +315,15 @@ const Notimatica = {
    */
   isUnsubscribed () {
     return !this.isSubscribed()
+  },
+
+  /**
+   * Assign tags on subscriber.
+   *
+   * @type {Array}
+   */
+  setTags (tags = []) {
+    this.options.tags = tags
   },
 
   /**
@@ -395,7 +404,7 @@ const Notimatica = {
    *
    * @param {Array} array History of calls
    */
-  _processRegisteredActions (array) {
+  _processRegisteredActions (array = []) {
     for (let i = 0; i < array.length; i++) {
       this.push(array[i])
     }

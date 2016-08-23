@@ -27,7 +27,7 @@ export default function Logs (target, prefix, style) {
     target.log('log', arguments)
   }
 
-  target.warning = function () {
+  target.warn = function () {
     target.log('warn', arguments)
   }
 
