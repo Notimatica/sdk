@@ -1,7 +1,8 @@
 import events from 'minivents'
+import merge from 'deepmerge'
 import logs from '../mixins/logs'
 import Visitor from '../visitor'
-import { merge, isHttps, filterObject } from '../utils'
+import { isHttps, filterObject } from '../utils'
 import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, DRIVER_EMULATE, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
 
 const Notimatica = {
@@ -11,7 +12,7 @@ const Notimatica = {
   _enabledPlugins: {},
   _plugins: [],
   visitor: null,
-  options: {
+  defaults: {
     emulate: false,
     debug: DEBUG,
     project: null,
@@ -32,6 +33,7 @@ const Notimatica = {
     webhooks: {},
     webhooksCors: true
   },
+  options: {},
   strings: {
     en: {
       'popup.welcome': 'Subscribe to {project}',
@@ -52,7 +54,7 @@ const Notimatica = {
   init (options) {
     if (this._inited) return this.warn('SDK was already inited.')
 
-    this.options = merge(this.options, options || {})
+    this.options = merge(this.defaults, options || {})
     this.strings = merge(this.strings, this.options.strings)
     delete this.options.strings
 
@@ -71,7 +73,7 @@ const Notimatica = {
   },
 
   /**
-   * Driver is ready, SDK is good to go.
+   * Driver is ready, plugins are loaded, SDK is good to go.
    */
   _ready () {
     this._inited = true
@@ -91,10 +93,13 @@ const Notimatica = {
   _loadPlugins () {
     this._enabledPlugins = filterObject(this.options.plugins, (plugin) => plugin.enable)
 
+    let head
+    let script
+
     for (let name in Notimatica._enabledPlugins) {
       if (this.options.plugins[name].enable) {
-        const head = document.head
-        const script = document.createElement('script')
+        head = document.head
+        script = document.createElement('script')
 
         script.type = 'text/javascript'
         script.src = `${this.options.sdkPath}/notimatica-${name}.js`
@@ -154,7 +159,7 @@ const Notimatica = {
       this._loadPlugins()
     })
     this.on('plugin:ready', (plugin) => {
-      this.strings = merge(plugin.strings, this.strings)
+      this.strings = merge({}, plugin.strings, this.strings)
 
       // Init plugin and only after that add it to the _plugins registry
       // If every plugin is inited, run _ready, because we are...ready
@@ -172,8 +177,14 @@ const Notimatica = {
       this.debug('Autosubscribing started')
       this.subscribe()
     })
-    this.on('user:message', (title, message) => {
-      this.debug([title, message].join(' - '))
+    this.on('user:interact', (title, message) => {
+      let debug = 'User interaction'
+
+      if (title || message) {
+        debug += ': ' + [title, message].join(' - ')
+      }
+
+      this.debug(debug)
     })
     this.on('warning', (message) => {
       this.warn('Attention', message)
@@ -324,6 +335,11 @@ const Notimatica = {
    */
   setTags (tags = []) {
     this.options.tags = tags
+
+    if (this.isSubscribed()) {
+      this._driver.silent = true
+      this._driver.subscribe()
+    }
   },
 
   /**
@@ -356,13 +372,16 @@ const Notimatica = {
     this.off()
 
     this.visitor = null
-    this._inited = false
+    this.options = {}
+
     this._debug = DEBUG
     this._driver = null
     this._enabledPlugins = null
 
     this._plugins.forEach((plugin) => plugin.destroy())
     this._plugins = []
+
+    this._inited = false
   },
 
   /**

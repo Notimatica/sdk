@@ -28,6 +28,8 @@ class Plugin extends AbstractPlugin {
       position: 'bottom-right', // bottom-right, bottom-left, top-right, top-left
       usePopover: true,
       click: () => {
+        Notimatica.emit('plugin:button:clicked')
+
         Notimatica.isSubscribed()
           ? Notimatica.unsubscribe()
           : Notimatica.subscribe()

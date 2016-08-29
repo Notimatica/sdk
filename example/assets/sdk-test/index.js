@@ -1,14 +1,17 @@
+/*global init */
+
 var options = {
   emulate: true,
   debug: true,
   autoSubscribe: true,
+  safariWebId: 'web.io.notimatica',
   tags: [
     123456789,
     'foo',
     'bar'
   ],
   plugins: {
-    button: {
+    prompt: {
       enable: true
     }
   },
@@ -28,26 +31,46 @@ init(options)
 
 $(function () {
   $('.subscribe-link').on('click', function (e) {
-    e.preventDefault()
     Notimatica.push(['subscribe'])
   })
   $('.unsubscribe-link').on('click', function (e) {
-    e.preventDefault()
     Notimatica.push(['unsubscribe'])
   })
+
   $('.show-message').on('click', function (e) {
-    e.preventDefault()
-    Notimatica.push(['emit', 'user:message', 'You have a message!', 'Something on our site needs you attention.'])
+    Notimatica.push(['emit', 'user:interact', 'You have a message!', 'Something on our site needs you attention.'])
+  })
+  $('.show-prompt').on('click', function (e) {
+    Notimatica.push(['emit', 'user:interact'])
+  })
+
+  $('.reset-sdk').on('click', function (e) {
+    Notimatica.push(['resetSDK'])
   })
   $('.reset-state').on('click', function (e) {
-    e.preventDefault()
     Notimatica.push(['resetState'])
   })
-
   $('.rebuild-sdk').on('click', function (e) {
-    e.preventDefault()
-
     Notimatica.push(['resetSDK'])
+    init(options)
+  })
+
+  $('.enable-button').on('click', function (e) {
+    Notimatica.push(['resetSDK'])
+    options.plugins = {
+      button: {
+        enable: true
+      }
+    }
+    init(options)
+  })
+  $('.enable-prompt').on('click', function (e) {
+    Notimatica.push(['resetSDK'])
+    options.plugins = {
+      prompt: {
+        enable: true
+      }
+    }
     init(options)
   })
 })

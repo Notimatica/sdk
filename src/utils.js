@@ -93,46 +93,6 @@ export function makeToken (endpoint, provider) {
 }
 
 /**
- * Merges two (or more) objects, giving the last one precedence.
- *
- * @param {Object} target The target object
- * @param {Object} source The source object
- */
-export function merge (target, source) {
-  if (!isObject(target)) {
-    target = {}
-  }
-
-  for (let property in source) {
-    if (source.hasOwnProperty(property)) {
-      var sourceProperty = source[property]
-
-      if (isObject(sourceProperty)) {
-        target[property] = merge(target[property], sourceProperty)
-        continue
-      }
-
-      target[property] = sourceProperty
-    }
-  }
-
-  for (var a = 2, l = arguments.length; a < l; a++) {
-    merge(target, arguments[a])
-  }
-
-  return target
-}
-
-/**
- * Extend object.
- *
- * @param {Object} object
- */
-export function extend (object) {
-  merge(this, object)
-}
-
-/**
  * Filter object by predicate function.
  *
  * @param  {Object} object      The object
@@ -173,6 +133,28 @@ export function getProperty (propertyName, object) {
   }
 
   return property
+}
+
+/**
+ * Leave only unique items in array.
+ *
+ * @param  {Array} source The source array
+ * @return {Array}
+ */
+export function unique (source) {
+  let uniqueMap = {}
+  let array = []
+
+  for (var i = 0, l = source.length; i < l; ++i) {
+    if (uniqueMap.hasOwnProperty(source[i])) {
+      continue
+    }
+
+    array.push(source[i])
+    uniqueMap[source[i]] = 1
+  }
+
+  return array
 }
 
 /**

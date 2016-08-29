@@ -92,7 +92,7 @@ export default {
       }, 200)
     })
 
-    Notimatica.on('user:message', (title, body) => {
+    Notimatica.on('user:interact', (title, body) => {
       this.setMessage(title, body)
     })
 

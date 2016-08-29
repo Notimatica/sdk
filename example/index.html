@@ -36,16 +36,56 @@
           <!-- OPTIONS -->
 
           <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingOne">
+            <div class="panel-heading" role="tab" id="optionsHeading">
               <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#optionsTab" aria-expanded="true" aria-controls="optionsTab">
                   SDK options
                 </a>
               </h4>
             </div>
-            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div id="optionsTab" class="panel-collapse collapse" role="tabpanel" aria-labelledby="optionsHeading">
               <div class="panel-body">
                 <code class="options"></code>
+              </div>
+            </div>
+          </div>
+
+          <!-- FLOATING BUTTON -->
+
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="floatingButtonHeading">
+              <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#floatingButtongTab" aria-expanded="true" aria-controls="floatingButtongTab">
+                  Floating Button Plugin
+                </a>
+              </h4>
+            </div>
+            <div id="floatingButtongTab" class="panel-collapse collapse" role="tabpanel" aria-labelledby="floatingButtonHeading">
+              <div class="panel-body">
+                <div class="btn-group" role="group" aria-label="plugins">
+                  <button class="btn btn-success enable-button">Enable button</button>
+                  <button class="btn btn-default show-message">Show message</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROMPT -->
+
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="promptHeading">
+              <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#promptTab" aria-expanded="true" aria-controls="promptTab">
+                  Prompt Plugin
+                </a>
+              </h4>
+            </div>
+            <div id="promptTab" class="panel-collapse collapse" role="tabpanel" aria-labelledby="promptHeading">
+              <div class="panel-body">
+                <div class="btn-group" role="group" aria-label="plugins">
+                  <button class="btn btn-success enable-prompt">Enable prompt</button>
+                  <button class="btn btn-default show-prompt">Show prompt</button>
+                </div>
               </div>
             </div>
           </div>
@@ -54,13 +94,13 @@
 
           <div class="panel panel-default">
             <div class="panel-footer">
-              <div class="btn-group" role="group" aria-label="...">
-                <button class="btn btn-default subscribe-link hidden">Subscribe</button>
-                <button class="btn btn-default unsubscribe-link hidden">Unsubscribe</button>
+              <div class="btn-group" role="group" aria-label="sdk">
+                <button class="btn btn-primary subscribe-link hidden">Subscribe</button>
+                <button class="btn btn-primary unsubscribe-link hidden">Unsubscribe</button>
 
-                <button class="btn btn-default show-message">Show message</button>
-                <button class="btn btn-default reset-state">Reset state</button>
-                <button class="btn btn-default rebuild-sdk">Rebuild SDK</button>
+                <button class="btn btn-warning reset-sdk">Reset SDK</button>
+                <button class="btn btn-warning reset-state">Reset state</button>
+                <button class="btn btn-danger rebuild-sdk">Rebuild SDK</button>
               </div>
             </div>
           </div>

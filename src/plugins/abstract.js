@@ -1,4 +1,5 @@
-import { merge, findNode, createNode } from '../utils'
+import merge from 'deepmerge'
+import { findNode, createNode } from '../utils'
 
 module.exports = class AbstractPlugin {
   /**
