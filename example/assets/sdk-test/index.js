@@ -107,7 +107,7 @@ $(function () {
           case 401:
             message = 'Wrong API key'
             break
-          case 402:
+          case 422:
             message = 'Validation error'
             break
           default:
@@ -117,7 +117,7 @@ $(function () {
         $('.send-test-message-result').addClass('text-danger').text(message)
         setTimeout(function () {
           $('.send-test-message-result').fadeOut(1000, function () {
-            $(this).removeClass('text-danger').text(message)
+            $(this).removeClass('text-danger').text('')
           })
         }, 2500)
       }
