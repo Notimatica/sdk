@@ -39,13 +39,46 @@
             <div class="panel-heading" role="tab" id="optionsHeading">
               <h4 class="panel-title">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#optionsTab" aria-expanded="true" aria-controls="optionsTab">
-                  SDK options
+                  SDK Options
                 </a>
               </h4>
             </div>
             <div id="optionsTab" class="panel-collapse collapse" role="tabpanel" aria-labelledby="optionsHeading">
               <div class="panel-body">
                 <code class="options"></code>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEND TEST MESSAGE -->
+
+          <div class="panel panel-default send-test-message hidden">
+            <div class="panel-heading" role="tab" id="sendTestMessageHeading">
+              <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#sendTestMessageTab" aria-expanded="true" aria-controls="sendTestMessageTab">
+                  Send Test Message
+                </a>
+              </h4>
+            </div>
+            <div id="sendTestMessageTab" class="panel-collapse collapse" role="tabpanel" aria-labelledby="sendTestMessageHeading">
+              <div class="panel-body">
+                <form>
+                  <div class="form-group">
+                    <label for="api-key">API Key</label>
+                    <input type="text" class="form-control" id="api-key" placeholder="API Key">
+                  </div>
+                  <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control" id="title" placeholder="Title">
+                  </div>
+                  <div class="form-group">
+                    <label for="body">Body</label>
+                    <textarea class="form-control" id="body" placeholder="Password"></textarea>
+                  </div>
+                  <button type="button" class="btn btn-success send-test-message">Submit</button>
+                  &nbsp;
+                  <span class="send-test-message-result"></span>
+                </form>
               </div>
             </div>
           </div>
