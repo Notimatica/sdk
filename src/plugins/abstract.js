@@ -83,8 +83,10 @@ module.exports = class AbstractPlugin {
    * Destroy plugin.
    */
   destroy () {
-    findNode('.notimatica-plugin-wrapper')
-      .forEach((node) => node.remove())
+    for (let node of findNode('.notimatica-plugin-wrapper')) {
+      node.remove()
+    }
+
     this.cssWrapper.remove()
   }
 }
