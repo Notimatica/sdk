@@ -11,7 +11,7 @@ var options = {
     'bar'
   ],
   plugins: {
-    prompt: {
+    button: {
       enable: true
     }
   },
@@ -74,13 +74,11 @@ $(function () {
     init(options)
   })
 
-  if (options.project) {
+  if (options.project && !options.emulate) {
     $('.send-test-message').removeClass('hidden')
   }
 
   $('button.send-test-message').on('click', function () {
-    var apiKey = $('#api-key').val()
-
     var data = {
       title: $('#title').val(),
       body: $('#body').val()
@@ -92,10 +90,10 @@ $(function () {
       data: data,
       dataType: 'json',
       headers: {
-        'authorization': 'Bearer ' + apiKey
+        'authorization': 'Bearer ' + $('#api-key').val()
       },
       success: function (data) {
-        $('.send-test-message-result').text('Sent')
+        $('.send-test-message-result').text('Message sent')
       },
       error: function (jqXHR, status) {
         var message

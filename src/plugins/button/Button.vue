@@ -74,7 +74,8 @@ export default {
       this.acting = true
     })
     Notimatica.on('subscribe:success', () => {
-      this.hidePopover()
+      if (this.popoverActive) this.hidePopover()
+
       setTimeout(() => {
         this.subscribed = true
         this.acting = false
@@ -85,7 +86,8 @@ export default {
       this.acting = true
     })
     Notimatica.on('unsubscribe:success', () => {
-      this.hidePopover()
+      if (this.popoverActive) this.hidePopover()
+
       setTimeout(() => {
         this.subscribed = false
         this.acting = false

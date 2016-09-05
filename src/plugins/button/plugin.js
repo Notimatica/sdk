@@ -96,6 +96,8 @@ class Plugin extends AbstractPlugin {
    * @return {Object}
    */
   build () {
+    Vue.config.debug = true
+
     return new Vue({
       el: '.notimatica-plugin-button-wrapper',
       data: {

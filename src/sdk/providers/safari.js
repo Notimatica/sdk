@@ -38,6 +38,16 @@ const provider = class Safari extends AbstractProvider {
   ready () {
     return new Promise((resolve) => {
       this.permissionData = window.safari.pushNotification.permission(this.options.safariWebId)
+
+      // If Safari is subscribed, but Notimatica registration is absent, show user a message.
+      Notimatica.on('ready', () => {
+        Notimatica.visitor.isSubscribed().then((notimaticaSubscribed) => {
+          if (this.permissionData.permission === 'granted' && !notimaticaSubscribed) {
+            this._showUnsubscribeMessage()
+          }
+        })
+      })
+
       resolve(this.permissionData)
     })
   }
@@ -55,7 +65,7 @@ const provider = class Safari extends AbstractProvider {
             this._requestPermission()
             break
           case 'granted':
-            Notimatica.emit('subscribe:success', permissionData.deviceToken)
+            Notimatica.emit('subscribe:subscription-received', permissionData.deviceToken)
             break
           default:
             Notimatica.emit('subscribe:fail', 'Safari denied to send notification')
@@ -72,15 +82,9 @@ const provider = class Safari extends AbstractProvider {
   unsubscribe () {
     return this.ready()
       .then((permissionData) => {
-        if (permissionData.permission === 'granted') {
-          Notimatica.emit(
-            'user:message',
-            'You are unsubscribed',
-            'Now you can open notifications preferences and remove this site from the list.'
-          )
-        }
+        this._showUnsubscribeMessage(permissionData)
       })
-      .then(() => Notimatica.emit('subscribe:subscription-removed'))
+      .then(() => Notimatica.emit('unsubscribe:subscription-removed'))
   }
 
   /**
@@ -90,7 +94,9 @@ const provider = class Safari extends AbstractProvider {
    */
   isSubscribed () {
     return this.ready()
-      .then((permissionData) => permissionData.permission === 'granted')
+      .then((permissionData) => {
+        return permissionData.permission === 'granted' && Notimatica.visitor.isSubscribed()
+      })
   }
 
   /**
@@ -110,6 +116,18 @@ const provider = class Safari extends AbstractProvider {
 
         Notimatica.emit('subscribe:subscription-received', permissionData.deviceToken)
       }
+    )
+  }
+
+  /**
+   * Show remove from preferences message if user is unregistered,
+   * but Safari is still subscribed to notifications.
+   */
+  _showUnsubscribeMessage (permissionData) {
+    Notimatica.emit(
+      'user:interact',
+      'You are unsubscribed',
+      'Now you can open Safari notifications preferences and remove this site from the list.'
     )
   }
 }
