@@ -5,6 +5,8 @@ var options = {
   debug: true,
   autoSubscribe: true,
   safariWebId: 'web.io.notimatica',
+  usePopup: true,
+  subdomain: 'subscribe',
   tags: [
     123456789,
     'foo',

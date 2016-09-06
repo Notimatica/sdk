@@ -93,6 +93,10 @@ const Notimatica = {
   _loadPlugins () {
     this._enabledPlugins = filterObject(this.options.plugins, (plugin) => plugin.enable)
 
+    if (Object.keys(this._enabledPlugins).length === 0) {
+      return this.emit('plugin:all-ready')
+    }
+
     let head
     let script
 
@@ -159,7 +163,7 @@ const Notimatica = {
       this._loadPlugins()
     })
     this.on('plugin:ready', (plugin) => {
-      this.strings = merge({}, plugin.strings, this.strings)
+      this.strings = merge(plugin.strings, this.strings)
 
       // Init plugin and only after that add it to the _plugins registry
       // If every plugin is inited, run _ready, because we are...ready
@@ -169,9 +173,12 @@ const Notimatica = {
 
           this._plugins.push(plugin)
           if (this.allPluginsReady()) {
-            this._ready()
+            this.emit('plugin:all-ready')
           }
         })
+    })
+    this.on('plugin:all-ready', () => {
+      this._ready()
     })
     this.on('autoSubscribe:start', () => {
       this.debug('Autosubscribing started')
@@ -250,7 +257,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   shouldUsePopup () {
-    return !isHttps() || this.options.usePopup
+    return this.visitor.browser !== 'Safari' && (!isHttps() || this.options.usePopup)
   },
 
   /**
