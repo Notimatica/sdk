@@ -257,7 +257,7 @@ const Notimatica = {
    * @return {Boolean}
    */
   shouldUsePopup () {
-    return this.visitor.browser !== 'Safari' && (!isHttps() || this.options.usePopup)
+    return this.visitor.env.browser !== 'Safari' && (!isHttps() || this.options.usePopup)
   },
 
   /**
