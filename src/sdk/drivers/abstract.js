@@ -9,7 +9,6 @@ module.exports = class AbstractDriver {
   constructor (options) {
     this.options = options
     this.isSubscribed = false
-    this.silent = false
 
     this._prepareProvider()
   }
@@ -39,14 +38,11 @@ module.exports = class AbstractDriver {
    * @param  {String} uuid The uuid
    * @return {Promise}
    */
-  _finishSubscription (uuid) {
+  _finishRegistration (uuid) {
     this.isSubscribed = true
 
     return Notimatica.visitor.uuid(uuid)
-      .then(() => {
-        if (!this.silent) Notimatica.emit('subscribe:success', uuid)
-        this.silent = false
-      })
+      .then((data) => data.value)
   }
 
   /**
@@ -55,14 +51,10 @@ module.exports = class AbstractDriver {
    *
    * @return {Promise}
    */
-  _finishUnsubscription () {
+  _finishUnregistration () {
     this.isSubscribed = false
 
     return Notimatica.visitor.uuid(null)
-      .then(() => {
-        if (!this.silent) Notimatica.emit('unsubscribe:success')
-        this.silent = false
-      })
   }
 
   /**

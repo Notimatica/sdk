@@ -32,19 +32,10 @@ module.exports = class Popup extends AbstractDriver {
    * Subscribe to SDK events.
    */
   _prepareNotimaticaEvents () {
-    Notimatica.on('popup:subscribed', (data) => {
-      return this._finishSubscription(data.token)
-    })
-    Notimatica.on('popup:unsubscribed', () => {
-      return this._finishUnsubscription()
-    })
-
     Notimatica.on('iframe:ready', (iframeUuid) => {
-      this.silent = true
-
       const action = iframeUuid
-        ? this._finishSubscription(iframeUuid)
-        : this._finishUnsubscription()
+        ? this._finishRegistration(iframeUuid)
+        : this._finishUnregistration()
 
       action.then(() => Notimatica.emit('driver:ready', this))
     })
@@ -92,9 +83,14 @@ module.exports = class Popup extends AbstractDriver {
    * @return {Promise}
    */
   subscribe () {
-    Notimatica.emit('subscribe:start')
+    return new Promise((resolve) => {
+      Notimatica.on('popup:subscribed', (data) => {
+        resolve(data.token)
+      })
 
-    return this._openPopup(this.options.project)
+      this._openPopup(this.options.project)
+    })
+      .then((uuid) => this._finishRegistration(uuid))
       .catch((err) => Notimatica.emit('subscribe:fail', err))
   }
 
@@ -104,9 +100,14 @@ module.exports = class Popup extends AbstractDriver {
    * @return {Promise}
    */
   unsubscribe () {
-    Notimatica.emit('unsubscribe:start')
+    return new Promise((resolve) => {
+      Notimatica.on('popup:unsubscribed', () => {
+        resolve()
+      })
 
-    return this._openPopup(this.options.project)
+      this._openPopup(this.options.project)
+    })
+      .then(() => this._finishUnregistration())
       .catch((err) => Notimatica.emit('unsubscribe:fail', err))
   }
 

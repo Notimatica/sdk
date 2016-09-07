@@ -65,11 +65,10 @@ const provider = class Safari extends AbstractProvider {
             this._requestPermission()
             break
           case 'granted':
-            Notimatica.emit('subscribe:subscription-received', permissionData.deviceToken)
+            Notimatica.emit('provider:subscription-received', permissionData.deviceToken)
             break
           default:
-            Notimatica.emit('subscribe:fail', 'Safari denied to send notification')
-            break
+            throw new Error('Safari denied to send notification')
         }
       })
   }
@@ -84,11 +83,11 @@ const provider = class Safari extends AbstractProvider {
       .then((permissionData) => {
         this._showUnsubscribeMessage(permissionData)
       })
-      .then(() => Notimatica.emit('unsubscribe:subscription-removed'))
+      .then(() => Notimatica.emit('provider:subscription-removed'))
   }
 
   /**
-   * If user was subscribed.
+   * If user is subscribed.
    *
    * @return {Promise}
    */
@@ -96,6 +95,18 @@ const provider = class Safari extends AbstractProvider {
     return this.ready()
       .then((permissionData) => {
         return permissionData.permission === 'granted' && Notimatica.visitor.isSubscribed()
+      })
+  }
+
+  /**
+   * Get subscription token.
+   *
+   * @return {Promise}
+   */
+  getToken () {
+    return this.ready()
+      .then((permissionData) => {
+        return permissionData.permission === 'granted' ? permissionData.deviceToken : null
       })
   }
 
@@ -114,7 +125,7 @@ const provider = class Safari extends AbstractProvider {
           throw new Error('Subcription was empty.')
         }
 
-        Notimatica.emit('subscribe:subscription-received', permissionData.deviceToken)
+        Notimatica.emit('provider:subscription-received', permissionData.deviceToken)
       }
     )
   }

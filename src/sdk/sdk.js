@@ -1,5 +1,5 @@
-import events from 'minivents'
 import merge from 'deepmerge'
+import events from '../mixins/events'
 import logs from '../mixins/logs'
 import Visitor from '../visitor'
 import { isHttps, filterObject } from '../utils'
@@ -182,7 +182,8 @@ const Notimatica = {
     })
     this.on('autoSubscribe:start', () => {
       this.debug('Autosubscribing started')
-      this.subscribe()
+      this.disableAutoSubscribe()
+        .then(() => this.subscribe())
     })
     this.on('user:interact', (title, message) => {
       let debug = 'User interaction'
@@ -298,7 +299,13 @@ const Notimatica = {
     }
 
     if (!this.isSubscribed()) {
+      this.emit('subscribe:start')
+
       this._driver.subscribe()
+        .then((uuid) => this.emit('subscribe:success', uuid))
+        .catch((err) => {
+          this.emit('subscribe:fail', err)
+        })
     }
   },
 
@@ -313,7 +320,13 @@ const Notimatica = {
     }
 
     if (!this.isUnsubscribed()) {
+      this.emit('unsubscribe:start')
+
       this._driver.unsubscribe()
+        .then(() => this.emit('unsubscribe:success'))
+        .catch((err) => {
+          this.emit('subscribe:fail', err)
+        })
     }
   },
 
@@ -342,11 +355,6 @@ const Notimatica = {
    */
   setTags (tags = []) {
     this.options.tags = tags
-
-    if (this.isSubscribed()) {
-      this._driver.silent = true
-      this._driver.subscribe()
-    }
   },
 
   /**

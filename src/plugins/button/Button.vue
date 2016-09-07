@@ -103,6 +103,7 @@ export default {
     })
 
     Notimatica.on('popup:close', () => {
+      this.acting = false
       this.hidePopover()
     })
 

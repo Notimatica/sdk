@@ -19,20 +19,27 @@ module.exports = class Emulate extends AbstractDriver {
   prepare () {
     return Notimatica.visitor.uuid()
       .then((uuid) => {
-        if (uuid) this.isSubscribed = true
+        this.isSubscribed = !!uuid
       })
       .then(() => Notimatica.emit('driver:ready', this))
   }
 
   /**
-   * Subscribe for https sites using native sdk.
+   * Subscribe.
    *
    * @return {Promise}
    */
   subscribe () {
-    if (!this.silent) Notimatica.emit('subscribe:start')
+    return new Promise((resolve, reject) => {
+      Notimatica.on('provider:subscription-received', (uuid) => {
+        resolve(uuid)
+      })
 
-    return this._finishSubscription('dummy-long-subscriber-uuid')
+      setTimeout(() => {
+        Notimatica.emit('provider:subscription-received', 'dummy-long-subscriber-uuid')
+      }, 2000)
+    })
+      .then((uuid) => this._finishRegistration(uuid))
   }
 
   /**
@@ -41,8 +48,15 @@ module.exports = class Emulate extends AbstractDriver {
    * @return {Promise}
    */
   unsubscribe () {
-    if (!this.silent) Notimatica.emit('unsubscribe:start')
+    return new Promise((resolve, reject) => {
+      Notimatica.on('provider:subscription-removed', () => {
+        resolve()
+      })
 
-    return this._finishUnsubscription()
+      setTimeout(() => {
+        Notimatica.emit('provider:subscription-removed')
+      }, 2000)
+    })
+      .then(() => this._finishUnregistration())
   }
 }

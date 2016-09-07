@@ -16,6 +16,24 @@ const provider = class AbstractProvider {
   pushSupported () {
     return false
   }
+
+  /**
+   * If user is subscribed.
+   *
+   * @return {Promise}
+   */
+  isSubscribed () {
+    return Promise.resolve(false)
+  }
+
+  /**
+   * Get subscription token.
+   *
+   * @return {Promise}
+   */
+  getToken () {
+    return Promise.resolve(null)
+  }
 }
 
 module.exports = provider
