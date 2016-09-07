@@ -169,6 +169,27 @@ export function isHttps () {
 }
 
 /**
+ * If document is ready.
+ *
+ * @param {Function} callback The document ready callback
+ */
+export function documentReady (callback) {
+  if (document.readyState !== 'loading') {
+    callback()
+  } else if (document.addEventListener) {
+    document.addEventListener('DOMContentLoaded', () => {
+      callback()
+    })
+  } else {
+    document.attachEvent('onreadystatechange', () => {
+      if (document.readyState !== 'loading') {
+        callback()
+      }
+    })
+  }
+}
+
+/**
  * Simple find in DOM helper
  *
  * @param  {String|Object} element  The element to search

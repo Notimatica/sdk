@@ -2,7 +2,7 @@ import merge from 'deepmerge'
 import events from '../mixins/events'
 import logs from '../mixins/logs'
 import Visitor from '../visitor'
-import { isHttps, filterObject } from '../utils'
+import { isHttps, filterObject, documentReady } from '../utils'
 import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, DRIVER_EMULATE, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
 
 const Notimatica = {
@@ -62,14 +62,16 @@ const Notimatica = {
 
     if (this.options.project === null && !this.options.emulate) return this.error('Project ID is absent.')
 
-    this._prepareEvents()
-    this._prepareVisitor()
-      .then(() => this._prepareDriver())
-      .catch((err) => {
-        err.message === 'unsupported'
-          ? this.emit('unsupported')
-          : this.emit('error', err)
-      })
+    documentReady(() => {
+      this._prepareEvents()
+      this._prepareVisitor()
+        .then(() => this._prepareDriver())
+        .catch((err) => {
+          err.message === 'unsupported'
+            ? this.emit('unsupported')
+            : this.emit('error', err)
+        })
+    })
   },
 
   /**

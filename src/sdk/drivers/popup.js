@@ -22,23 +22,15 @@ module.exports = class Popup extends AbstractDriver {
   prepare () {
     if (!this.options.subdomain) throw new Error('You have to fill "subdomain" option to use popup fallback for HTTP site.')
 
-    this._prepareNotimaticaEvents()
     this._preparePostEvents()
 
     return this._prepareIframe()
-  }
-
-  /**
-   * Subscribe to SDK events.
-   */
-  _prepareNotimaticaEvents () {
-    Notimatica.on('iframe:ready', (iframeUuid) => {
-      const action = iframeUuid
-        ? this._finishRegistration(iframeUuid)
-        : this._finishUnregistration()
-
-      action.then(() => Notimatica.emit('driver:ready', this))
-    })
+      .then((iframeUuid) => {
+        return iframeUuid
+          ? this._finishRegistration(iframeUuid)
+          : this._finishUnregistration()
+      })
+      .then(() => Notimatica.emit('driver:ready', this))
   }
 
   /**
@@ -50,9 +42,10 @@ module.exports = class Popup extends AbstractDriver {
     const messageEvent = eventMethod === 'attachEvent' ? 'onmessage' : 'message'
 
     eventer(messageEvent, (event) => {
-      if (event.origin.indexOf(`https://${this.options.subdomain}.notimatica.io`) === -1) return
-
-      Notimatica.emit(event.data.event, event.data.data)
+      Notimatica.debug(`Received "${event.data.event}" iframe event from the ${event.origin}.`)
+      if (event.origin.indexOf(`https://${this.options.subdomain}.notimatica.io`) !== -1) {
+        Notimatica.emit(event.data.event, event.data.data)
+      }
     }, false)
   }
 
@@ -63,6 +56,10 @@ module.exports = class Popup extends AbstractDriver {
    */
   _prepareIframe () {
     return new Promise((resolve) => {
+      Notimatica.on('iframe:ready', (iframeUuid) => {
+        resolve(iframeUuid)
+      })
+
       const body = document.body
       const iframe = document.createElement('iframe')
       const query = {
