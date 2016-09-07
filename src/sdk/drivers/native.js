@@ -30,12 +30,8 @@ module.exports = class Native extends AbstractDriver {
               .then((token) => this.register(token))
           case !providerSubscribed && notimaticaSubscribed: // browser unsubscribed, sdk is - unregister
             return this.unregister()
-          case providerSubscribed && notimaticaSubscribed:
-            return true
-          case !providerSubscribed && !notimaticaSubscribed:
-            return false
           default:
-            return true
+            return providerSubscribed && notimaticaSubscribed
         }
       })
       .then((uuid) => {

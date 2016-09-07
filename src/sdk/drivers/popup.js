@@ -118,7 +118,6 @@ module.exports = class Popup extends AbstractDriver {
     return new Promise((resolve) => {
       if (this._popup == null || this._popup.closed) {
         let query = {
-          tags: this.options.tags,
           language: Notimatica.visitor.env.language,
           strings: {
             [Notimatica.visitor.env.language]: {
