@@ -182,8 +182,7 @@ const Notimatica = {
     })
     this.on('autoSubscribe:start', () => {
       this.debug('Autosubscribing started')
-      this.disableAutoSubscribe()
-        .then(() => this.subscribe())
+      this.subscribe()
     })
     this.on('user:interact', (title, message) => {
       let debug = 'User interaction'
@@ -212,6 +211,7 @@ const Notimatica = {
       this.warn('Push notifications are not yet available for your browser.')
     })
     this.on('subscribe:start', () => {
+      this.disableAutoSubscribe()
       this.debug('Start subscribing.')
     })
     this.on('subscribe:success', (token) => {
