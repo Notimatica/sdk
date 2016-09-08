@@ -88,7 +88,6 @@ module.exports = class Popup extends AbstractDriver {
       this._openPopup(this.options.project)
     })
       .then((uuid) => this._finishRegistration(uuid))
-      .catch((err) => Notimatica.emit('subscribe:fail', err))
   }
 
   /**
@@ -105,7 +104,6 @@ module.exports = class Popup extends AbstractDriver {
       this._openPopup(this.options.project)
     })
       .then(() => this._finishUnregistration())
-      .catch((err) => Notimatica.emit('unsubscribe:fail', err))
   }
 
   /**

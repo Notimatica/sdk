@@ -21,7 +21,6 @@ class Plugin extends AbstractPlugin {
    */
   get defaults () {
     return {
-      autorun: true,
       target: 'body',
       css: Notimatica.options.sdkPath + '/notimatica-button.css',
       cssTarget: 'head',

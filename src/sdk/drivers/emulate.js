@@ -31,12 +31,12 @@ module.exports = class Emulate extends AbstractDriver {
    */
   subscribe () {
     return new Promise((resolve, reject) => {
-      Notimatica.on('provider:subscription-received', (uuid) => {
+      Notimatica.on('provider:subscribed', (uuid) => {
         resolve(uuid)
       })
 
       setTimeout(() => {
-        Notimatica.emit('provider:subscription-received', 'dummy-long-subscriber-uuid')
+        Notimatica.emit('provider:subscribed', 'dummy-long-subscriber-uuid')
       }, 2000)
     })
       .then((uuid) => this._finishRegistration(uuid))
@@ -49,12 +49,12 @@ module.exports = class Emulate extends AbstractDriver {
    */
   unsubscribe () {
     return new Promise((resolve, reject) => {
-      Notimatica.on('provider:subscription-removed', () => {
+      Notimatica.on('provider:unsubscribed', () => {
         resolve()
       })
 
       setTimeout(() => {
-        Notimatica.emit('provider:subscription-removed')
+        Notimatica.emit('provider:unsubscribed')
       }, 2000)
     })
       .then(() => this._finishUnregistration())

@@ -47,7 +47,7 @@ module.exports = class Native extends AbstractDriver {
    */
   subscribe () {
     return new Promise((resolve) => {
-      Notimatica.on('provider:subscription-received', (subscription) => {
+      Notimatica.on('provider:subscribed', (subscription) => {
         resolve(subscription)
       })
 
@@ -63,7 +63,7 @@ module.exports = class Native extends AbstractDriver {
    */
   unsubscribe () {
     return new Promise((resolve) => {
-      Notimatica.on('provider:subscription-removed', () => {
+      Notimatica.on('provider:unsubscribed', () => {
         resolve()
       })
 
