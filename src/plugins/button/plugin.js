@@ -62,7 +62,7 @@ class Plugin extends AbstractPlugin {
         'button.tooltip.subscribe': 'Подписаться на уведомления',
         'button.tooltip.unsubscribe': 'Отписаться от уведомлений',
         'button.tooltip.message': 'У вас новое сообщение'
-      },
+      }
     }
   }
 
