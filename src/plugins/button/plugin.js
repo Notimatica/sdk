@@ -44,14 +44,24 @@ class Plugin extends AbstractPlugin {
   get strings () {
     return {
       'en': {
-        'button.popover.subscribe': "Do you want to recieve desktop notifications from us? Click Subscribe button!",
-        'button.popover.unsubscribe': "If you don't want to recieve notifications anymore, click Unsubscribe button.",
+        'button.popover.subscribe': "Do you want to recieve notifications from us? Click Subscribe!",
+        'button.popover.unsubscribe': "If you don't want to recieve notifications anymore, click Unsubscribe.",
         'button.popover.button.subscribe': 'Subscribe',
         'button.popover.button.unsubscribe': 'Unsubscribe',
-        'button.popover.button.cancel': 'Not now',
+        'button.popover.button.cancel': 'Later',
         'button.tooltip.subscribe': 'Subscribe to notifications',
         'button.tooltip.unsubscribe': 'Unsubscribe from notifications',
         'button.tooltip.message': 'There is a message for you'
+      },
+      'ru': {
+        'button.popover.subscribe': "Хотите получать уведомления от нас? Нажмите на кнопку Подписаться!",
+        'button.popover.unsubscribe': "Если вы не хотите больше получать уведомления – нажмите на кнопку Отписаться.",
+        'button.popover.button.subscribe': 'Подписаться',
+        'button.popover.button.unsubscribe': 'Отписаться',
+        'button.popover.button.cancel': 'Позже',
+        'button.tooltip.subscribe': 'Подписаться на уведомления',
+        'button.tooltip.unsubscribe': 'Отписаться от уведомлений',
+        'button.tooltip.message': 'У вас новое сообщение'
       }
     }
   }
