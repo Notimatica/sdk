@@ -43,6 +43,11 @@ class Plugin extends AbstractPlugin {
         'prompt.subscribe': "Do you want to recieve desktop notifications from us? Click Subscribe button!",
         'prompt.button.subscribe': 'Subscribe',
         'prompt.button.cancel': 'Not now'
+      },
+      'ru': {
+      	'prompt.subscribe': "Хотите получать уведомления от нас? Нажмите на кнопку Подписаться!",
+        'prompt.button.subscribe': 'Подписаться',
+        'prompt.button.cancel': 'Не сейчас'
       }
     }
   }

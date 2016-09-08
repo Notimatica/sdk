@@ -52,7 +52,17 @@ class Plugin extends AbstractPlugin {
         'button.tooltip.subscribe': 'Subscribe to notifications',
         'button.tooltip.unsubscribe': 'Unsubscribe from notifications',
         'button.tooltip.message': 'There is a message for you'
-      }
+      },
+      'ru': {
+        'button.popover.subscribe': "Хотите получать уведомления от нас? Нажмите на кнопку Подписаться!",
+        'button.popover.unsubscribe': "Если вы не хотите больше получать уведомления – нажмите на кнопку Отписаться.",
+        'button.popover.button.subscribe': 'Подписаться',
+        'button.popover.button.unsubscribe': 'Отписаться',
+        'button.popover.button.cancel': 'Не сейчас',
+        'button.tooltip.subscribe': 'Подписаться на уведомления',
+        'button.tooltip.unsubscribe': 'Отписаться от уведомлений',
+        'button.tooltip.message': 'У вас новое сообщение'
+      },
     }
   }
 
