@@ -43,7 +43,7 @@ module.exports = class Popup extends AbstractDriver {
 
     eventer(messageEvent, (event) => {
       Notimatica.debug(`Received "${event.data.event}" iframe event from the ${event.origin}.`)
-      if (event.origin.indexOf(`https://${this.options.subdomain}.notimatica.io`) !== -1) {
+      if (event.origin.indexOf(this._fallbackAddress()) !== -1) {
         Notimatica.emit(event.data.event, event.data.data)
       }
     }, false)
