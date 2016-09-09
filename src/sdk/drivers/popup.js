@@ -156,8 +156,6 @@ module.exports = class Popup extends AbstractDriver {
    * @return {String}
    */
   _fallbackAddress () {
-    return /^https?:\/\//.test(this.options.subdomain)
-      ? this.options.subdomain
-      : `https://${this.options.subdomain}.notimatica.io`
+    return `https://${this.options.subdomain}.notimatica.io`
   }
 }
