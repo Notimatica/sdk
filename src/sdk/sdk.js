@@ -29,7 +29,7 @@ const Notimatica = {
     plugins: {},
     sdkPath: SDK_PATH,
     strings: {},
-    defaultLocale: 'en',
+    locale: '',
     webhooks: {},
     webhooksCors: true
   },

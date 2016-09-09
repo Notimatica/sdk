@@ -67,7 +67,7 @@ module.exports = class Popup extends AbstractDriver {
         parent: document.location.href
       }
 
-      iframe.src = `https://${this.options.subdomain}.notimatica.io/http-iframe?${toQueryString(query)}`
+      iframe.src = `${this._fallbackAddress()}/http-iframe?${toQueryString(query)}`
       iframe.name = 'notimatica-iframe'
       iframe.style = 'width:0; height:0; border:0; border:none'
       body.appendChild(iframe)
@@ -115,7 +115,7 @@ module.exports = class Popup extends AbstractDriver {
   _openPopup (project) {
     return new Promise((resolve) => {
       if (this._popup == null || this._popup.closed) {
-        let query = {
+        const options = {
           language: Notimatica.visitor.env.language,
           strings: {
             [Notimatica.visitor.env.language]: {
@@ -130,10 +130,16 @@ module.exports = class Popup extends AbstractDriver {
           }
         }
 
-        query = base64.fromByteArray(new TextEncoderLite('utf-8').encode(JSON.stringify(query)))
+        const query = {
+          options: base64.fromByteArray(
+              new TextEncoderLite('utf-8').encode(
+                JSON.stringify(options)
+              )
+            )
+        }
 
         this._popup = window.open(
-          `https://${this.options.subdomain}.notimatica.io/?options=${query}`,
+          `${this._fallbackAddress()}/?${toQueryString(query)}`,
           'notimatica_popup',
           `width=${this.options.popup.width},height=${this.options.popup.height},toolbar=0,resizable=0,scrollbars=0,location=0,menubar=0,status=0`)
       } else {
@@ -142,5 +148,16 @@ module.exports = class Popup extends AbstractDriver {
 
       resolve(this._popup)
     })
+  }
+
+  /**
+   * Generate fallback address.
+   *
+   * @return {String}
+   */
+  _fallbackAddress () {
+    return /^https?:\/\//.test(this.options.subdomain)
+      ? this.options.subdomain
+      : `https://${this.options.subdomain}.notimatica.io`
   }
 }

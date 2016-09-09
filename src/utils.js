@@ -1,4 +1,4 @@
-import { PROVIDERS_ENDPOINTS } from './defaults'
+import { PROVIDERS_ENDPOINTS, LOCALE } from './defaults'
 
 /**
  * If varible is string.
@@ -252,11 +252,15 @@ export function getQueryParameter (name, url) {
  * @return {String}
  */
 export function locale () {
-  const l = Notimatica.visitor.env.language
+  function localeExist (l) {
+    return typeof Notimatica.strings[l] !== 'undefined'
+  }
 
-  return typeof Notimatica.strings[l] !== 'undefined'
-    ? l
-    : Notimatica.options.defaultLocale
+  return localeExist(Notimatica.options.locale)
+    ? Notimatica.options.locale
+    : localeExist(Notimatica.visitor.env.language)
+      ? Notimatica.visitor.env.language
+      : LOCALE
 }
 
 /**
