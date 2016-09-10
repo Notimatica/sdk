@@ -51,7 +51,7 @@ class Plugin extends AbstractPlugin {
         'button.popover.button.cancel': 'Later',
         'button.tooltip.subscribe': 'Subscribe to notifications',
         'button.tooltip.unsubscribe': 'Unsubscribe from notifications',
-        'button.tooltip.message': 'New notifocation'
+        'button.tooltip.message': 'New notification'
       },
       'ru': {
         'button.popover.subscribe': "Хотите получать уведомления от {project}? Нажмите Подписаться!",
