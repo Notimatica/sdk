@@ -40,12 +40,12 @@ class Plugin extends AbstractPlugin {
   get strings () {
     return {
       'en': {
-        'prompt.subscribe': "Do you want to receive notifications from {project}? Click Subscribe!",
+        'prompt.subscribe': "Do you want to receive notifications from us? Click Subscribe!",
         'prompt.button.subscribe': 'Subscribe',
         'prompt.button.cancel': 'Later'
       },
       'ru': {
-        'prompt.subscribe': "Хотите получать уведомления от {project}? Нажмите Подписаться!",
+        'prompt.subscribe': "Хотите получать уведомления от нас? Нажмите Подписаться!",
         'prompt.button.subscribe': 'Подписаться',
         'prompt.button.cancel': 'Позже'
       }

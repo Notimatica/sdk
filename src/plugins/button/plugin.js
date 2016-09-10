@@ -44,8 +44,8 @@ class Plugin extends AbstractPlugin {
   get strings () {
     return {
       'en': {
-        'button.popover.subscribe': "Do you want to receive notifications from {project}? Click Subscribe!",
-        'button.popover.unsubscribe': "Don\'t want to recieve notifications anymore? Click Unsubscribe.",
+        'button.popover.subscribe': "Do you want to receive notifications from us? Click Subscribe!",
+        'button.popover.unsubscribe': "Don't want to recieve notifications anymore? Click Unsubscribe.",
         'button.popover.button.subscribe': 'Subscribe',
         'button.popover.button.unsubscribe': 'Unsubscribe',
         'button.popover.button.cancel': 'Later',
