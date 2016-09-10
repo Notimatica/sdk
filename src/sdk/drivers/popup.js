@@ -20,7 +20,7 @@ module.exports = class Popup extends AbstractDriver {
    * @return {Promise}
    */
   prepare () {
-    if (!this.options.subdomain) throw new Error('You have to fill "subdomain" option to use popup fallback for HTTP site.')
+    if (!this.options.subdomain) throw new Error('You have to fill "Subdomain" option to use popup fallback for HTTP-site.')
 
     this._preparePostEvents()
 
