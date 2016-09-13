@@ -1,7 +1,7 @@
 /*global init */
 
 var options = {
-  project: '08823593-135f-5576-9a91-f3a0675aa1d2', safariWebId: 'web.io.notimatica',
+  emulate: true,
   debug: true,
   autoSubscribe: true,
   tags: [
