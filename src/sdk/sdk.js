@@ -36,22 +36,22 @@ const Notimatica = {
   options: {},
   strings: {
     en: {
-      'popup.welcome': 'Subscribe to {project}',
-      'popup.subscribe': 'Do you want to receive notifications from {project}?',
-      'popup.subscribed': 'You are subscribed to notifications from {project}.',
+      'popup.welcome': '{project}',
+      'popup.subscribe': 'Do you want to receive notifications from {project}? Click Subscribe!',
+      'popup.subscribed': 'Don\'t want to recieve notifications anymore? Click Unsubscribe.',
       'popup.unsupported': 'Your browser doesn\'t support push notifications.',
       'popup.buttons.subscribe': 'Subscribe',
       'popup.buttons.unsubscribe': 'Unsubscribe',
-      'popup.buttons.cancel': 'Cancel'
+      'popup.buttons.cancel': 'Later'
     },
     ru: {
-      'popup.welcome': 'Подписаться на {project}',
-      'popup.subscribe': 'Хотите получать уведомления от {project}?',
-      'popup.subscribed': 'Вы подписаны на уведомления от {project}.',
+      'popup.welcome': '{project}',
+      'popup.subscribe': 'Хотите получать уведомления от {project}? Нажмите Подписаться!',
+      'popup.subscribed': 'Не хотите больше получать уведомления? Нажмите Отписаться.',
       'popup.unsupported': 'Ваш браузер не поддерживает уведомления.',
       'popup.buttons.subscribe': 'Подписаться',
       'popup.buttons.unsubscribe': 'Отписаться',
-      'popup.buttons.cancel': 'Отмена'
+      'popup.buttons.cancel': 'Позже'
     }
   },
 
