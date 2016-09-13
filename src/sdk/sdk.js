@@ -176,8 +176,7 @@ const Notimatica = {
     this.on('plugin:ready', (plugin) => {
       this.strings = merge(plugin.strings, this.strings)
 
-      // Init plugin and only after that add it to the _plugins registry
-      // If every plugin is inited, run _ready, because we are...ready
+      // Init plugin and only after that add it to the _plugins repository
       plugin.init(this.options.plugins[plugin.name])
         .then(() => {
           this.debug(`Plugin "${plugin.name}" inited`)
@@ -189,6 +188,7 @@ const Notimatica = {
         })
     })
     this.on('plugin:all-ready', () => {
+      // When every plugin is inited, run _ready, because we are...ready
       this._ready()
     })
     this.on('autoSubscribe:start', () => {

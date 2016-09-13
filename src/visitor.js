@@ -11,7 +11,7 @@ module.exports = class Visitor {
   }
 
   /**
-   * Get user ID.
+   * Get subscriber ID.
    *
    * @return {Promise}
    */

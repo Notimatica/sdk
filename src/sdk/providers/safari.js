@@ -1,7 +1,7 @@
 require('whatwg-fetch')
 
 import AbstractProvider from './abstract'
-import { PROVIDER_SAFARI, API_URL } from '../../defaults'
+import { PROVIDER_SAFARI, PROVIDERS_ENDPOINTS } from '../../defaults'
 
 const provider = class Safari extends AbstractProvider {
   /**
@@ -114,8 +114,10 @@ const provider = class Safari extends AbstractProvider {
    * Helper to request permission to subscribe.
    */
   _requestPermission () {
+    const url = PROVIDERS_ENDPOINTS[PROVIDER_SAFARI].replace('%', this.options.project)
+
     window.safari.pushNotification.requestPermission(
-      `${API_URL}/v1/projects/${this.options.project}/safari`, // The web service URL.
+      url, // The web service URL.
       this.options.safariWebId,
       {},
       (permissionData) => {

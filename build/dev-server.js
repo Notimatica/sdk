@@ -55,21 +55,6 @@ app.use(hotMiddleware)
 // serve pure static assets
 app.use(express.static('./example'))
 
-// POST method route
-app.post('/webhook/show', function (req, res) {
-  res.json(req.params)
-})
-
-// POST method route
-app.post('/webhook/click', function (req, res) {
-  res.json(req.params)
-})
-
-// POST method route
-app.post('/webhook/close', function (req, res) {
-  res.json(req.params)
-})
-
 module.exports = app.listen(port, function (err) {
   if (err) {
     console.log(err)

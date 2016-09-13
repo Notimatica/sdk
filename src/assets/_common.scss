@@ -1,5 +1,8 @@
 $text-color: #1e3948;
 $border-color: #d3e0e9;
+$subscribe-color: #00c385;
+$unsubscribe-color: #f0ad4e;
+
 
 .notimatica-reset {
   margin: 0;
@@ -7,6 +10,7 @@ $border-color: #d3e0e9;
   border: 0;
   outline: 0;
   font-size: 100%;
+  font-family: Helvetica, Arial, sans-serif;
   vertical-align: baseline;
   background: transparent;
   line-height: 1;
@@ -22,8 +26,7 @@ $border-color: #d3e0e9;
 }
 
 .notimatica-clearfix {
-  &:before,
-  &:after {
+  &:before, &:after {
     content: " ";
     display: table;
   }
@@ -53,4 +56,53 @@ $border-color: #d3e0e9;
 
 .notimatica-pull-right {
   float: right;
+}
+
+.notimatica-common-button {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 300;
+  text-align: center;
+  color: #fff;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.8;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  transition: all 0.2s linear;
+}
+
+.notimatica-common-button-link {
+  color: $text-color;
+  font-weight: 400;
+  background-color: transparent;
+  border-color: transparent;
+  border-radius: 0;
+  &:hover, &:focus, &:active {
+    text-decoration: underline;
+  }
+}
+
+.notimatica-subscribe {
+  .notimatica-common-button-action {
+    background-color: $subscribe-color;
+    &:hover, &:focus, &:active {
+      background-color: darken($subscribe-color, 10%);
+    }
+  }
+}
+
+.notimatica-unsubscribe {
+  .notimatica-common-button-action {
+    background-color: $unsubscribe-color;
+    &:hover, &:focus, &:active {
+      background-color: darken($unsubscribe-color, 10%);
+    }
+  }
 }

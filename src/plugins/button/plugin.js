@@ -2,7 +2,7 @@ require('./button.scss')
 
 import Vue from 'vue'
 import AbstractPlugin from '../abstract'
-import Button from './Button'
+import FloatingButton from './Button'
 
 class Plugin extends AbstractPlugin {
   /**
@@ -73,8 +73,8 @@ class Plugin extends AbstractPlugin {
    */
   get template () {
     /*eslint quotes: 0*/
-    return `<div class="notimatica-reset notimatica-plugin-wrapper notimatica-plugin-button-wrapper notimatica-plugin-button-${this.options.position}">
-      <button :position="position" :use-popover="usePopover" :click="click"></button>
+    return `<div class="notimatica-reset notimatica-plugin-wrapper notimatica-plugin-button-wrapper">
+      <floating-button :position="position" :use-popover="usePopover" :click="click"></floating-button>
     </div>`
   }
 
@@ -115,7 +115,7 @@ class Plugin extends AbstractPlugin {
         click: this.options.click
       },
       components: {
-        Button
+        FloatingButton
       }
     })
   }

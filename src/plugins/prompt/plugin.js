@@ -60,13 +60,13 @@ class Plugin extends AbstractPlugin {
   get template () {
     /*eslint quotes: 0*/
     return `<div class="notimatica-reset notimatica-plugin-wrapper notimatica-plugin-prompt-wrapper">
-      <div class="notimatica-prompt notimatica-fade">
+      <div class="notimatica-prompt notimatica-subscribe notimatica-fade">
           <div class="notimatica-prompt-content">
             ${t('prompt.subscribe')}
           </div>
           <div class="notimatica-prompt-footer">
-            <button class="notimatica-pull-left action">${t('prompt.button.subscribe')}</button>
-            <button class="notimatica-pull-right cancel">${t('prompt.button.cancel')}</button>
+            <button class="notimatica-pull-left notimatica-common-button notimatica-common-button-action">${t('prompt.button.subscribe')}</button>
+            <button class="notimatica-pull-right notimatica-common-button notimatica-common-button-link">${t('prompt.button.cancel')}</button>
             <div class="clearfix"></div>
           </div>
         </div>
@@ -100,12 +100,12 @@ class Plugin extends AbstractPlugin {
    * Play widget.
    */
   play () {
-    $('button.action', '.notimatica-prompt-footer').on('click', () => {
+    $('button.notimatica-common-button-action', '.notimatica-prompt-footer').on('click', () => {
       this._hide()
       this.options.click()
     })
 
-    $('button.cancel', '.notimatica-prompt-footer').on('click', () => {
+    $('button.notimatica-common-button-link', '.notimatica-prompt-footer').on('click', () => {
       this._hide()
     })
   }

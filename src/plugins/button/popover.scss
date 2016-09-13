@@ -16,44 +16,6 @@ $popover-width: 396px;
   line-height: 1.4;
   background-color: #fff;
   color: $text-color;
-
-  button {
-    display: inline-block;
-    margin-bottom: 0;
-    font-weight: 300;
-    text-align: center;
-    vertical-align: middle;
-    touch-action: manipulation;
-    cursor: pointer;
-    background-image: none;
-    border: 1px solid transparent;
-    white-space: nowrap;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.8;
-    border-radius: 4px;
-    -webkit-user-select: none;
-
-    &.action {
-      color: #fff;
-      background-color: #00c385;
-      border-color: #00aa74;
-      &:hover {
-        background-color: #009062;
-        border-color: #006c4a;
-      }
-    }
-
-    &.cancel {
-      color: $text-color;
-      background-color: #fff;
-      border-color: $border-color;
-      &:hover {
-        background-color: #f5fbff;
-        border-color: $border-color;
-      }
-    }
-  }
 }
 
 .notimatica-popover-title,
@@ -85,7 +47,7 @@ $popover-width: 396px;
   font-size: 14px;
 }
 
-.notimatica-plugin-button-bottom-right {
+.notimatica-button-bottom-right {
   .notimatica-popover {
     bottom: 100px;
     right: 30px;
@@ -95,7 +57,7 @@ $popover-width: 396px;
   }
 }
 
-.notimatica-plugin-button-bottom-left {
+.notimatica-button-bottom-left {
   .notimatica-popover {
     bottom: 100px;
     left: 30px;
@@ -105,7 +67,7 @@ $popover-width: 396px;
   }
 }
 
-.notimatica-plugin-button-top-left {
+.notimatica-button-top-left {
   .notimatica-popover {
     top: 100px;
     left: 30px;
@@ -115,7 +77,7 @@ $popover-width: 396px;
   }
 }
 
-.notimatica-plugin-button-top-right {
+.notimatica-button-top-right {
   .notimatica-popover {
     top: 100px;
     right: 30px;

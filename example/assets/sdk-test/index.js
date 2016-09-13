@@ -1,7 +1,7 @@
 /*global init */
 
 var options = {
-  emulate: true,
+  project: '08823593-135f-5576-9a91-f3a0675aa1d2', safariWebId: 'web.io.notimatica',
   debug: true,
   autoSubscribe: true,
   tags: [
@@ -20,9 +20,9 @@ var options = {
     }
   },
   webhooks: {
-    'notification:show': 'http://localhost:8081/webhook/show',
-    'notification:click': 'http://localhost:8081/webhook/click',
-    'notification:close': 'http://localhost:8081/webhook/close'
+    'notification:show': 'https://dev.notimatica.io/webhook/show',
+    'notification:click': 'https://dev.notimatica.io/webhook/click',
+    'notification:close': 'https://dev.notimatica.io/webhook/close'
   }
 }
 
@@ -111,7 +111,7 @@ $(function () {
             message = 'Unknown error'
         }
 
-        $('.send-test-message-result').addClass('text-danger').text(message)
+        $('.send-test-message-result').show().addClass('text-danger').text(message)
         setTimeout(function () {
           $('.send-test-message-result').fadeOut(1000, function () {
             $(this).removeClass('text-danger').text('')
