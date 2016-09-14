@@ -20,12 +20,15 @@ class Plugin extends AbstractPlugin {
    * @return {Object}
    */
   get defaults () {
+    // Disable popover for popup users by default
+    const usePopover = !Notimatica.shouldUsePopup()
+
     return {
       target: 'body',
       css: Notimatica.options.sdkPath + '/notimatica-button.css',
       cssTarget: 'head',
       position: 'bottom-right', // bottom-right, bottom-left, top-right, top-left
-      usePopover: true,
+      usePopover: usePopover,
       click: () => {
         Notimatica.emit('plugin:button:clicked')
 

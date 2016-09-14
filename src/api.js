@@ -10,7 +10,7 @@ import { VERSION, API_URL, POSTMAN_URL } from './defaults'
  * @param  {Boolean} cors   Uses cors headers
  * @return {Promise}
  */
-export const httpCall = function (method, url, data, headers, cors = true) {
+export const httpCall = function (method, url, data = null, headers = {}, cors = true) {
   headers = Object.assign({
     'Content-type': 'application/json',
     'Accept': 'application/json'
@@ -21,7 +21,7 @@ export const httpCall = function (method, url, data, headers, cors = true) {
     headers: cors ? headers : {},
     cache: 'no-cache',
     mode: cors ? 'cors' : 'no-cors',
-    body: JSON.stringify(data)
+    body: data !== null ? JSON.stringify(data) : null
   })
     .then((response) => {
       if (response.status >= 200 && response.status < 300) {
