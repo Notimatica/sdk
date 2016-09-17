@@ -236,7 +236,7 @@ var NSW = {
       NSW.storage.get('key_value', 'webhooks'),
       NSW.storage.get('key_value', 'webhooksCors')
     ])
-      .then(([ webhooks, webhookCors ]) => {
+      .then(([ webhooks, webhooksCors ]) => {
         if (webhooks.value[webhook]) {
           const hook = webhooks.value[webhook]
           const data = {
@@ -254,7 +254,7 @@ var NSW = {
           return httpCall('post', hook, data, {
             'X-Notimatica-SDK': VERSION,
             'X-Notimatica-SDK-Event': webhook
-          }, webhookCors.value)
+          }, webhooksCors.value)
         }
       })
   }

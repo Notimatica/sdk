@@ -21,7 +21,8 @@ var options = {
     'notification:show': 'https://dev.notimatica.io/webhook/show',
     'notification:click': 'https://dev.notimatica.io/webhook/click',
     'notification:close': 'https://dev.notimatica.io/webhook/close'
-  }
+  },
+  webhooksCors: false
 }
 
 init(options)
