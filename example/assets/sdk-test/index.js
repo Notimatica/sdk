@@ -4,11 +4,9 @@ var options = {
   emulate: true,
   debug: true,
   autoSubscribe: true,
-  tags: [
-    123456789,
-    'foo',
-    'bar'
-  ],
+  extra: {
+    group: 'anonymous'
+  },
   plugins: {
     button: {
       enable: true

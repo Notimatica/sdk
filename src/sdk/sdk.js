@@ -2,8 +2,8 @@ import merge from 'deepmerge'
 import events from '../mixins/events'
 import logs from '../mixins/logs'
 import Visitor from '../visitor'
-import { isHttps, filterObject, documentReady } from '../utils'
-import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, DRIVER_EMULATE, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH } from '../defaults'
+import { isHttps, isIframe, filterObject, isPlainObject, documentReady } from '../utils'
+import { DEBUG, DRIVER_NATIVE, DRIVER_POPUP, DRIVER_IFRAME, DRIVER_EMULATE, POPUP_HEIGHT, POPUP_WIGHT, SDK_PATH, EXTRA_MAX_LENGTH } from '../defaults'
 
 const Notimatica = {
   _inited: false,
@@ -112,15 +112,13 @@ const Notimatica = {
     let script
 
     for (let name in Notimatica._enabledPlugins) {
-      if (this.options.plugins[name].enable) {
-        head = document.head
-        script = document.createElement('script')
+      head = document.head
+      script = document.createElement('script')
 
-        script.type = 'text/javascript'
-        script.src = `${this.options.sdkPath}/notimatica-${name}.js`
-        script.async = 'true'
-        head.appendChild(script)
-      }
+      script.type = 'text/javascript'
+      script.src = `${this.options.sdkPath}/notimatica-${name}.js`
+      script.async = 'true'
+      head.appendChild(script)
     }
   },
 
@@ -139,6 +137,7 @@ const Notimatica = {
       { key: 'pageTitle', value: document.title },
       { key: 'baseUrl', value: document.location.origin }
     ])
+      .then(() => this.setExtra(this.options.extra))
   },
 
   /**
@@ -150,9 +149,11 @@ const Notimatica = {
   _prepareDriver () {
     const driver = this.options.emulate
       ? DRIVER_EMULATE
-      : this.shouldUsePopup()
-        ? DRIVER_POPUP
-          : DRIVER_NATIVE
+      : isIframe()
+        ? DRIVER_IFRAME
+        : this.shouldUsePopup()
+          ? DRIVER_POPUP
+            : DRIVER_NATIVE
     const Driver = require('./drivers/' + driver)
 
     this._driver = new Driver(this.options)
@@ -221,15 +222,18 @@ const Notimatica = {
     this.on('unsupported', (message) => {
       this.warn('Push notifications are not yet available for your browser.')
     })
+    this.on('provider:subscribed', (token) => {
+      this.debug('Browser subscribed', token)
+    })
+    this.on('provider:unsubscribed', () => {
+      this.debug('Browser unsubscribed')
+    })
     this.on('subscribe:start', () => {
       this.disableAutoSubscribe()
       this.debug('Start subscribing.')
     })
-    this.on('subscribe:success', (token) => {
-      this.debug('User subscribed with token', token)
-    })
-    this.on('subscribe:subscription', (subscription) => {
-      this.debug('Subscription recieved', subscription)
+    this.on('subscribe:success', (uuid) => {
+      this.debug('User subscribed with uuid', uuid)
     })
     this.on('subscribe:fail', (err) => {
       this.error('Subscription failed', err)
@@ -364,8 +368,20 @@ const Notimatica = {
    *
    * @type {Array}
    */
-  setTags (tags = []) {
-    this.options.tags = tags
+  setExtra (extra) {
+    if (!isPlainObject(extra)) throw new Error('User\'s extra params should be a plain key:value map.')
+
+    if (Object.keys(extra) > EXTRA_MAX_LENGTH) throw new Error('You can not set more than 5 extra params for the user.')
+
+    this.options.extra = extra
+
+    this.visitor.setExtra(extra)
+      .then((changed) => {
+        if (changed) this.emit('visitor:set-extra')
+      })
+      .catch((e) => {
+        this.error(e.message)
+      })
   },
 
   /**

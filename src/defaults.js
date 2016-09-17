@@ -13,6 +13,7 @@ export const ENV_SW = 'sw'
 
 export const DRIVER_NATIVE = 'native'
 export const DRIVER_POPUP = 'popup'
+export const DRIVER_IFRAME = 'iframe'
 export const DRIVER_EMULATE = 'emulate'
 
 export const PROVIDER_CHROME = 'chrome'
@@ -30,6 +31,7 @@ export const PROVIDERS_ENDPOINTS = {
 export const POPUP_HEIGHT = 450
 export const POPUP_WIGHT = 550
 
+export const EXTRA_MAX_LENGTH = 5
 export const AUTOSUBSCRIBE = true
 export const LOCALE = 'en'
 export const DB_VERSION = 1

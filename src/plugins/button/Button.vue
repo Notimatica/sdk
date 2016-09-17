@@ -95,6 +95,15 @@ export default {
       }, 200)
     })
 
+    Notimatica.on('subscribe:fail', () => {
+      if (this.popoverActive) this.hidePopover()
+
+      setTimeout(() => {
+        this.acting = false
+        this.setMessage('Subscription failed.', 'Subscription failed for some reason. Please, try again later.')
+      }, 200)
+    })
+
     Notimatica.on('unsubscribe:start', () => {
       this.acting = true
     })

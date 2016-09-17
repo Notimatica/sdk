@@ -3,7 +3,7 @@ import { PROVIDERS_ENDPOINTS, LOCALE } from './defaults'
 /**
  * If varible is string.
  *
- * @param  {*}  el The varible
+ * @param  {*}  varible The varible
  * @return {Boolean}
  */
 export function isString (varible) {
@@ -11,19 +11,25 @@ export function isString (varible) {
 }
 
 /**
- * If varible is object.
+ * If varible is a plain object.
  *
- * @param  {*}  el The varible
+ * @param  {*}  varible The varible
  * @return {Boolean}
  */
-export function isObject (varible) {
-  return varible instanceof Object
+export function isPlainObject (varible) {
+  if (Object.prototype.toString.call(varible) !== '[object Object]') {
+    return false
+  } else {
+    const prototype = Object.getPrototypeOf(varible)
+
+    return prototype === null || prototype === Object.prototype
+  }
 }
 
 /**
  * If varible is function.
  *
- * @param  {*}  el The varible
+ * @param  {*}  varible The varible
  * @return {Boolean}
  */
 export function isFunction (varible) {
@@ -33,7 +39,7 @@ export function isFunction (varible) {
 /**
  * If varible is array.
  *
- * @param  {*}  el The varible
+ * @param  {*}  varible The varible
  * @return {Boolean}
  */
 export function isArray (varible) {
@@ -166,6 +172,19 @@ export function isHttps () {
   if (typeof window === 'undefined') return false
 
   return window.location.protocol === 'https:' || window.location.hostname === 'localhost'
+}
+
+/**
+ * If page lodaed in iframe.
+ *
+ * @return {Boolean}
+ */
+export function isIframe () {
+  try {
+    return window.self !== window.top
+  } catch (e) {
+    return true
+  }
 }
 
 /**

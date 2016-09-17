@@ -22,6 +22,10 @@ module.exports = class Popup extends AbstractDriver {
   prepare () {
     if (!this.options.subdomain) throw new Error('You have to fill "subdomain" option to use popup fallback for HTTP-site.')
 
+    Notimatica.on('visitor:set-extra', () => {
+      this._prepareIframe()
+    })
+
     this._preparePostEvents()
 
     return this._prepareIframe()
@@ -60,17 +64,22 @@ module.exports = class Popup extends AbstractDriver {
         resolve(iframeUuid)
       })
 
-      const body = document.body
-      const iframe = document.createElement('iframe')
-      const query = {
-        tags: this.options.tags,
+      if (this.iframe) this.iframe.remove()
+
+      this.iframe = document.createElement('iframe')
+      const options = {
+        extra: base64.fromByteArray(
+            new TextEncoderLite('utf-8').encode(
+              JSON.stringify(this.options.extra)
+            )
+          ),
         parent: document.location.href
       }
 
-      iframe.src = `${this._fallbackAddress()}/http-iframe?${toQueryString(query)}`
-      iframe.name = 'notimatica-iframe'
-      iframe.style = 'width:0; height:0; border:0; border:none'
-      body.appendChild(iframe)
+      this.iframe.src = `${this._fallbackAddress()}/http-iframe?${toQueryString(options)}`
+      this.iframe.name = 'notimatica-iframe'
+      this.iframe.style = 'width:0; height:0; border:0; border:none'
+      document.body.appendChild(this.iframe)
     })
   }
 
@@ -116,7 +125,7 @@ module.exports = class Popup extends AbstractDriver {
     return new Promise((resolve) => {
       if (this._popup == null || this._popup.closed) {
         const options = {
-          language: Notimatica.visitor.env.language,
+          extra: this.options.extra,
           strings: {
             [Notimatica.visitor.env.language]: {
               'welcome': t('popup.welcome'),

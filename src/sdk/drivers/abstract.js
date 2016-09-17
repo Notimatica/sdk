@@ -1,3 +1,5 @@
+import { makeToken } from '../../utils'
+import { subscribe, unsubscribe } from '../../api'
 import { PROVIDER_CHROME, PROVIDER_FIREFOX, PROVIDER_SAFARI, PROVIDER_UNKNOWN } from '../../defaults'
 
 module.exports = class AbstractDriver {
@@ -41,7 +43,7 @@ module.exports = class AbstractDriver {
   _finishRegistration (uuid) {
     this.isSubscribed = true
 
-    return Notimatica.visitor.uuid(uuid)
+    return Notimatica.visitor.setUuid(uuid)
       .then((data) => data.value)
   }
 
@@ -54,7 +56,7 @@ module.exports = class AbstractDriver {
   _finishUnregistration () {
     this.isSubscribed = false
 
-    return Notimatica.visitor.uuid(null)
+    return Notimatica.visitor.deleteUuid()
   }
 
   /**
@@ -79,5 +81,61 @@ module.exports = class AbstractDriver {
 
     const Provider = require('../providers/' + provider)
     this.provider = new Provider(this.options)
+  }
+
+  /**
+   * Call notimatica API to register subscriber.
+   *
+   * @param   {Object} subscription
+   * @returns {Promise}
+   */
+  _register (subscription) {
+    const env = Notimatica.visitor.env
+    const provider = this.provider.name
+    const data = {
+      provider: provider,
+      token: makeToken(subscription, provider),
+      browser: env.browser,
+      browser_version: env.browserMajorVersion,
+      cookies: env.cookies,
+      flash: env.flashVersion,
+      mobile: env.mobile,
+      os: env.os,
+      os_version: env.osVersion,
+      screen: env.screen,
+      timezone: env.timezone,
+      language: env.language,
+      extra: this.options.extra
+    }
+
+    Notimatica.emit('register:start', data)
+
+    return subscribe(this.options.project, data)
+      .then((data) => {
+        Notimatica.emit('register:success', data)
+
+        return data.subscriber.uuid
+      })
+  }
+
+  /**
+   * Delete subscription from notimatica.
+   *
+   * @param  {Object|null} uuid Subscriber's notimatica uuid
+   * @return {Promise}
+   */
+  _unregister (uuid) {
+    if (!uuid) return
+
+    const data = {
+      uuid
+    }
+
+    Notimatica.emit('unregister:start', data)
+
+    return unsubscribe(this.options.project, data)
+      .then(() => {
+        Notimatica.emit('unregister:success')
+      })
   }
 }

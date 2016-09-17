@@ -1,8 +1,5 @@
 import AbstractDriver from './abstract'
 
-import { subscribe, unsubscribe } from '../../api'
-import { makeToken } from '../../utils'
-
 module.exports = class Native extends AbstractDriver {
   /**
    * Driver name.
@@ -19,6 +16,13 @@ module.exports = class Native extends AbstractDriver {
    * @return {Promise}
    */
   prepare () {
+    Notimatica.on('visitor:set-extra', () => {
+      if (this.isSubscribed) {
+        this.provider.getToken()
+          .then((token) => this.register(token))
+      }
+    })
+
     return Promise.all([
       this.provider.isSubscribed(),
       Notimatica.visitor.isSubscribed()
@@ -75,12 +79,21 @@ module.exports = class Native extends AbstractDriver {
   /**
    * Register subscriber.
    *
-   * @param  {String} subscription The subscription
+   * @param  {String} token The subscription token
    * @return {Promise}
    */
   register (subscription) {
-    return this._register(subscription)
+    return Notimatica.visitor.setToken(subscription)
+      .then(() => this._register(subscription))
       .then((uuid) => this._finishRegistration(uuid))
+      .catch((err) => {
+        Notimatica.emit('register:fail', err)
+
+        return this.provider.unsubscribe()
+          .then(() => {
+            throw new Error('Registration failed.')
+          })
+      })
   }
 
   /**
@@ -89,69 +102,10 @@ module.exports = class Native extends AbstractDriver {
    * @return {Promise}
    */
   unregister () {
-    return Notimatica.visitor.uuid()
+    return Notimatica.visitor.deleteToken()
+      .then(() => Notimatica.visitor.getUuid())
       .then((uuid) => this._unregister(uuid))
       .then(() => this._finishUnregistration())
-  }
-
-  /**
-   * Call notimatica API to register subscriber.
-   *
-   * @param   {Object} subscription
-   * @returns {Promise}
-   */
-  _register (subscription) {
-    const env = Notimatica.visitor.env
-    const provider = this.provider.name
-    const data = {
-      provider: provider,
-      token: makeToken(subscription, provider),
-      browser: env.browser,
-      browser_version: env.browserMajorVersion,
-      cookies: env.cookies,
-      flash: env.flashVersion,
-      mobile: env.mobile,
-      os: env.os,
-      os_version: env.osVersion,
-      screen: env.screen,
-      timezone: env.timezone,
-      language: env.language,
-      tags: this.options.tags
-    }
-
-    Notimatica.emit('register:start', data)
-
-    return subscribe(this.options.project, data)
-      .then((data) => {
-        Notimatica.emit('register:success', data)
-
-        return data.subscriber.uuid
-      })
-      .catch((err) => {
-        Notimatica.emit('register:fail', err)
-        throw new Error('Registration failed.')
-      })
-  }
-
-  /**
-   * Delete subscription from notimatica.
-   *
-   * @param  {Object|null} uuid Subscriber's notimatica uuid
-   * @return {Promise}
-   */
-  _unregister (uuid) {
-    if (!uuid) return
-
-    const data = {
-      uuid
-    }
-
-    Notimatica.emit('unregister:start', data)
-
-    return unsubscribe(this.options.project, data)
-      .then(() => {
-        Notimatica.emit('unregister:success')
-      })
       .catch((err) => {
         Notimatica.emit('unregister:fail', err)
         throw new Error('Failed to unregister.')

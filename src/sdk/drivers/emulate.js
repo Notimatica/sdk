@@ -17,7 +17,7 @@ module.exports = class Emulate extends AbstractDriver {
    * @return {Promise}
    */
   prepare () {
-    return Notimatica.visitor.uuid()
+    return Notimatica.visitor.getUuid()
       .then((uuid) => {
         this.isSubscribed = !!uuid
       })
