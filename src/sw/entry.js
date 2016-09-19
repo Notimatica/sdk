@@ -234,10 +234,12 @@ var NSW = {
   callWebhook (webhook, notification) {
     return Promise.all([
       NSW.storage.get('key_value', 'webhooks'),
-      NSW.storage.get('key_value', 'webhooksCors')
+      NSW.storage.get('key_value', 'webhooksCors'),
+      NSW.storage.get('key_value', 'subscriber'),
+      NSW.storage.get('key_value', 'extra')
     ])
-      .then(([ webhooks, webhooksCors ]) => {
-        if (webhooks.value[webhook]) {
+      .then(([ webhooks, webhooksCors, subscriber, extra ]) => {
+        if (webhooks && webhooks.value[webhook]) {
           const hook = webhooks.value[webhook]
           const data = {
             event: webhook,
@@ -245,7 +247,10 @@ var NSW = {
             title: notification.title,
             body: notification.body,
             project: notification.tag,
-            subsciber: notification.subscriber,
+            subscriber: {
+              uuid: subscriber.value ? subscriber.value : null,
+              extra: extra.value ? extra.value : {}
+            },
             action: notification.action || '_click'
           }
 
@@ -254,7 +259,7 @@ var NSW = {
           return httpCall('post', hook, data, {
             'X-Notimatica-SDK': VERSION,
             'X-Notimatica-SDK-Event': webhook
-          }, webhooksCors.value)
+          }, webhooksCors ? webhooksCors.value : false)
         }
       })
   }
