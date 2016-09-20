@@ -82,11 +82,11 @@ export const unsubscribe = function (project, data) {
 /**
  * Get notification payload.
  *
- * @param  {String} token The subscriber token
+ * @param  {String} uuid The subscriber uuid
  * @return {Promise}
  */
-export const getPayload = function (token) {
-  return apiCall('get', 'postman', '/v1/notifications/payload?token=' + encodeURIComponent(token))
+export const getPayload = function (uuid) {
+  return apiCall('get', 'postman', '/v1/notifications/payload?uuid=' + encodeURIComponent(uuid))
     .then(res => res.payload)
 }
 

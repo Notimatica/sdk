@@ -2,7 +2,7 @@ import Storage from '../storage'
 import logs from '../mixins/logs'
 import { getPayload, getRedirect, httpCall } from '../api'
 import { VERSION } from '../defaults'
-import { makeToken, getQueryParameter } from '../utils'
+import { getQueryParameter } from '../utils'
 
 var NSW = {
   _inited: false,
@@ -42,33 +42,31 @@ var NSW = {
     NSW.debug('Message received', event)
 
     return event.waitUntil(
-      self.registration.pushManager.getSubscription()
-        .then((subscription) => {
-          if (!subscription) return
+      NSW.storage.get('key_value', 'subscriber')
+        .then((uuid) => {
+          if (!uuid) throw new Error('UUID not found')
 
-          const token = makeToken(subscription.endpoint)
+          return getPayload(uuid.value)
+        })
+        .then((payload) => {
+          NSW.debug('Payload received', payload)
 
-          return getPayload(token)
-            .then((payload) => {
-              NSW.debug('Payload received', payload)
+          return NSW.showNotification(payload)
+            .then(() => Promise.all([
+              NSW.storage.set('notifications', payload),
+              NSW.storage.set('key_value', {
+                key: 'fallbackNotification',
+                value: payload
+              })
+            ]))
+            .then(() => NSW.callWebhook('notification:show', payload))
+        })
+        .catch((err) => {
+          NSW.debug('Payload error', err)
 
-              NSW.showNotification(payload)
-                .then(() => Promise.all([
-                  NSW.storage.set('notifications', payload),
-                  NSW.storage.set('key_value', {
-                    key: 'fallbackNotification',
-                    value: payload
-                  })
-                ]))
-                .then(() => NSW.callWebhook('notification:show', payload))
-            })
-            .catch((err) => {
-              NSW.debug('Payload error', err)
-
-              if (!self.UNSUBSCRIBED_FROM_NOTIFICATIONS) {
-                return NSW.showFallbackNotification()
-              }
-            })
+          if (!self.UNSUBSCRIBED_FROM_NOTIFICATIONS) {
+            return NSW.showFallbackNotification()
+          }
         })
       )
   },
