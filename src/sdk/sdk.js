@@ -366,7 +366,8 @@ const Notimatica = {
   /**
    * Assign tags on subscriber.
    *
-   * @type {Array}
+   * @param  {Object} extra The extra data.
+   * @return {Promise}
    */
   setExtra (extra) {
     if (!isPlainObject(extra)) throw new Error('User\'s extra params should be a plain key:value map.')
@@ -375,7 +376,7 @@ const Notimatica = {
 
     this.options.extra = extra
 
-    this.visitor.setExtra(extra)
+    return this.visitor.setExtra(extra)
       .then((changed) => {
         if (changed) this.emit('visitor:set-extra')
       })

@@ -4,9 +4,6 @@ var options = {
   project: '08823593-135f-5576-9a91-f3a0675aa1d2',
   debug: true,
   autoSubscribe: true,
-  extra: {
-    group: 'anonymous'
-  },
   plugins: {
     button: {
       enable: true
