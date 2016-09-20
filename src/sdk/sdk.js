@@ -18,7 +18,7 @@ const Notimatica = {
     project: null,
     safariWebId: null,
     subdomain: null,
-    tags: [],
+    extra: {},
     autoSubscribe: false,
     usePopup: false,
     popup: {
