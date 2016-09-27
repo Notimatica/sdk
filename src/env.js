@@ -5,7 +5,7 @@ let screenSize = ''
 if (window.screen.width) {
   const width = (window.screen.width) ? window.screen.width : ''
   const height = (window.screen.height) ? window.screen.height : ''
-  screenSize += '' + width + ' x ' + height
+  screenSize += '' + width + 'x' + height
 }
 
 // browser
@@ -18,7 +18,7 @@ let nameOffset, verOffset, ix
 
 // Opera
 if ((verOffset = nAgt.indexOf('Opera')) !== -1) {
-  browser = 'Opera'
+  browser = 'opera'
   version = nAgt.substring(verOffset + 6)
   if ((verOffset = nAgt.indexOf('Version')) !== -1) {
     version = nAgt.substring(verOffset + 8)
@@ -27,33 +27,33 @@ if ((verOffset = nAgt.indexOf('Opera')) !== -1) {
 // Opera Next
 if ((verOffset = nAgt.indexOf('OPR')) !== -1) {
   // MSIE
-  browser = 'Opera'
+  browser = 'opera'
   version = nAgt.substring(verOffset + 4)
 } else if ((verOffset = nAgt.indexOf('MSIE')) !== -1) {
-  browser = 'Microsoft Internet Explorer'
+  browser = 'ie'
   version = nAgt.substring(verOffset + 5)
 } else if ((verOffset = nAgt.indexOf('Chrome')) !== -1) {
   // Chrome
-  browser = 'Chrome'
+  browser = 'chrome'
   version = nAgt.substring(verOffset + 7)
 } else if ((verOffset = nAgt.indexOf('Safari')) !== -1) {
   // Safari
-  browser = 'Safari'
+  browser = 'safari'
   version = nAgt.substring(verOffset + 7)
   if ((verOffset = nAgt.indexOf('Version')) !== -1) {
     version = nAgt.substring(verOffset + 8)
   }
 } else if ((verOffset = nAgt.indexOf('Firefox')) !== -1) {
   // Firefox
-  browser = 'Firefox'
+  browser = 'firefox'
   version = nAgt.substring(verOffset + 8)
 } else if (nAgt.indexOf('Trident/') !== -1) {
   // MSIE 11+
-  browser = 'Microsoft Internet Explorer'
+  browser = 'ie'
   version = nAgt.substring(nAgt.indexOf('rv:') + 3)
 } else if ((verOffset = nAgt.indexOf('Edge/')) !== -1) {
   // MS Edge
-  browser = 'Microsoft Edge'
+  browser = 'edge'
   version = nAgt.substring(verOffset + 4)
 } else if ((nameOffset = nAgt.lastIndexOf(' ') + 1) < (verOffset = nAgt.lastIndexOf('/'))) {
   // Other browsers
@@ -103,18 +103,18 @@ let clientStrings = [
   {s: 'Windows NT 4.0', r: /(Windows NT 4.0|WinNT4.0|WinNT|Windows NT)/},
   {s: 'Windows CE', r: /Windows CE/},
   {s: 'Windows 3.11', r: /Win16/},
-  {s: 'Android', r: /Android/},
-  {s: 'Open BSD', r: /OpenBSD/},
-  {s: 'Sun OS', r: /SunOS/},
-  {s: 'Linux', r: /(Linux|X11)/},
-  {s: 'iOS', r: /(iPhone|iPad|iPod)/},
-  {s: 'Mac OS X', r: /Mac OS X/},
-  {s: 'Mac OS', r: /(MacPPC|MacIntel|Mac_PowerPC|Macintosh)/},
-  {s: 'QNX', r: /QNX/},
-  {s: 'UNIX', r: /UNIX/},
-  {s: 'BeOS', r: /BeOS/},
-  {s: 'OS/2', r: /OS\/2/},
-  {s: 'Search Bot', r: /(nuhk|Googlebot|Yammybot|Openbot|Slurp|MSNBot|Ask Jeeves\/Teoma|ia_archiver)/}
+  {s: 'android', r: /Android/},
+  {s: 'openbsd', r: /OpenBSD/},
+  {s: 'sun', r: /SunOS/},
+  {s: 'linux', r: /(Linux|X11)/},
+  {s: 'ios', r: /(iPhone|iPad|iPod)/},
+  {s: 'mac', r: /Mac OS X/},
+  {s: 'mac', r: /(MacPPC|MacIntel|Mac_PowerPC|Macintosh)/},
+  {s: 'qnx', r: /QNX/},
+  {s: 'unix', r: /UNIX/},
+  {s: 'beos', r: /BeOS/},
+  {s: 'os2', r: /OS\/2/},
+  {s: 'search_bot', r: /(nuhk|Googlebot|Yammybot|Openbot|Slurp|MSNBot|Ask Jeeves\/Teoma|ia_archiver)/}
 ]
 
 for (let id in clientStrings) {
@@ -129,19 +129,19 @@ let osVersion = unknown
 
 if (/Windows/.test(os)) {
   osVersion = /Windows (.*)/.exec(os)[1]
-  os = 'Windows'
+  os = 'windows'
 }
 
 switch (os) {
-  case 'Mac OS X':
-    osVersion = /Mac OS X (10[\._\d]+)/.exec(nAgt)[1]
+  case 'mac':
+    osVersion = /Mac OS X (10[\._\d]+)/.exec(nAgt)[1].replace(/_/g, '.')
     break
 
-  case 'Android':
+  case 'android':
     osVersion = /Android ([\._\d]+)/.exec(nAgt)[1]
     break
 
-  case 'iOS':
+  case 'ios':
     osVersion = /OS (\d+)_(\d+)_?(\d+)?/.exec(nVer)
     osVersion = osVersion[1] + '.' + osVersion[2] + '.' + (osVersion[3] | 0)
     break

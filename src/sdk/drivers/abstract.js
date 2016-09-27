@@ -65,13 +65,13 @@ module.exports = class AbstractDriver {
   _prepareProvider () {
     let provider
     switch (Notimatica.visitor.env.browser) {
-      case 'Chrome':
+      case 'chrome':
         provider = PROVIDER_CHROME
         break
-      case 'Firefox':
+      case 'firefox':
         provider = PROVIDER_FIREFOX
         break
-      case 'Safari':
+      case 'safari':
         provider = PROVIDER_SAFARI
         break
       default:
