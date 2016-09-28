@@ -80,7 +80,7 @@ var NSW = {
   showNotification (payload) {
     const notification = {
       body: payload.body,
-      icon: NSW.ensureImageResourceHttps(payload.icon),
+      icon: payload.icon,
       tag: payload.tag,
       data: payload
     }
@@ -118,32 +118,6 @@ var NSW = {
           })
         })
       })
-  },
-
-  /**
-   * TNX OneSignal SDK
-   *
-   * Given an image URL, returns a proxied HTTPS image using the https://images.weserv.nl service.
-   * For a null image, returns null so that no icon is displayed.
-   * If the image origin contains localhost, starts with 192.168.*.* or already from weserv.nl,
-   * we do not proxy the image.
-   *
-   * @param  {String} imageUrl An HTTP or HTTPS image URL.
-   * @return {String|NULL}
-   */
-  ensureImageResourceHttps (imageUrl) {
-    if (!imageUrl) return null
-
-    try {
-      let parsedImageUrl = new URL(imageUrl)
-      if (/192\.168|localhost|images\.weserv\.nl/.exec(parsedImageUrl.hostname) !== null) return imageUrl
-    } catch (e) { }
-
-    /* HTTPS origin hosts can be used by prefixing the hostname with ssl: */
-    let replacedImageUrl = imageUrl.replace(/https:\/\//, 'ssl:')
-                                   .replace(/http:\/\//, '')
-
-    return `https://images.weserv.nl/?url=${encodeURIComponent(replacedImageUrl)}`
   },
 
   /**
