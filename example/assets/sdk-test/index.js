@@ -5,7 +5,7 @@ var options = {
   debug: true,
   autoSubscribe: true,
   extra: {
-    group: 'anonymous'
+    source: 'playground'
   },
   plugins: {
     button: {
