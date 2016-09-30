@@ -8,7 +8,6 @@ module.exports = class Visitor {
   constructor () {
     this.env = window ? env : {}
     this.storage = Storage
-    console.log(this.env)
     this.uuid = null
   }
 
