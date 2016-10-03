@@ -83,6 +83,9 @@ export default {
     }
   },
   ready () {
+    Notimatica.on('subscribe:do', () => {
+      this.processClick()
+    })
     Notimatica.on('subscribe:start', () => {
       this.acting = true
     })
@@ -104,6 +107,9 @@ export default {
       }, 200)
     })
 
+    Notimatica.on('unsubscribe:do', () => {
+      this.processClick()
+    })
     Notimatica.on('unsubscribe:start', () => {
       this.acting = true
     })
@@ -127,10 +133,6 @@ export default {
     Notimatica.on('popup:close', () => {
       this.acting = false
       this.hidePopover()
-    })
-
-    Notimatica.on('autoSubscribe:start', () => {
-      this.showPopover()
     })
 
     this.subscribed = Notimatica.isSubscribed()

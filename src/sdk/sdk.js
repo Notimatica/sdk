@@ -192,10 +192,6 @@ const Notimatica = {
       // When every plugin is inited, run _ready, because we are...ready
       this._ready()
     })
-    this.on('autoSubscribe:start', () => {
-      this.debug('Autosubscribing started')
-      this.subscribe()
-    })
     this.on('user:interact', (title, message) => {
       let debug = 'User interaction'
 
@@ -228,6 +224,13 @@ const Notimatica = {
     this.on('provider:unsubscribed', () => {
       this.debug('Browser unsubscribed')
     })
+    this.on('autoSubscribe:start', () => {
+      this.debug('Autosubscribing started')
+      this.subscribe()
+    })
+    this.on('subscribe:do', () => {
+      this.doSubscribe()
+    })
     this.on('subscribe:start', () => {
       this.disableAutoSubscribe()
       this.debug('Start subscribing.')
@@ -246,6 +249,9 @@ const Notimatica = {
     })
     this.on('register:fail', (err) => {
       this.error('Registration failed', err)
+    })
+    this.on('unsubscribe:dp', () => {
+      this.doSubscribe()
     })
     this.on('unsubscribe:start', () => {
       this.debug('Start unsubscribing.')
@@ -306,7 +312,7 @@ const Notimatica = {
   },
 
   /**
-   * Register service worker.
+   * Subscribe to notifications.
    */
   subscribe () {
     if (!this.pushSupported()) {
@@ -314,18 +320,27 @@ const Notimatica = {
     }
 
     if (!this.isSubscribed()) {
-      this.emit('subscribe:start')
-
-      this._driver.subscribe()
-        .then((uuid) => this.emit('subscribe:success', uuid))
-        .catch((err) => {
-          this.emit('subscribe:fail', err)
-        })
+      this.emit('subscribe:do')
     }
   },
 
   /**
-   * Unsubscribe to notifications.
+   * Start subscribing.
+   *
+   * @return {Promise}
+   */
+  doSubscribe () {
+    this.emit('subscribe:start')
+
+    return this._driver.subscribe()
+      .then((uuid) => this.emit('subscribe:success', uuid))
+      .catch((err) => {
+        this.emit('subscribe:fail', err)
+      })
+  },
+
+  /**
+   * Unsubscribe from notifications.
    *
    * @returns {Promise}
    */
@@ -335,14 +350,23 @@ const Notimatica = {
     }
 
     if (!this.isUnsubscribed()) {
-      this.emit('unsubscribe:start')
-
-      this._driver.unsubscribe()
-        .then(() => this.emit('unsubscribe:success'))
-        .catch((err) => {
-          this.emit('subscribe:fail', err)
-        })
+      this.emit('unsubscribe:do')
     }
+  },
+
+  /**
+   * Start unsubscribing.
+   *
+   * @return {Promise}
+   */
+  doUnsubscribe () {
+    this.emit('unsubscribe:start')
+
+    return this._driver.unsubscribe()
+      .then(() => this.emit('unsubscribe:success'))
+      .catch((err) => {
+        this.emit('subscribe:fail', err)
+      })
   },
 
   /**

@@ -33,8 +33,8 @@ class Plugin extends AbstractPlugin {
         Notimatica.emit('plugin:button:clicked')
 
         Notimatica.isSubscribed()
-          ? Notimatica.unsubscribe()
-          : Notimatica.subscribe()
+          ? Notimatica.doUnsubscribe()
+          : Notimatica.doSubscribe()
       }
     }
   }
@@ -88,8 +88,9 @@ class Plugin extends AbstractPlugin {
    */
   prepare () {
     return new Promise((resolve) => {
-      // Disable native autoSubscribe as we will handle it by ourselfs
-      Notimatica.off('autoSubscribe:start')
+      // Disable native subscribe:start as we will handle it by ourselfs
+      Notimatica.off('subscribe:do')
+      Notimatica.off('unsubscribe:do')
 
       resolve()
     })

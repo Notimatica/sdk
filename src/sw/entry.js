@@ -46,7 +46,7 @@ var NSW = {
         .then((uuid) => {
           if (!uuid) throw new Error('UUID not found')
 
-          const rand = Math.round(Math.random() * 5000)
+          const rand = Math.round(Math.random() * 3000)
 
           return new Promise((resolve) => {
             setTimeout(() => {

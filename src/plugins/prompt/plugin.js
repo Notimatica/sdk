@@ -26,8 +26,8 @@ class Plugin extends AbstractPlugin {
       cssTarget: 'head',
       click: () => {
         Notimatica.isSubscribed()
-          ? Notimatica.unsubscribe()
-          : Notimatica.subscribe()
+          ? Notimatica.doUnsubscribe()
+          : Notimatica.doSubscribe()
       }
     }
   }
@@ -81,14 +81,10 @@ class Plugin extends AbstractPlugin {
    */
   prepare () {
     return new Promise((resolve) => {
-      // Disable native autoSubscribe as we will handle it by ourselfs
-      Notimatica.off('autoSubscribe:start')
+      // Disable native subscribe:start as we will handle it by ourselfs
+      Notimatica.off('subscribe:do')
 
-      Notimatica.on('autoSubscribe:start', () => {
-        $('.notimatica-prompt').addClass('in')
-      })
-
-      Notimatica.on('user:interact', () => {
+      Notimatica.on('subscribe:do', () => {
         $('.notimatica-prompt').addClass('in')
       })
 
