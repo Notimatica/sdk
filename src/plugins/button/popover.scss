@@ -3,86 +3,88 @@
 $arrow-height: 10px;
 $popover-width: 396px;
 
-.notimatica-popover {
-  position: fixed;
-  z-index: 400002;
-  width: $popover-width;
-  padding: 1px;
-  border: 1px solid $border-color;
-  border-radius: 6px;
-  box-shadow: 0 5px 10px rgba(0,0,0,.2);
-  letter-spacing: .4px;
-  font-size: 14px;
-  line-height: 1.4;
-  background-color: #fff;
-  color: $text-color;
-}
-
-.notimatica-popover-title,
-.notimatica-popover-content {
-  padding: 10px 16px;
-}
-.notimatica-popover-title {
-  background-color: #f5f8fa;
-  border-bottom: 1px solid $border-color;
-  border-radius: 5px 5px 0 0;
-  padding-right: 30px;
-}
-.notimatica-popover-content {
-  background-color: #fff;
-  border-radius: 0 0 5px 5px;
-}
-.notimatica-popover-footer {
-  margin: 0 16px;
-  padding: 10px 0;
-  border-top: 1px solid $border-color;
-}
-.notimatica-popover-close {
-  position: absolute;
-  top: 3px;
-  right: 8px;
-  z-index: 400003;
-  cursor: pointer;
-  color: #23527c;
-  font-size: 14px;
-}
-
-.notimatica-button-bottom-right {
+.notimatica-plugin-button-wrapper {
   .notimatica-popover {
-    bottom: 100px;
-    right: 30px;
-    margin-bottom: 5px + $arrow-height;
-
-    @include arrow-down($border-color, #fff, $arrow-height, $popover-width - $button-width / 2 - 2);
+    position: fixed;
+    z-index: 400002;
+    width: $popover-width;
+    padding: 1px;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    letter-spacing: .4px;
+    font-size: 14px;
+    line-height: 1.4;
+    background-color: #fff;
+    color: $text-color;
   }
-}
 
-.notimatica-button-bottom-left {
-  .notimatica-popover {
-    bottom: 100px;
-    left: 30px;
-    margin-bottom: 5px + $arrow-height;
-
-    @include arrow-down($border-color, #fff, $arrow-height, $button-width / 2);
+  .notimatica-popover-title,
+  .notimatica-popover-content {
+    padding: 10px 16px;
   }
-}
-
-.notimatica-button-top-left {
-  .notimatica-popover {
-    top: 100px;
-    left: 30px;
-    margin-top: 5px + $arrow-height;
-
-    @include arrow-up($border-color, #fff, $arrow-height, $button-width / 2);
+  .notimatica-popover-title {
+    background-color: #f5f8fa;
+    border-bottom: 1px solid $border-color;
+    border-radius: 5px 5px 0 0;
+    padding-right: 30px;
   }
-}
+  .notimatica-popover-content {
+    background-color: #fff;
+    border-radius: 0 0 5px 5px;
+  }
+  .notimatica-popover-footer {
+    margin: 0 16px;
+    padding: 10px 0;
+    border-top: 1px solid $border-color;
+  }
+  .notimatica-popover-close {
+    position: absolute;
+    top: 3px;
+    right: 8px;
+    z-index: 400003;
+    cursor: pointer;
+    color: #23527c;
+    font-size: 14px;
+  }
 
-.notimatica-button-top-right {
-  .notimatica-popover {
-    top: 100px;
-    right: 30px;
-    margin-top: 5px + $arrow-height;
+  .notimatica-button-bottom-right {
+    .notimatica-popover {
+      bottom: 100px;
+      right: 30px;
+      margin-bottom: 5px + $arrow-height;
 
-    @include arrow-up($border-color, #fff, $arrow-height, $popover-width - $button-width / 2 - 2);
+      @include arrow-down($border-color, #fff, $arrow-height, $popover-width - $button-width / 2 - 2);
+    }
+  }
+
+  .notimatica-button-bottom-left {
+    .notimatica-popover {
+      bottom: 100px;
+      left: 30px;
+      margin-bottom: 5px + $arrow-height;
+
+      @include arrow-down($border-color, #fff, $arrow-height, $button-width / 2);
+    }
+  }
+
+  .notimatica-button-top-left {
+    .notimatica-popover {
+      top: 100px;
+      left: 30px;
+      margin-top: 5px + $arrow-height;
+
+      @include arrow-up($border-color, #fff, $arrow-height, $button-width / 2);
+    }
+  }
+
+  .notimatica-button-top-right {
+    .notimatica-popover {
+      top: 100px;
+      right: 30px;
+      margin-top: 5px + $arrow-height;
+
+      @include arrow-up($border-color, #fff, $arrow-height, $popover-width - $button-width / 2 - 2);
+    }
   }
 }

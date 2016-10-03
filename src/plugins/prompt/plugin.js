@@ -67,7 +67,7 @@ class Plugin extends AbstractPlugin {
           <div class="notimatica-prompt-footer">
             <button class="notimatica-pull-left notimatica-common-button notimatica-common-button-action">${t('prompt.button.subscribe')}</button>
             <button class="notimatica-pull-right notimatica-common-button notimatica-common-button-link">${t('prompt.button.cancel')}</button>
-            <div class="clearfix"></div>
+            <div class="notimatica-clearfix"></div>
           </div>
         </div>
       </div>

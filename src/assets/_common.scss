@@ -3,107 +3,114 @@ $border-color: #d3e0e9;
 $subscribe-color: #00c385;
 $unsubscribe-color: #f0ad4e;
 
-
 .notimatica-reset {
-  margin: 0;
-  padding:0;
-  border: 0;
-  outline: 0;
-  font-size: 100%;
-  font-family: Helvetica, Arial, sans-serif;
-  vertical-align: baseline;
-  background: transparent;
-  line-height: 1;
-  letter-spacing: 0.4;
-  text-align: start;
-  text-decoration: none;
-  text-shadow: none;
-  text-transform: none;
-  letter-spacing: normal;
-  word-break: normal;
-  word-spacing: normal;
-  word-wrap: normal;
-  white-space: normal;
-}
-
-.notimatica-clearfix {
-  &:before, &:after {
-    content: " ";
-    display: table;
-  }
-  &:after {
-    clear: both;
+  div, span, object, iframe, h1, h2, h3, h4, h5, h6, p,
+  pre, a, abbr, acronym, address, code, del, dfn, em, img,
+  dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption,
+  table, tbody, tfoot, thead, tr
+  input, button {
+    margin: 0;
+    padding:0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    font-family: Helvetica, Arial, sans-serif;
+    vertical-align: baseline;
+    background: transparent;
+    line-height: 1;
+    letter-spacing: 0.4;
+    text-align: start;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: normal;
+    word-break: normal;
+    word-spacing: normal;
+    word-wrap: normal;
+    white-space: normal;
   }
 }
 
-.notimatica-fade {
-  opacity: 0;
-  pointer-events: none;
-  transition: all .18s ease-out;
-
-  &.in {
-    opacity: 1;
-    pointer-events: auto;
+.notimatica-plugin-wrapper {
+  .notimatica-clearfix {
+    &:before, &:after {
+      content: " ";
+      display: table;
+    }
     &:after {
+      clear: both;
+    }
+  }
+
+  .notimatica-fade {
+    opacity: 0;
+    pointer-events: none;
+    transition: all .18s ease-out;
+
+    &.in {
       opacity: 1;
       pointer-events: auto;
+      &:after {
+        opacity: 1;
+        pointer-events: auto;
+      }
     }
   }
-}
 
-.notimatica-pull-left {
-  float: left;
-}
-
-.notimatica-pull-right {
-  float: right;
-}
-
-.notimatica-common-button {
-  display: inline-block;
-  margin-bottom: 0;
-  font-weight: 300;
-  text-align: center;
-  color: #fff;
-  vertical-align: middle;
-  touch-action: manipulation;
-  cursor: pointer;
-  background-image: none;
-  border: 1px solid transparent;
-  white-space: nowrap;
-  padding: 6px 12px;
-  font-size: 14px;
-  line-height: 1.8;
-  border-radius: 4px;
-  -webkit-user-select: none;
-  transition: all 0.2s linear;
-}
-
-.notimatica-common-button-link {
-  color: $text-color;
-  font-weight: 400;
-  background-color: transparent;
-  border-color: transparent;
-  border-radius: 0;
-  &:hover, &:focus, &:active {
-    text-decoration: underline;
+  .notimatica-pull-left {
+    float: left;
   }
-}
 
-.notimatica-subscribe {
-  .notimatica-common-button-action {
-    background-color: $subscribe-color;
+  .notimatica-pull-right {
+    float: right;
+  }
+
+  .notimatica-common-button {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 300;
+    text-align: center;
+    color: #fff;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.8;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    transition: all 0.2s linear;
+  }
+
+  .notimatica-common-button-link {
+    color: $text-color;
+    font-weight: 400;
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 0;
     &:hover, &:focus, &:active {
-      background-color: darken($subscribe-color, 10%);
+      text-decoration: underline;
     }
   }
-}
 
-.notimatica-unsubscribe {
-  .notimatica-common-button-action {
-    background-color: $unsubscribe-color;
-    &:hover, &:focus, &:active {
-      background-color: darken($unsubscribe-color, 10%);
+  .notimatica-subscribe {
+    .notimatica-common-button-action {
+      background-color: $subscribe-color;
+      &:hover, &:focus, &:active {
+        background-color: darken($subscribe-color, 10%);
+      }
+    }
+  }
+
+  .notimatica-unsubscribe {
+    .notimatica-common-button-action {
+      background-color: $unsubscribe-color;
+      &:hover, &:focus, &:active {
+        background-color: darken($unsubscribe-color, 10%);
+      }
     }
   }
 }

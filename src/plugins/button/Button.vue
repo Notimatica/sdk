@@ -55,7 +55,7 @@
             class="notimatica-pull-right notimatica-common-button notimatica-common-button-link">
             {{ popoverButtonCancel }}
           </button>
-          <div class="clearfix"></div>
+          <div class="notimatica-clearfix"></div>
         </div>
       </div>
       <div class="notimatica-popover-close" @click="hidePopover">&times;</div>

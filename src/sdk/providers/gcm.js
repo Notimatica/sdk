@@ -32,6 +32,9 @@ const provider = class Gcm extends AbstractProvider {
 
         return this.registration.pushManager.getSubscription()
       })
+      .catch(() => {
+        throw new Error('Seams like notimatica-sw.js or manifest.json file is missing.')
+      })
   }
 
   /**

@@ -46,7 +46,13 @@ var NSW = {
         .then((uuid) => {
           if (!uuid) throw new Error('UUID not found')
 
-          return getPayload(uuid.value)
+          const rand = Math.round(Math.random() * 5000)
+
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              resolve(getPayload(uuid.value))
+            }, rand)
+          })
         })
         .then((payload) => {
           NSW.debug('Payload received', payload)
