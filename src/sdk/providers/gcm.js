@@ -26,12 +26,7 @@ const provider = class Gcm extends AbstractProvider {
    */
   ready () {
     return navigator.serviceWorker.register('/notimatica-sw.js')
-      .then(navigator.serviceWorker.ready)
-      .then((registration) => {
-        this.registration = registration
-
-        return this.registration.pushManager.getSubscription()
-      })
+      .then(() => navigator.serviceWorker.ready)
       .catch(() => {
         throw new Error('Seams like notimatica-sw.js or manifest.json file is missing.')
       })
@@ -44,7 +39,7 @@ const provider = class Gcm extends AbstractProvider {
    */
   subscribe () {
     return this.ready()
-      .then(() => this.registration.pushManager.subscribe({ userVisibleOnly: true }))
+      .then((registration) => registration.pushManager.subscribe({ userVisibleOnly: true }))
       .then((subscription) => subscription.endpoint)
       .then((endpoint) => Notimatica.emit('provider:subscribed', endpoint))
   }
@@ -56,10 +51,10 @@ const provider = class Gcm extends AbstractProvider {
    */
   unsubscribe () {
     return this.ready()
+      .then((registration) => registration.pushManager.getSubscription())
       .then((subscription) => {
         if (subscription) subscription.unsubscribe()
       })
-      .then(() => this.registration.unregister())
       .then(() => Notimatica.emit('provider:unsubscribed'))
   }
 
@@ -70,6 +65,7 @@ const provider = class Gcm extends AbstractProvider {
    */
   isSubscribed () {
     return this.ready()
+      .then((registration) => registration.pushManager.getSubscription())
       .then((subscription) => !!subscription)
   }
 
@@ -80,6 +76,7 @@ const provider = class Gcm extends AbstractProvider {
    */
   getToken () {
     return this.ready()
+      .then((registration) => registration.pushManager.getSubscription())
       .then((subscription) => subscription ? subscription.endpoint : null)
   }
 }

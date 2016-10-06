@@ -14,6 +14,7 @@ var NSW = {
    */
   init () {
     if (!NSW._inited) {
+      self.addEventListener('install', NSW.onInstall)
       self.addEventListener('push', NSW.onPushReceived)
       self.addEventListener('notificationclick', NSW.onNotificationClicked)
       self.addEventListener('notificationclosed', NSW.onNotificationClosed)
@@ -30,6 +31,18 @@ var NSW = {
     NSW.debug('ServiceWorker inited')
 
     return NSW
+  },
+
+  /**
+   * SW installed.
+   *
+   * @param  {Object} event The installed event
+   * @return {Object}
+   */
+  onInstall (event) {
+    self.skipWaiting()
+
+    NSW.debug('ServiceWorker installed', event)
   },
 
   /**
