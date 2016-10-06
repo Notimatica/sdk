@@ -6,7 +6,7 @@ import { getQueryParameter } from '../utils'
 
 var NSW = {
   _inited: false,
-  _debug: typeof process.env.NODE_ENV !== 'undefined' && process.env.NODE_ENV !== 'production',
+  _debug: process.env.NODE_ENV !== 'production',
   visitor: null,
 
   /**
@@ -22,7 +22,7 @@ var NSW = {
       NSW.storage = Storage
       NSW.storage.get('key_value', 'debug')
         .then((debug) => {
-          if (debug !== null) NSW._debug = debug
+          if (debug !== null) NSW._debug = debug.value
         })
 
       NSW._inited = true
