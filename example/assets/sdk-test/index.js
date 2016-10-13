@@ -2,7 +2,7 @@
 
 var options = {
   emulate: true,
-  debug: true,
+  debug: false,
   autoSubscribe: true,
   extra: {
     source: 'playground'
@@ -22,7 +22,7 @@ var options = {
     'notification:click': 'https://dev.notimatica.io/webhook/click',
     'notification:close': 'https://dev.notimatica.io/webhook/close'
   },
-  webhooksCors: false
+  webhooksCors: true
 }
 
 init(options)

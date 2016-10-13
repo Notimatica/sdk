@@ -13,22 +13,20 @@ var NSW = {
    * Init SW.
    */
   init () {
-    if (!NSW._inited) {
-      self.addEventListener('install', NSW.onInstall)
-      self.addEventListener('push', NSW.onPushReceived)
-      self.addEventListener('notificationclick', NSW.onNotificationClicked)
-      self.addEventListener('notificationclosed', NSW.onNotificationClosed)
+    if (NSW._inited) return NSW
 
-      NSW.storage = Storage
-      NSW.storage.get('key_value', 'debug')
-        .then((debug) => {
-          if (debug !== null) NSW._debug = debug.value
-        })
+    NSW.storage = Storage
+    NSW.storage.get('key_value', 'debug')
+      .then((debug) => {
+        if (debug !== null) NSW._debug = debug.value
+      })
 
-      NSW._inited = true
-    }
+    self.addEventListener('install', NSW.onInstall)
+    self.addEventListener('push', NSW.onPushReceived)
+    self.addEventListener('notificationclick', NSW.onNotificationClicked)
+    self.addEventListener('notificationclosed', NSW.onNotificationClosed)
 
-    NSW.debug('ServiceWorker inited')
+    NSW._inited = true
 
     return NSW
   },
@@ -41,8 +39,6 @@ var NSW = {
    */
   onInstall (event) {
     self.skipWaiting()
-
-    NSW.debug('ServiceWorker installed', event)
   },
 
   /**
@@ -80,8 +76,8 @@ var NSW = {
             ]))
             .then(() => NSW.callWebhook('notification:show', payload))
         })
-        .catch((err) => {
-          NSW.debug('Payload error', err)
+        .catch((e) => {
+          NSW.error('Payload error', e.message)
 
           if (!self.UNSUBSCRIBED_FROM_NOTIFICATIONS) {
             return NSW.showFallbackNotification()
@@ -104,6 +100,8 @@ var NSW = {
       data: payload
     }
 
+    NSW.debug('Show notification', notification)
+
     return self.registration.showNotification(payload.title, notification)
   },
 
@@ -117,25 +115,24 @@ var NSW = {
       .then((notification) => {
         if (!notification) throw new Error('No fallback notification')
 
-        NSW.debug('Display fallback notification')
+        NSW.warn('Display fallback notification')
 
         NSW.showNotification(notification.value)
       })
       .catch(() => {
-        NSW.debug('Display backup notification')
+        NSW.warn('Display backup notification')
 
         return Promise.all([
           NSW.storage.get('key_value', 'pageTitle'),
           NSW.storage.get('key_value', 'baseUrl'),
           NSW.storage.get('key_value', 'project')
-        ]).then(([title, url, project]) => {
-          return NSW.showNotification({
+        ])
+          .then(([title, url, project]) => NSW.showNotification({
             body: 'You have an update.',
             title: title.value || null,
             tag: project || null,
             url: url.value || null
-          })
-        })
+          }))
       })
   },
 
@@ -252,6 +249,9 @@ var NSW = {
             'X-Notimatica-SDK-Event': webhook
           }, webhooksCors ? webhooksCors.value : false)
         }
+      })
+      .catch((e) => {
+        NSW.error('Webhook error', e.message)
       })
   }
 }

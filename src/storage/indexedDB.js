@@ -80,7 +80,7 @@ export default class IndexedDBStorage {
    * Get table value.
    *
    * @param  {String}        table The table name
-   * @param  {String|Number} id    The table id
+   * @param  {String|Number} id    The row id
    * @return {Promise}
    */
   get (table, id) {
@@ -88,7 +88,7 @@ export default class IndexedDBStorage {
       .then((database) => new Promise((resolve, reject) => {
         try {
           const request = database
-            .transaction([table], 'readwrite')
+            .transaction([table], 'readonly')
             .objectStore(table)
             .get(id)
 
@@ -116,7 +116,7 @@ export default class IndexedDBStorage {
       .then((database) => new Promise((resolve, reject) => {
         try {
           const request = database
-            .transaction([table], 'readwrite')
+            .transaction([table], 'readonly')
             .objectStore(table)
             .getAll()
 
