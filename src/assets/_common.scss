@@ -99,8 +99,10 @@ $unsubscribe-color: #f0ad4e;
   .notimatica-subscribe {
     .notimatica-common-button-action {
       background-color: $subscribe-color;
+      border: 1px solid darken($subscribe-color, 5%);
       &:hover, &:focus, &:active {
         background-color: darken($subscribe-color, 10%);
+        border: 1px solid darken($subscribe-color, 15%);
       }
     }
   }
@@ -108,8 +110,10 @@ $unsubscribe-color: #f0ad4e;
   .notimatica-unsubscribe {
     .notimatica-common-button-action {
       background-color: $unsubscribe-color;
+      border: 1px solid darken($unsubscribe-color, 5%);
       &:hover, &:focus, &:active {
         background-color: darken($unsubscribe-color, 10%);
+        border: 1px solid darken($unsubscribe-color, 15%);
       }
     }
   }
