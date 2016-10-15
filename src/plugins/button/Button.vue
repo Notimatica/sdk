@@ -35,7 +35,7 @@
     </div>
 
     <div class="notimatica-popover notimatica-fade" :class="{'in': popoverActive}" v-if="usePopover || counter > 0">
-      <div v-if="message.body">
+      <div v-if="counter > 0">
         <div class="notimatica-popover-title" v-if="message.title">{{ message.title }}</div>
         <div class="notimatica-popover-content">{{{ message.body }}}</div>
         <div class="notimatica-clearfix"></div>
@@ -87,39 +87,33 @@ export default {
       this.processClick()
     })
     Notimatica.on('subscribe:start', () => {
+      this.hidePopover()
       this.acting = true
     })
     Notimatica.on('subscribe:success', () => {
-      if (this.popoverActive) this.hidePopover()
-
-      setTimeout(() => {
-        this.subscribed = true
-        this.acting = false
-      }, 200)
+      this.subscribed = true
+      this.acting = false
     })
 
     Notimatica.on('subscribe:fail', () => {
-      if (this.popoverActive) this.hidePopover()
+      this.acting = false
+      this.setMessage('Subscription failed.', 'Subscription failed for some reason. Please, try again later.')
+    })
 
-      setTimeout(() => {
-        this.acting = false
-        this.setMessage('Subscription failed.', 'Subscription failed for some reason. Please, try again later.')
-      }, 200)
+    Notimatica.on('subscribe:cancel', () => {
+      this.acting = false
     })
 
     Notimatica.on('unsubscribe:do', () => {
       this.processClick()
     })
     Notimatica.on('unsubscribe:start', () => {
+      this.hidePopover()
       this.acting = true
     })
     Notimatica.on('unsubscribe:success', () => {
-      if (this.popoverActive) this.hidePopover()
-
-      setTimeout(() => {
-        this.subscribed = false
-        this.acting = false
-      }, 200)
+      this.subscribed = false
+      this.acting = false
     })
 
     Notimatica.on('user:interact', (title, body) => {
@@ -127,11 +121,6 @@ export default {
     })
 
     Notimatica.on('popover:hide', () => {
-      this.hidePopover()
-    })
-
-    Notimatica.on('popup:close', () => {
-      this.acting = false
       this.hidePopover()
     })
 
@@ -252,12 +241,13 @@ export default {
      */
     hidePopover () {
       this.popoverActive = false
-      this.counter = 0
 
-      setTimeout(() => {
+      if (this.counter > 0) {
+        this.counter = 0
+
         this.message.title = ''
         this.message.body = ''
-      }, 200)
+      }
     }
   }
 }

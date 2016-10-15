@@ -42,6 +42,9 @@ const provider = class Gcm extends AbstractProvider {
       .then((registration) => registration.pushManager.subscribe({ userVisibleOnly: true }))
       .then((subscription) => subscription.endpoint)
       .then((endpoint) => Notimatica.emit('provider:subscribed', endpoint))
+      .catch(() => {
+        Notimatica.emit('subscribe:cancel')
+      })
   }
 
   /**

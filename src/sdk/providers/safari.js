@@ -2,6 +2,7 @@ require('whatwg-fetch')
 
 import AbstractProvider from './abstract'
 import { PROVIDER_SAFARI, PROVIDERS_ENDPOINTS } from '../../defaults'
+import { t } from '../../utils'
 
 const provider = class Safari extends AbstractProvider {
   /**
@@ -68,7 +69,8 @@ const provider = class Safari extends AbstractProvider {
             Notimatica.emit('provider:subscribed', permissionData.deviceToken)
             break
           default:
-            throw new Error('Safari denied to send notification')
+            Notimatica.emit('subscribe:cancel')
+            this._showIsUnsubscribedMessage()
         }
       })
   }
@@ -124,7 +126,7 @@ const provider = class Safari extends AbstractProvider {
         Notimatica.emit('debug', 'Safari permission request result', permissionData)
 
         if (!permissionData.deviceToken || permissionData.permission !== 'granted') {
-          throw new Error('Subcription was empty.')
+          return Notimatica.emit('subscribe:cancel')
         }
 
         Notimatica.emit('provider:subscribed', permissionData.deviceToken)
@@ -136,11 +138,23 @@ const provider = class Safari extends AbstractProvider {
    * Show remove from preferences message if user is unregistered,
    * but Safari is still subscribed to notifications.
    */
-  _showUnsubscribeMessage (permissionData) {
+  _showIsUnsubscribedMessage () {
     Notimatica.emit(
       'user:interact',
-      'You are unsubscribed',
-      'Now you can open Safari notifications preferences and remove this site from the list.'
+      t('message.safari.is_unsubscribed.title'),
+      t('message.safari.is_unsubscribed.body')
+    )
+  }
+
+  /**
+   * Show remove from preferences message if user is unregistered,
+   * but Safari is still subscribed to notifications.
+   */
+  _showUnsubscribeMessage () {
+    Notimatica.emit(
+      'user:interact',
+      t('message.safari.unsubscribed.title'),
+      t('message.safari.unsubscribed.body')
     )
   }
 }

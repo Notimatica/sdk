@@ -36,6 +36,11 @@ const Notimatica = {
   options: {},
   strings: {
     en: {
+      'message.safari.unsubscribed.title': 'You are unsubscribed',
+      'message.safari.unsubscribed.body': 'Now you can open Safari notifications preferences and remove this site from the list.',
+      'message.safari.is_unsubscribed.title': 'Safari denies subscription',
+      'message.safari.is_unsubscribed.body': 'You\'ve already blocked our site from sending you notifications.<br><br>To undo, please open Safari notifications preferences and remove it from the list.',
+
       'popup.welcome': '{project}',
       'popup.subscribe': 'Do you want to receive notifications from {project}? Click Subscribe!',
       'popup.subscribed': 'Don\'t want to recieve notifications anymore? Click Unsubscribe.',
@@ -45,6 +50,11 @@ const Notimatica = {
       'popup.buttons.cancel': 'Later'
     },
     ru: {
+      'message.safari.unsubscribed.title': 'Вы успешно отписались',
+      'message.safari.unsubscribed.body': 'Теперь вы можете открыть настройки уведомлений Safari и удалить наш сайт из списка.',
+      'message.safari.is_unsubscribed.title': 'Safari не разрешает вам подписаться',
+      'message.safari.is_unsubscribed.body': 'Однажды вы запретили нашему сайту отправлять вам сообщения.<br><br>Чтобы разрешить снова, пожалуйста зайдите в настройки нотификаций Safari и удалите его из списка.',
+
       'popup.welcome': '{project}',
       'popup.subscribe': 'Хотите получать уведомления от {project}? Нажмите Подписаться!',
       'popup.subscribed': 'Не хотите больше получать уведомления? Нажмите Отписаться.',
@@ -237,6 +247,9 @@ const Notimatica = {
     })
     this.on('subscribe:success', (uuid) => {
       this.debug('User subscribed with uuid', uuid)
+    })
+    this.on('subscribe:cancel', (err) => {
+      this.error('Subscription canceled', err)
     })
     this.on('subscribe:fail', (err) => {
       this.error('Subscription failed', err)
