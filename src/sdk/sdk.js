@@ -112,7 +112,7 @@ const Notimatica = {
    * Load enabled plugins.
    */
   _loadPlugins () {
-    this._enabledPlugins = filterObject(this.options.plugins, (plugin) => plugin.enable)
+    this._enabledPlugins = filterObject(this.options.plugins, (plugin) => plugin.enabled)
 
     if (Object.keys(this._enabledPlugins).length === 0) {
       return this.emit('plugin:all-ready')

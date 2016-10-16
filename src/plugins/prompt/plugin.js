@@ -87,6 +87,9 @@ class Plugin extends AbstractPlugin {
       Notimatica.on('subscribe:do', () => {
         $('.notimatica-prompt').addClass('in')
       })
+      Notimatica.on('user:interact', () => {
+        $('.notimatica-prompt').addClass('in')
+      })
 
       resolve()
     })

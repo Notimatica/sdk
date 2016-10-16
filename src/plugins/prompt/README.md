@@ -12,7 +12,7 @@ Snappy way to replace default browser subscription prompt. Particularly useful i
     project: 'PROJECT_ID',
     plugins: {
       prompt: {
-        enable: true
+        enabled: true
       }
     }
   }]);

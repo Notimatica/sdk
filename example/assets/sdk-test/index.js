@@ -2,14 +2,14 @@
 
 var options = {
   emulate: true,
-  debug: false,
+  debug: true,
   autoSubscribe: true,
   extra: {
     source: 'playground'
   },
   plugins: {
     button: {
-      enable: true
+      enabled: true
     }
   },
   strings: {
@@ -57,7 +57,7 @@ $(function () {
     Notimatica.push(['resetSDK'])
     options.plugins = {
       button: {
-        enable: true
+        enabled: true
       }
     }
     init(options)
@@ -66,7 +66,7 @@ $(function () {
     Notimatica.push(['resetSDK'])
     options.plugins = {
       prompt: {
-        enable: true
+        enabled: true
       }
     }
     init(options)

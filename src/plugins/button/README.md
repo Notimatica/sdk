@@ -11,7 +11,7 @@ Simple way to provide user action button to subscribe to notifications. With nic
     project: 'PROJECT_ID',
     plugins: {
       button: {
-        enable: true,
+        enabled: true,
         position: 'bottom-left'
       }
     }
